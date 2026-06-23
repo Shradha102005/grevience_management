@@ -1,0 +1,2 @@
+# Pyrefly configuration — use the project venv so all packages resolve correctly
+python_interpreter = ".venv/Scripts/python.exe"
