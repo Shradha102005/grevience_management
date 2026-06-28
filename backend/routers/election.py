@@ -1,5 +1,5 @@
 """
-Election Campaign router — AI speech generation + Twilio outreach.
+Election Campaign router - AI speech generation + Twilio outreach.
 
 Roles:
   Admin / Officer → generate speeches, launch outreach campaigns, view history
@@ -8,7 +8,7 @@ Roles:
 Gemini integration:
   If GEMINI_API_KEY is set in .env, uses google-generativeai to generate a
   polished campaign speech.  If not set (or on error), falls back to a
-  well-crafted template speech — the mock flag is persisted to the DB so the
+  well-crafted template speech - the mock flag is persisted to the DB so the
   UI can display an appropriate notice.
 """
 
@@ -54,9 +54,9 @@ if GROQ_API_KEY:
         _GROQ_AVAILABLE = True
         logger.info("Groq client initialised for election speech generation.")
     except Exception as exc:
-        logger.warning(f"Groq initialisation failed: {exc} — running in mock mode.")
+        logger.warning(f"Groq initialisation failed: {exc} - running in mock mode.")
 else:
-    logger.info("GROQ_API_KEY not set — election speech generator in mock mode.")
+    logger.info("GROQ_API_KEY not set - election speech generator in mock mode.")
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
@@ -85,20 +85,13 @@ def _mock_speech(req: SpeechGenerateRequest) -> str:
         f"  • {p.strip()}" for p in req.key_points.splitlines() if p.strip()
     )
     return (
-        f"Respected {audience_label}, esteemed guests, and my dear friends,\n\n"
-        f"I stand before you today, humbled and honoured by your trust, as {req.candidate_name} "
-        f"— a committed servant of the people, driven by one singular purpose: "
-        f"a better tomorrow for every one of us.\n\n"
-        f"Our campaign stands firmly on the theme of **{req.theme}**. "
-        f"This is not just a slogan — it is a solemn promise backed by a clear action plan.\n\n"
-        f"Here is what we will achieve together:\n"
-        f"{points_list}\n\n"
-        f"We believe that every citizen deserves a voice that is heard, a future that is bright, "
-        f"and a government that truly works for the people.\n\n"
-        f"When you cast your vote for {req.candidate_name}, you are not just choosing a candidate — "
-        f"you are choosing progress, integrity, and the unwavering promise of change.\n\n"
-        f"Together, we will build a community that every one of us can be proud to call home.\n\n"
-        f"Jai Hind! Jai Bharat!\n\nThank you."
+        f"Campaign Message from {req.candidate_name}:\n"
+        f"Dear {audience_label},\n"
+        f"I stand before you to promise a better tomorrow through **{req.theme}**.\n"
+        f"Together we will achieve:\n"
+        f"{points_list}\n"
+        f"Vote for progress. Vote for {req.candidate_name}.\n"
+        f"Jai Hind!"
     )
 
 
@@ -113,11 +106,12 @@ def _generate_speech_with_groq(req: SpeechGenerateRequest) -> str:
         f"Target audience: {audience_label}\n"
         f"Key talking points (include all of these):\n{req.key_points}\n\n"
         f"Requirements:\n"
-        f"- Length: 300–400 words\n"
+        f"- Maximum Length: STRICTLY UNDER 350 characters (around 40-50 words) so it fits in a Trial Twilio SMS limit\n"
         f"- Tone: Inspiring, confident, warm, and personal\n"
-        f"- Include a powerful opening, three substantive paragraphs addressing the key points, "
+        f"- Include a powerful opening, substantive paragraphs addressing the key points, "
         f"and a strong closing call-to-action\n"
         f"- End with an appropriate patriotic closing\n"
+        f"- Do NOT use the em-dash (-) or other special Unicode characters, use standard hyphens (-)\n"
         f"- Do NOT include any stage directions or formatting notes\n"
         f"- Output only the speech text, no preamble"
     )
@@ -217,16 +211,23 @@ def launch_outreach(
     if not session:
         raise HTTPException(status_code=404, detail="Campaign session not found.")
 
-    # Build a concise SMS / call message from the first 300 chars of the speech
-    speech_preview = session.generated_speech[:300].rstrip()
+    # Strip non-ASCII characters to force GSM-7 encoding (prevents 70-char segment limit & Error 30044)
+    # This removes smart quotes, bullet points, and em-dashes that the AI might generate.
+    safe_speech = session.generated_speech.encode('ascii', 'ignore').decode('ascii')
+    
+    # Twilio limits SMS messages to 1600 characters. We'll send as much as possible.
+    speech_preview = safe_speech[:1450].rstrip()
+    if len(safe_speech) > 1450:
+        speech_preview += "..."
+    
     sms_text = (
         f"Campaign Message from {session.candidate_name}:\n"
-        f"{speech_preview}...\n"
+        f"{speech_preview}\n"
         f"Theme: {session.theme} | CIVICOS Campaign Platform"
     )
     call_text = (
         f"Hello, this is a campaign message from {session.candidate_name}. "
-        f"{session.generated_speech[:500]}. "
+        f"{session.generated_speech[:1450]} "
         f"Thank you for listening. Vote wisely."
     )
 
@@ -262,7 +263,7 @@ def launch_outreach(
     )
 
 
-# ── GET /campaigns — list all sessions ───────────────────────────────────────
+# ── GET /campaigns - list all sessions ───────────────────────────────────────
 
 @router.get("/campaigns", response_model=List[CampaignSessionResponse])
 def list_campaigns(
@@ -278,7 +279,7 @@ def list_campaigns(
     return [_build_session_response(s) for s in sessions]
 
 
-# ── GET /campaigns/{id} — session detail ──────────────────────────────────────
+# ── GET /campaigns/{id} - session detail ──────────────────────────────────────
 
 @router.get("/campaigns/{session_id}", response_model=CampaignSessionResponse)
 def get_campaign(

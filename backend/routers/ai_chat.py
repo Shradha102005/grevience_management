@@ -160,12 +160,12 @@ class AgricultureAnalysisResponse(BaseModel):
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
-def _call_groq(messages: list[dict], max_tokens: int = 512) -> str:
+def _call_groq(messages: list[dict[str, str]], max_tokens: int = 512) -> str:
     """Call Groq API and return the assistant reply string."""
     if _MOCK_AI or _groq is None:
         raise RuntimeError("Mock mode")
-    resp = _groq.chat.completions.create(
-        model="llama3-8b-8192",
+    resp = _groq.chat.completions.create(  # pyrefly: ignore
+        model="llama-3.1-8b-instant",
         messages=messages,  # type: ignore[arg-type]
         max_tokens=max_tokens,
         temperature=0.7,
@@ -242,7 +242,9 @@ async def agriculture_analyze(
     description: str = Form(default=""),
     language: str = Form(default="en"),
 ) -> AgricultureAnalysisResponse:
-    """Analyze a crop photo and return disease/pest diagnosis."""
+    """Analyze crop symptoms and return AI disease/pest diagnosis."""
+    import json, re
+
     mock_result = AgricultureAnalysisResponse(
         diagnosis="Bacterial Leaf Blight",
         confidence=87,
@@ -260,47 +262,61 @@ async def agriculture_analyze(
         is_mock=True,
     )
 
-    if _MOCK_AI:
+    if _MOCK_AI or _groq is None:
         return mock_result
 
+    symptom = description.strip() or "general crop disease symptoms"
+    lang_instruction = _build_language_instruction(language)
+
+    system_prompt = (
+        "You are an expert Indian agricultural scientist. "
+        "Based on the farmer's crop symptom description, respond ONLY with a valid JSON object "
+        "in this exact format (no markdown, no extra text):\n"
+        '{"diagnosis": "<disease or condition name>", "confidence": <integer 60-99>, '
+        '"treatment": ["<step 1>", "<step 2>", "<step 3>", "<step 4>"], '
+        '"schemes": ["<scheme 1>", "<scheme 2>", "<scheme 3>"]}'
+        + lang_instruction
+    )
+
+    user_msg = (
+        f"A farmer reports the following crop symptoms: {symptom}. "
+        "Diagnose the most likely disease or deficiency, give a confidence percentage, "
+        "4 specific treatment steps, and 3 relevant Indian government schemes."
+    )
+
     try:
-        contents = await image.read()
-        b64_image = base64.standard_b64encode(contents).decode()
-        lang_instruction = _build_language_instruction(language)
-
-        prompt = (
-            f"You are an expert agricultural scientist analyzing a crop photo. "
-            f"The farmer describes: '{description or 'Please analyze this crop image'}'. "
-            f"Provide: 1) Disease/pest name and confidence %, 2) Treatment steps (numbered), "
-            f"3) Relevant government schemes the farmer should know about. "
-            f"Format response as JSON: {{\"diagnosis\": str, \"confidence\": int, \"treatment\": [str], \"schemes\": [str]}}"
-            + lang_instruction
+        resp = _groq.chat.completions.create(  # pyrefly: ignore
+            model="llama-3.1-8b-instant",
+            messages=[  # type: ignore[arg-type]
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_msg},
+            ],
+            max_tokens=700,
+            temperature=0.4,
+            response_format={"type": "json_object"},
         )
+        raw = (resp.choices[0].message.content or "").strip()
 
-        # Note: llama3-8b-8192 doesn't support vision; use text-based diagnosis from description
-        messages = [
-            {"role": "system", "content": "You are an expert agricultural scientist."},
-            {"role": "user", "content": f"{prompt}\n\nFarmer's description: {description or 'leaf discoloration, brown spots'}"},
-        ]
-        reply = _call_groq(messages, max_tokens=600)
-
-        # Try to parse JSON, fallback to mock
-        import json
+        # Primary parse
         try:
-            data = json.loads(reply)
-            return AgricultureAnalysisResponse(
-                diagnosis=data.get("diagnosis", "Unknown"),
-                confidence=int(data.get("confidence", 80)),
-                treatment=data.get("treatment", []),
-                schemes=data.get("schemes", []),
-                is_mock=False,
-            )
-        except Exception:
-            return mock_result
+            data = json.loads(raw)
+        except json.JSONDecodeError:
+            # Fallback: extract first {...} block from response
+            match = re.search(r"\{.*\}", raw, re.DOTALL)
+            data = json.loads(match.group()) if match else {}
+
+        return AgricultureAnalysisResponse(
+            diagnosis=str(data.get("diagnosis", "Unknown condition")),
+            confidence=int(data.get("confidence", 80)),
+            treatment=list(data.get("treatment", [])),
+            schemes=list(data.get("schemes", [])),
+            is_mock=False,
+        )
 
     except Exception as exc:
         logger.error(f"Agriculture analyze error: {exc}")
         return mock_result
+
 
 
 @router.get("/status")
@@ -308,7 +324,7 @@ def ai_status() -> dict:
     """Return current AI mode (live or mock)."""
     return {
         "mode": "mock" if _MOCK_AI else "live",
-        "model": "llama3-8b-8192" if not _MOCK_AI else None,
+        "model": "llama-3.1-8b-instant" if not _MOCK_AI else None,
         "supported_modules": list(MODULE_PROMPTS.keys()),
         "supported_languages": LANGUAGE_MAP,
     }

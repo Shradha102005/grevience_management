@@ -1,5 +1,5 @@
 """
-Disaster Alert router — all endpoints for the Disaster & Emergency module.
+Disaster Alert router - all endpoints for the Disaster & Emergency module.
 
 Roles:
   Admin  → create/broadcast alerts, resolve/cancel, view stats
@@ -133,14 +133,14 @@ def _do_broadcast(alert_id: uuid.UUID, db_url: str) -> None:
         engine.dispose()
 
 
-# ── GET /zones — list valid zones ─────────────────────────────────────────────
+# ── GET /zones - list valid zones ─────────────────────────────────────────────
 
 @router.get("/zones", response_model=List[str])
 def list_zones():
     return VALID_ZONES
 
 
-# ── GET /alerts — list alerts (role-filtered) ─────────────────────────────────
+# ── GET /alerts - list alerts (role-filtered) ─────────────────────────────────
 
 @router.get("/alerts", response_model=List[AlertResponse])
 def list_alerts(
@@ -174,7 +174,7 @@ def list_alerts(
     return [_build_alert_response(a, db) for a in alerts]
 
 
-# ── GET /alerts/{id} — alert detail ──────────────────────────────────────────
+# ── GET /alerts/{id} - alert detail ──────────────────────────────────────────
 
 @router.get("/alerts/{alert_id}", response_model=AlertResponse)
 def get_alert(
@@ -188,7 +188,7 @@ def get_alert(
     return _build_alert_response(alert, db)
 
 
-# ── POST /alerts — Admin: create & broadcast ──────────────────────────────────
+# ── POST /alerts - Admin: create & broadcast ──────────────────────────────────
 
 @router.post("/alerts", response_model=AlertResponse, status_code=status.HTTP_201_CREATED)
 def create_alert(
@@ -225,7 +225,7 @@ def create_alert(
     )
 
     if "All Zones" not in body.affected_zones:
-        # Filter by zone — include users whose zone is in affected_zones
+        # Filter by zone - include users whose zone is in affected_zones
         matching_users = [
             u for u in user_q.all()
             if u.zone and u.zone in body.affected_zones
@@ -255,7 +255,7 @@ def create_alert(
     return _build_alert_response(alert, db)
 
 
-# ── PUT /alerts/{id}/resolve — Admin: resolve an alert ───────────────────────
+# ── PUT /alerts/{id}/resolve - Admin: resolve an alert ───────────────────────
 
 @router.put("/alerts/{alert_id}/resolve", response_model=AlertResponse)
 def resolve_alert(
@@ -274,7 +274,7 @@ def resolve_alert(
     return _build_alert_response(alert, db)
 
 
-# ── PUT /alerts/{id}/cancel — Admin: cancel an alert ─────────────────────────
+# ── PUT /alerts/{id}/cancel - Admin: cancel an alert ─────────────────────────
 
 @router.put("/alerts/{alert_id}/cancel", response_model=AlertResponse)
 def cancel_alert(
@@ -292,7 +292,7 @@ def cancel_alert(
     return _build_alert_response(alert, db)
 
 
-# ── POST /alerts/{id}/acknowledge — Officer/Citizen acknowledge ───────────────
+# ── POST /alerts/{id}/acknowledge - Officer/Citizen acknowledge ───────────────
 
 @router.post("/alerts/{alert_id}/acknowledge", response_model=MessageResponse)
 def acknowledge_alert(
@@ -318,7 +318,7 @@ def acknowledge_alert(
     return MessageResponse(message="Alert acknowledged")
 
 
-# ── POST /phone — Citizen/Officer: register phone number & zone ───────────────
+# ── POST /phone - Citizen/Officer: register phone number & zone ───────────────
 
 @router.post("/phone", response_model=UserResponse)
 def register_phone(
@@ -337,7 +337,7 @@ def register_phone(
     return UserResponse.model_validate(current_user)
 
 
-# ── GET /stats — Admin: summary statistics ────────────────────────────────────
+# ── GET /stats - Admin: summary statistics ────────────────────────────────────
 
 @router.get("/stats", response_model=AlertStats)
 def get_stats(
@@ -363,7 +363,7 @@ def get_stats(
     )
 
 
-# ── GET /twilio-status — check if Twilio is live or mock ─────────────────────
+# ── GET /twilio-status - check if Twilio is live or mock ─────────────────────
 
 @router.get("/twilio-status")
 def twilio_status(current_user: User = Depends(get_current_user)):

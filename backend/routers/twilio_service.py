@@ -2,7 +2,7 @@
 Twilio SMS & Voice Call service with graceful mock fallback.
 
 If TWILIO_ACCOUNT_SID / TWILIO_AUTH_TOKEN / TWILIO_FROM_NUMBER are not set
-in the environment, all calls succeed silently in "mock" mode — the UI still
+in the environment, all calls succeed silently in "mock" mode - the UI still
 works and delivery rows are recorded with status="mock".
 """
 
@@ -20,7 +20,7 @@ except ImportError:
     TwilioClient = None         # type: ignore[assignment,misc]
     TwilioRestException = None  # type: ignore[assignment,misc]
     _TWILIO_AVAILABLE = False
-    logger.warning("twilio package not installed — running in mock mode")
+    logger.warning("twilio package not installed - running in mock mode")
 
 # ── Read credentials ─────────────────────────────────────────────────────────
 ACCOUNT_SID  = os.getenv("TWILIO_ACCOUNT_SID", "")  # pyrefly: ignore
@@ -41,7 +41,7 @@ if not _MOCK_MODE and TwilioClient is not None:  # pyrefly: ignore
 else:
     _twilio = None
     if not _MOCK_MODE:
-        logger.info("Twilio credentials not set — running in mock mode")
+        logger.info("Twilio credentials not set - running in mock mode")
 
 
 def is_mock() -> bool:
@@ -58,13 +58,18 @@ def send_sms(to: str, message: str) -> dict:
         logger.info(f"[MOCK SMS] To: {to} | Msg: {message[:60]}...")
         return {"sid": None, "status": "mock", "error": None}
 
+    # Force GSM-7 encoding by stripping non-ASCII characters (e.g. smart quotes, bullet points, em-dashes).
+    # If Unicode characters are sent, Twilio switches to UCS-2 encoding which reduces the segment limit from 160 to 70 chars.
+    # This leads to a massive segment bloat, causing Trial accounts to fail with Error 30044.
+    safe_message = message.encode('ascii', 'ignore').decode('ascii')
+
     try:
         msg = _twilio.messages.create(  # type: ignore[union-attr]
-            body=message,
+            body=safe_message,
             from_=FROM_NUMBER,
             to=to,
         )
-        logger.info(f"SMS sent to {to} — SID: {msg.sid}")
+        logger.info(f"SMS sent to {to} - SID: {msg.sid}")
         return {"sid": msg.sid, "status": "sent", "error": None}
     except Exception as exc:
         logger.error(f"SMS failed to {to}: {exc}")
@@ -94,7 +99,7 @@ def make_call(to: str, message: str) -> dict:
             from_=FROM_NUMBER,
             to=to,
         )
-        logger.info(f"Call initiated to {to} — SID: {call.sid}")
+        logger.info(f"Call initiated to {to} - SID: {call.sid}")
         return {"sid": call.sid, "status": "sent", "error": None}
     except Exception as exc:
         logger.error(f"Call failed to {to}: {exc}")
@@ -114,7 +119,7 @@ def broadcast_alert(
       [{"phone": str, "sms": result_dict, "call": result_dict | None}]
     """
     sms_message = (
-        f"ALERT [{severity.upper()}] — {alert_title}\n"
+        f"ALERT [{severity.upper()}] - {alert_title}\n"
         f"{alert_description}\n"
         "Issued by: CIVICOS Emergency Services. Stay safe and follow official instructions."
     )

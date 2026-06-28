@@ -9,6 +9,8 @@ export const Route = createFileRoute("/portal")({
     ],
   }),
   beforeLoad: () => {
+    // Guard for SSR — localStorage is not available on the server
+    if (typeof window === "undefined") return;
     const token = localStorage.getItem("access_token");
     if (!token) {
       throw redirect({ to: "/login" });
