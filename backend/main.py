@@ -1,9 +1,12 @@
 from dotenv import load_dotenv
 load_dotenv()  # Load .env before any os.getenv() calls in routers
 
+import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+logger = logging.getLogger(__name__)
 
 from database import init_db
 from routers import auth as auth_router
@@ -17,6 +20,14 @@ from routers import live_data as live_data_router
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     init_db()
+    # Launch Playwright scheme scraper in the background (non-blocking)
+    try:
+        from routers.scheme_scraper import background_scrape_loop
+        import asyncio
+        asyncio.create_task(background_scrape_loop())
+        logger.info("📡 Scheme scraper background task scheduled.")
+    except Exception as e:
+        logger.warning(f"Could not start scheme scraper: {e}")
     yield
 
 

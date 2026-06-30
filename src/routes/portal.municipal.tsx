@@ -2,20 +2,17 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect, useCallback } from "react";
 import {
   Building2, MapPin, RefreshCw, Plus, Search, Filter, Pencil, 
-  MoreHorizontal, MessageSquare, Clock, AlignLeft, CheckCircle2,
-  AlertCircle, ChevronRight, X, ArrowUpCircle, ArrowDownCircle, MinusCircle, ListTodo
+  Clock, CheckCircle2, AlertCircle, ArrowUpCircle, ArrowDownCircle, 
+  MinusCircle, ShieldCheck, ArrowLeft, Send
 } from "lucide-react";
-import { PageHeader } from "@/components/portal/portal-shell";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth-context";
 import api from "@/lib/api";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -40,12 +37,20 @@ interface PublicComplaint {
 
 const CATEGORIES = ["Road Damage", "Street Lights", "Garbage", "Water Leakage", "Drainage", "Traffic Signals", "Public Safety", "Parks", "Other"];
 const STATUSES = ["Submitted", "Under Review", "Assigned", "In Progress", "Resolved", "Closed"];
-const PRIORITIES = ["Low", "Medium", "High"];
 
 const priorityIcon: Record<string, any> = {
-  High: <ArrowUpCircle className="h-3 w-3 text-destructive" />,
-  Medium: <MinusCircle className="h-3 w-3 text-warning" />,
-  Low: <ArrowDownCircle className="h-3 w-3 text-muted-foreground" />,
+  High: <ArrowUpCircle className="h-4 w-4 text-red-500" />,
+  Medium: <MinusCircle className="h-4 w-4 text-amber-500" />,
+  Low: <ArrowDownCircle className="h-4 w-4 text-slate-400" />,
+};
+
+const statusColors: Record<string, string> = {
+  "Submitted": "bg-slate-100 text-slate-600 border-slate-200",
+  "Under Review": "bg-blue-50 text-blue-600 border-blue-200",
+  "Assigned": "bg-indigo-50 text-indigo-600 border-indigo-200",
+  "In Progress": "bg-amber-50 text-amber-600 border-amber-200",
+  "Resolved": "bg-emerald-50 text-emerald-600 border-emerald-200",
+  "Closed": "bg-slate-100 text-slate-500 border-slate-200",
 };
 
 function timeAgo(iso: string) {
@@ -97,8 +102,9 @@ function Municipal() {
   }, [statusFilter, search, activeItem]);
 
   useEffect(() => {
-    const timer = setTimeout(fetchIssues, 300);
-    return () => clearTimeout(timer);
+    fetchIssues();
+    const timer = setInterval(fetchIssues, 3000);
+    return () => clearInterval(timer);
   }, [fetchIssues]);
 
   const handleCreate = async () => {
@@ -124,46 +130,60 @@ function Municipal() {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-6rem)] gap-0 bg-background text-foreground">
-      {/* Top Header / View Bar */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-border/50 bg-card">
+    <div className="-m-6 flex flex-col h-[calc(100vh-4rem)] relative overflow-hidden font-sans" style={{ background: "#f1f5f9" }}>
+      
+      {/* ── Ambient Background (Light Theme Premium) ── */}
+      <div className="absolute inset-0 z-0 pointer-events-none opacity-60" style={{
+        backgroundImage: `
+          radial-gradient(circle at 15% 50%, rgba(167, 139, 250, 0.15), transparent 30%),
+          radial-gradient(circle at 85% 30%, rgba(56, 189, 248, 0.15), transparent 30%),
+          radial-gradient(circle at 50% 80%, rgba(52, 211, 153, 0.15), transparent 40%)
+        `
+      }} />
+      <div className="absolute inset-0 z-0 pointer-events-none" style={{ backgroundImage: "radial-gradient(rgba(148, 163, 184, 0.1) 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
+
+      {/* ── Top Header Glass ── */}
+      <div className="flex items-center justify-between px-8 py-5 z-10 shrink-0" style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.5)" }}>
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <div className="h-6 w-6 rounded bg-primary/10 flex items-center justify-center text-primary"><ListTodo className="h-4 w-4" /></div>
-            <span className="font-semibold text-sm">Issue Tracker</span>
-            <span className="text-muted-foreground text-sm px-2">/</span>
-            <span className="text-sm font-medium">All Issues</span>
+          <div className="h-12 w-12 rounded-2xl flex items-center justify-center text-blue-600 shadow-xl shadow-blue-500/10" style={{ background: "linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)", border: "1px solid rgba(255,255,255,0.8)" }}>
+            <ShieldCheck className="h-6 w-6" />
+          </div>
+          <div>
+            <h1 className="font-extrabold text-slate-900 text-xl tracking-tight">Municipal Command AI</h1>
+            <p className="text-sm text-slate-500 font-semibold tracking-wide">Live Operations Console</p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="relative">
-            <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
-            <Input className="h-7 pl-8 text-xs w-64 bg-muted/20 border-transparent hover:border-border focus:border-border" placeholder="Search issues..." value={search} onChange={e => setSearch(e.target.value)} />
+        
+        <div className="flex items-center gap-3">
+          <div className="relative shadow-sm rounded-xl">
+            <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <Input className="h-10 pl-10 text-sm w-64 bg-white/70 border-white shadow-sm text-slate-800 focus:border-blue-300 focus:ring-4 focus:ring-blue-500/10 rounded-xl transition-all placeholder:text-slate-400" placeholder="Search operations..." value={search} onChange={e => setSearch(e.target.value)} />
           </div>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="h-7 text-xs w-32 bg-muted/20 border-transparent hover:border-border focus:border-border"><Filter className="h-3.5 w-3.5 mr-2 opacity-50" /><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all" className="text-xs">All Statuses</SelectItem>
-              {STATUSES.map(s => <SelectItem key={s} value={s} className="text-xs">{s}</SelectItem>)}
+            <SelectTrigger className="h-10 text-sm w-40 bg-white/70 border-white shadow-sm text-slate-700 rounded-xl font-medium"><Filter className="h-3.5 w-3.5 mr-2 opacity-50" /><SelectValue /></SelectTrigger>
+            <SelectContent className="bg-white/90 backdrop-blur-xl border-white shadow-xl rounded-xl">
+              <SelectItem value="all">All Statuses</SelectItem>
+              {STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
             </SelectContent>
           </Select>
-          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={fetchIssues}><RefreshCw className="h-3.5 w-3.5" /></Button>
+          <Button variant="outline" size="icon" className="h-10 w-10 border-white bg-white/70 text-slate-600 hover:bg-white shadow-sm rounded-xl" onClick={fetchIssues}><RefreshCw className="h-4 w-4" /></Button>
+          
           <Dialog open={newIssueOpen} onOpenChange={setNewIssueOpen}>
             <DialogTrigger asChild>
-              <Button size="sm" className="h-7 text-xs px-3 ml-2"><Pencil className="mr-2 h-3 w-3" /> New Issue</Button>
+              <Button className="h-10 bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20 font-bold px-5 ml-2 rounded-xl transition-transform hover:scale-105"><Plus className="mr-2 h-4 w-4" /> Report Issue</Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px]">
-              <DialogHeader><DialogTitle className="text-sm">Create Issue</DialogTitle></DialogHeader>
-              <div className="space-y-4 pt-2">
-                 <div className="grid gap-2"><Label className="text-xs">Title</Label><Input className="h-8 text-xs" value={newForm.title} onChange={e => setNewForm(f => ({...f, title: e.target.value}))} /></div>
+            <DialogContent className="sm:max-w-[500px] bg-white/90 backdrop-blur-2xl border-white shadow-2xl rounded-2xl text-slate-800">
+              <DialogHeader><DialogTitle className="text-slate-900 font-bold text-xl">Create Operation Ticket</DialogTitle></DialogHeader>
+              <div className="space-y-4 pt-4">
+                 <div className="grid gap-2"><Label className="text-sm font-bold text-slate-700">Subject</Label><Input className="h-11 bg-white/50 border-slate-200 rounded-xl" value={newForm.title} onChange={e => setNewForm(f => ({...f, title: e.target.value}))} /></div>
                  <div className="grid grid-cols-2 gap-4">
-                   <div className="grid gap-2"><Label className="text-xs">Category</Label><Select value={newForm.category} onValueChange={v => setNewForm(f => ({...f, category: v}))}><SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger><SelectContent>{CATEGORIES.map(c => <SelectItem key={c} value={c} className="text-xs">{c}</SelectItem>)}</SelectContent></Select></div>
-                   <div className="grid gap-2"><Label className="text-xs">Location</Label><Input className="h-8 text-xs" value={newForm.location} onChange={e => setNewForm(f => ({...f, location: e.target.value}))} /></div>
+                   <div className="grid gap-2"><Label className="text-sm font-bold text-slate-700">Category</Label><Select value={newForm.category} onValueChange={v => setNewForm(f => ({...f, category: v}))}><SelectTrigger className="h-11 bg-white/50 border-slate-200 rounded-xl"><SelectValue /></SelectTrigger><SelectContent className="bg-white rounded-xl">{CATEGORIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent></Select></div>
+                   <div className="grid gap-2"><Label className="text-sm font-bold text-slate-700">Location</Label><Input className="h-11 bg-white/50 border-slate-200 rounded-xl" value={newForm.location} onChange={e => setNewForm(f => ({...f, location: e.target.value}))} /></div>
                  </div>
-                 <div className="grid gap-2"><Label className="text-xs">Description</Label><Textarea className="h-20 text-xs resize-none" value={newForm.description} onChange={e => setNewForm(f => ({...f, description: e.target.value}))} /></div>
-                 <div className="flex justify-end gap-2 pt-2">
-                   <Button variant="ghost" className="h-8 text-xs" onClick={() => setNewIssueOpen(false)}>Cancel</Button>
-                   <Button className="h-8 text-xs" onClick={handleCreate} disabled={submitting}>Create Issue</Button>
+                 <div className="grid gap-2"><Label className="text-sm font-bold text-slate-700">Description</Label><Textarea className="h-28 bg-white/50 border-slate-200 rounded-xl resize-none" value={newForm.description} onChange={e => setNewForm(f => ({...f, description: e.target.value}))} /></div>
+                 <div className="flex justify-end gap-3 pt-6">
+                   <Button variant="ghost" className="h-11 rounded-xl text-slate-600 hover:bg-slate-100 font-bold" onClick={() => setNewIssueOpen(false)}>Cancel</Button>
+                   <Button className="h-11 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 shadow-lg shadow-blue-500/20" onClick={handleCreate} disabled={submitting}>Deploy Ticket</Button>
                  </div>
               </div>
             </DialogContent>
@@ -171,132 +191,170 @@ function Municipal() {
         </div>
       </div>
 
-      <div className="flex flex-1 min-h-0">
-        {/* Main List */}
-        <div className={`flex-1 flex flex-col min-h-0 bg-background ${activeItem ? 'hidden md:flex border-r border-border' : 'flex'}`}>
-          <div className="flex-1 overflow-auto">
-            <Table>
-              <TableHeader className="sticky top-0 bg-card z-10 shadow-sm">
-                <TableRow className="hover:bg-transparent border-b border-border/50">
-                  <TableHead className="h-8 py-1 px-4 text-[10px] font-semibold uppercase tracking-wider w-24">ID</TableHead>
-                  <TableHead className="h-8 py-1 text-[10px] font-semibold uppercase tracking-wider w-10"></TableHead>
-                  <TableHead className="h-8 py-1 text-[10px] font-semibold uppercase tracking-wider">Title</TableHead>
-                  <TableHead className="h-8 py-1 text-[10px] font-semibold uppercase tracking-wider w-32">Status</TableHead>
-                  <TableHead className="h-8 py-1 text-[10px] font-semibold uppercase tracking-wider w-32 hidden lg:table-cell">Category</TableHead>
-                  <TableHead className="h-8 py-1 text-[10px] font-semibold uppercase tracking-wider w-24 text-right">Created</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {complaints.length === 0 && !loading && (
-                  <TableRow><TableCell colSpan={6} className="h-24 text-center text-xs text-muted-foreground">No issues found.</TableCell></TableRow>
-                )}
-                {complaints.map(c => (
-                  <TableRow 
-                    key={c.id} 
-                    className={`cursor-pointer group border-b border-border/30 ${activeItem?.id === c.id ? 'bg-primary/5' : 'hover:bg-muted/30'}`}
-                    onClick={() => { setActiveItem(c); setUpdateStatus(c.status); }}
-                  >
-                    <TableCell className="py-2.5 px-4 text-[11px] font-mono text-muted-foreground font-medium">{c.complaint_number}</TableCell>
-                    <TableCell className="py-2.5 text-center">{priorityIcon[c.priority]}</TableCell>
-                    <TableCell className="py-2.5 text-[13px] font-medium truncate max-w-[200px]">{c.title}</TableCell>
-                    <TableCell className="py-2.5">
-                       <span className="inline-flex items-center text-[11px] px-1.5 py-0.5 rounded-sm border border-border/50 bg-background">
-                         <div className={`h-1.5 w-1.5 rounded-full mr-1.5 ${c.status === 'Resolved' || c.status === 'Closed' ? 'bg-success' : c.status === 'In Progress' ? 'bg-warning' : 'bg-muted-foreground'}`} />
-                         {c.status}
-                       </span>
-                    </TableCell>
-                    <TableCell className="py-2.5 text-[12px] text-muted-foreground hidden lg:table-cell">{c.category}</TableCell>
-                    <TableCell className="py-2.5 text-[11px] text-muted-foreground text-right font-mono">{timeAgo(c.created_at)}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        </div>
-
-        {/* Side Panel Detail */}
-        {activeItem && (
-          <div className="w-full md:w-[400px] lg:w-[450px] shrink-0 bg-card flex flex-col min-h-0 shadow-[-10px_0_15px_-3px_rgba(0,0,0,0.05)] z-20 animate-in slide-in-from-right-8 duration-200">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-border/50 bg-background/50 backdrop-blur sticky top-0">
-              <div className="flex items-center gap-2">
-                <Badge variant="outline" className="text-[10px] font-mono bg-background">{activeItem.complaint_number}</Badge>
-                {isStaff && (
-                  <Select value={updateStatus} onValueChange={v => { setUpdateStatus(v); handleUpdateStatus(); }}>
-                    <SelectTrigger className="h-6 text-[10px] bg-background border-border/50 w-[120px] shadow-none"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {STATUSES.map(s => <SelectItem key={s} value={s} className="text-xs">{s}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                )}
-              </div>
-              <div className="flex items-center gap-1">
-                <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground"><MoreHorizontal className="h-4 w-4" /></Button>
-                <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground" onClick={() => setActiveItem(null)}><X className="h-4 w-4" /></Button>
-              </div>
-            </div>
-
-            <div className="flex-1 overflow-auto p-5 space-y-6">
-               <div>
-                 <h2 className="text-lg font-bold leading-tight mb-2">{activeItem.title}</h2>
-                 <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">{activeItem.description || "No description provided."}</p>
-               </div>
-
-               <div className="grid grid-cols-2 gap-y-4 gap-x-6 py-4 border-y border-border/50">
-                 <div>
-                   <p className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Status</p>
-                   <span className="text-xs font-medium flex items-center gap-1.5"><div className="h-1.5 w-1.5 rounded-full bg-primary" /> {activeItem.status}</span>
-                 </div>
-                 <div>
-                   <p className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Priority</p>
-                   <span className="text-xs font-medium flex items-center gap-1.5">{priorityIcon[activeItem.priority]} {activeItem.priority}</span>
-                 </div>
-                 <div>
-                   <p className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Category</p>
-                   <span className="text-xs font-medium">{activeItem.category}</span>
-                 </div>
-                 <div>
-                   <p className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Location</p>
-                   <span className="text-xs font-medium flex items-center gap-1.5"><MapPin className="h-3 w-3 text-muted-foreground" /> {activeItem.location}</span>
-                 </div>
-                 <div className="col-span-2">
-                   <p className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Department</p>
-                   <span className="text-xs font-medium flex items-center gap-1.5"><Building2 className="h-3 w-3 text-muted-foreground" /> {activeItem.department}</span>
-                 </div>
-               </div>
-
-               <div>
-                 <p className="text-[10px] uppercase font-bold text-muted-foreground mb-3 flex items-center gap-1.5"><AlignLeft className="h-3 w-3" /> Activity</p>
-                 <div className="space-y-4">
-                   <div className="flex gap-3">
-                     <div className="mt-0.5 h-6 w-6 rounded-full bg-muted flex items-center justify-center shrink-0"><AlertCircle className="h-3 w-3 text-muted-foreground" /></div>
-                     <div>
-                       <p className="text-xs"><span className="font-semibold text-foreground">System</span> logged the issue.</p>
-                       <span className="text-[10px] text-muted-foreground font-mono">{new Date(activeItem.created_at).toLocaleString()}</span>
-                     </div>
-                   </div>
-                   {activeItem.status !== 'Submitted' && (
-                     <div className="flex gap-3">
-                       <div className="mt-0.5 h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center shrink-0"><Pencil className="h-3 w-3 text-primary" /></div>
-                       <div>
-                         <p className="text-xs"><span className="font-semibold text-foreground">Operator</span> updated status to {activeItem.status}.</p>
-                         <span className="text-[10px] text-muted-foreground font-mono">{new Date(activeItem.updated_at).toLocaleString()}</span>
-                       </div>
-                     </div>
-                   )}
-                 </div>
-               </div>
+      {/* ── Main Canvas Area ── */}
+      <div className="flex-1 flex overflow-hidden p-8 justify-center z-10">
+        
+        {/* VIEW 1: Premium Glass List */}
+        {!activeItem && (
+          <div className="w-full max-w-7xl h-full flex flex-col">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-extrabold text-slate-800 tracking-tight">Active Operations</h2>
+              <Badge className="bg-white text-blue-700 border-white shadow-sm px-4 py-1.5 text-xs font-bold rounded-full">Monitoring {complaints.length} tickets</Badge>
             </div>
             
-            {/* Comment Input */}
-            <div className="p-3 border-t border-border/50 bg-background/50">
-              <div className="relative">
-                 <Input className="pr-10 text-xs h-9 bg-card border-border shadow-none" placeholder="Add a comment..." />
-                 <Button size="icon" variant="ghost" className="absolute right-1 top-1 h-7 w-7 text-muted-foreground"><MessageSquare className="h-3.5 w-3.5" /></Button>
+            <div className="flex-1 overflow-y-auto space-y-4 pr-2 pb-10" style={{ scrollbarWidth: 'none' }}>
+              {complaints.length === 0 ? (
+                <div className="text-center p-20 bg-white/40 backdrop-blur-xl rounded-3xl border border-white shadow-xl text-slate-400 font-medium">
+                  <ShieldCheck className="h-16 w-16 mx-auto mb-4 text-slate-300" />
+                  All operations normal. No active issues.
+                </div>
+              ) : (
+                complaints.map((c, i) => (
+                  <div 
+                    key={c.id} 
+                    onClick={() => { setActiveItem(c); setUpdateStatus(c.status); }}
+                    className="group bg-white/60 backdrop-blur-xl border border-white shadow-lg shadow-slate-200/50 hover:shadow-xl hover:bg-white/80 rounded-2xl p-6 cursor-pointer transition-all hover:-translate-y-1 flex items-center gap-6"
+                    style={{ animation: `slideIn 0.3s cubic-bezier(0.16,1,0.3,1) ${i * 0.05}s both` }}
+                  >
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-3 mb-2.5">
+                        <span className="text-[11px] text-slate-500 font-mono font-bold bg-slate-100/80 px-2 py-0.5 rounded-md border border-slate-200">{c.complaint_number}</span>
+                        <span className={`text-[10px] font-extrabold uppercase tracking-widest px-2.5 py-0.5 rounded-md border ${statusColors[c.status] || 'bg-slate-100 text-slate-600 border-slate-200'}`}>
+                          {c.status}
+                        </span>
+                        <span className="text-[11px] text-slate-400 font-semibold">{timeAgo(c.created_at)}</span>
+                      </div>
+                      <h4 className="font-extrabold text-slate-800 text-lg leading-tight truncate group-hover:text-blue-600 transition-colors">{c.title}</h4>
+                      <p className="text-sm text-slate-500 mt-1.5 flex items-center gap-2 truncate font-medium">
+                        <MapPin className="h-4 w-4 shrink-0 text-slate-400" /> {c.location}
+                      </p>
+                    </div>
+                    
+                    <div className="flex items-center gap-6 shrink-0 border-l border-slate-200/50 pl-6">
+                      <div className="text-right">
+                        <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-1">Priority</p>
+                        <span className="text-sm font-bold text-slate-700 flex items-center gap-1.5 justify-end">
+                          {priorityIcon[c.priority]} {c.priority}
+                        </span>
+                      </div>
+                      <div className="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center group-hover:bg-blue-100 group-hover:text-blue-600 transition-colors text-slate-400">
+                        <ChevronRight className="h-5 w-5" />
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* VIEW 2: Premium Detail Modal/HUD */}
+        {activeItem && (
+          <div className="w-full max-w-7xl h-full flex flex-col bg-white/70 backdrop-blur-2xl border border-white shadow-2xl shadow-slate-300/50 rounded-[2rem] overflow-hidden animate-in zoom-in-95 duration-300">
+            
+            {/* HUD Header */}
+            <div className="px-10 py-8 border-b border-white/50 bg-white/40 flex justify-between items-start">
+              <div className="flex items-start gap-6">
+                <Button variant="ghost" size="icon" onClick={() => setActiveItem(null)} className="h-12 w-12 bg-white hover:bg-slate-50 border border-slate-100 text-slate-600 rounded-full shadow-sm shrink-0 transition-transform hover:scale-105">
+                  <ArrowLeft className="h-5 w-5" />
+                </Button>
+                <div>
+                  <div className="flex items-center gap-3 mb-3">
+                    <span className="bg-slate-800 text-white font-mono text-xs px-3 py-1 rounded-md font-bold shadow-md">{activeItem.complaint_number}</span>
+                    <span className={`text-[11px] font-extrabold uppercase tracking-widest px-3 py-1 rounded-md border shadow-sm ${statusColors[activeItem.status] || 'bg-slate-100 text-slate-600 border-slate-200'}`}>
+                      {activeItem.status}
+                    </span>
+                  </div>
+                  <h2 className="text-3xl font-black text-slate-900 tracking-tight leading-tight">{activeItem.title}</h2>
+                </div>
+              </div>
+
+              {isStaff && (
+                <div className="flex flex-col items-end gap-2 bg-white p-3 rounded-2xl border border-slate-100 shadow-sm">
+                  <Label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Update Status</Label>
+                  <Select value={updateStatus} onValueChange={v => { setUpdateStatus(v); handleUpdateStatus(); }}>
+                    <SelectTrigger className="h-10 text-sm font-bold bg-slate-50 border-transparent w-[200px] text-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10"><SelectValue /></SelectTrigger>
+                    <SelectContent className="bg-white rounded-xl shadow-xl border-slate-100">
+                      {STATUSES.map(s => <SelectItem key={s} value={s} className="font-bold">{s}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+            </div>
+
+            {/* HUD Body */}
+            <div className="p-10 flex-1 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                
+                {/* Left Column */}
+                <div className="lg:col-span-2 space-y-10">
+                  <div className="bg-white rounded-3xl p-8 border border-white shadow-xl shadow-slate-200/40">
+                    <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2"><AlignLeft className="h-4 w-4" /> Description</h3>
+                    <p className="text-[16px] text-slate-700 font-medium leading-relaxed whitespace-pre-wrap">
+                      {activeItem.description || "No detailed description provided by the reporter."}
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-6 bg-slate-900 rounded-3xl p-8 text-white shadow-2xl relative overflow-hidden">
+                    <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: "linear-gradient(45deg, #1e293b 25%, transparent 25%, transparent 75%, #1e293b 75%, #1e293b), linear-gradient(45deg, #1e293b 25%, transparent 25%, transparent 75%, #1e293b 75%, #1e293b)", backgroundSize: "20px 20px", backgroundPosition: "0 0, 10px 10px" }} />
+                    <div className="relative z-10">
+                      <p className="text-[10px] uppercase font-black text-slate-400 tracking-widest mb-2">Priority</p>
+                      <span className="text-xl font-bold flex items-center gap-3">{priorityIcon[activeItem.priority]} {activeItem.priority}</span>
+                    </div>
+                    <div className="relative z-10">
+                      <p className="text-[10px] uppercase font-black text-slate-400 tracking-widest mb-2">Category</p>
+                      <span className="text-xl font-bold">{activeItem.category}</span>
+                    </div>
+                    <div className="col-span-2 pt-6 border-t border-slate-700/50 relative z-10">
+                      <p className="text-[10px] uppercase font-black text-slate-400 tracking-widest mb-2">Assigned Department</p>
+                      <span className="text-xl font-bold flex items-center gap-3"><Building2 className="h-6 w-6 text-indigo-400" /> {activeItem.department}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Column */}
+                <div className="space-y-10">
+                  {/* Glass Map Widget */}
+                  <div className="bg-white rounded-3xl border border-white shadow-xl shadow-slate-200/40 overflow-hidden relative h-[220px] flex items-center justify-center">
+                    <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "radial-gradient(#64748b 2px, transparent 2px)", backgroundSize: "24px 24px" }} />
+                    <div className="z-10 flex flex-col items-center p-6 text-center bg-white/60 backdrop-blur-md rounded-2xl m-6 border border-white">
+                      <MapPin className="h-8 w-8 text-blue-600 mb-2 drop-shadow-lg" />
+                      <p className="text-sm font-black text-slate-900 leading-tight">{activeItem.location}</p>
+                    </div>
+                  </div>
+
+                  {/* Activity Timeline Widget */}
+                  <div className="bg-white rounded-3xl p-8 border border-white shadow-xl shadow-slate-200/40">
+                    <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest mb-8 flex items-center gap-2"><Clock className="h-4 w-4" /> Timeline</h3>
+                    <div className="space-y-8 border-l-2 border-slate-100 ml-4 pl-8 relative">
+                      <div className="relative">
+                        <div className="absolute -left-[45px] top-0 h-8 w-8 rounded-full bg-slate-50 border-4 border-white flex items-center justify-center shadow-md"><AlertCircle className="h-4 w-4 text-slate-500" /></div>
+                        <p className="text-sm text-slate-900"><span className="font-black">System</span> logged.</p>
+                        <span className="text-xs text-slate-400 font-mono font-semibold mt-1 block">{new Date(activeItem.created_at).toLocaleString()}</span>
+                      </div>
+                      {activeItem.status !== 'Submitted' && (
+                        <div className="relative">
+                          <div className="absolute -left-[45px] top-0 h-8 w-8 rounded-full bg-blue-50 border-4 border-white flex items-center justify-center shadow-md"><Pencil className="h-4 w-4 text-blue-600" /></div>
+                          <p className="text-sm text-slate-900"><span className="font-black">Operator</span> update.</p>
+                          <span className="text-xs text-slate-400 font-mono font-semibold mt-1 block">{new Date(activeItem.updated_at).toLocaleString()}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
               </div>
             </div>
           </div>
         )}
       </div>
+
+      <style>{`
+        @keyframes slideIn {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </div>
   );
 }
