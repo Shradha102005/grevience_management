@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { useAuth } from "@/lib/auth-context";
 
 export const Route = createFileRoute("/portal/helpline")({
   component: Helpline,
@@ -68,19 +69,29 @@ const MACROS = [
   { label: "Close Ticket",    text: "This issue has been resolved. Closing ticket. Have a great day!" },
 ];
 
-// ── New Ticket Modal ─────────────────────────────────────────────────────────
 function NewTicketModal({ open, onClose, onCreated }: {
   open: boolean; onClose: () => void; onCreated: (t: Ticket) => void;
 }) {
+  const { user } = useAuth();
   const [form, setForm] = useState({ requester_name: "", subject: "", query: "", priority: "Normal", channel: "Web" });
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (user?.name) {
+      setForm(f => ({ ...f, requester_name: user.name }));
+    }
+  }, [user]);
 
   const submit = async () => {
     if (!form.query.trim()) { toast.error("Describe the issue"); return; }
     setLoading(true);
     try {
+      const payload = {
+        ...form,
+        submitted_by: user?.id || null
+      };
       const r1 = await fetch(`${API_BASE}/live/helpline/ticket`, {
-        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form),
+        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
       });
       if (!r1.ok) throw new Error();
       const { ticket_id } = await r1.json();
@@ -573,6 +584,9 @@ function StatCard({ label, count, icon: Icon, color, bg, border, onClick, active
 
 // ── Main ─────────────────────────────────────────────────────────────────────
 export function Helpline() {
+  const { user } = useAuth();
+  const isStaff = user?.role === "admin" || user?.role === "officer";
+
   const [tickets, setTickets]           = useState<Ticket[]>([]);
   const [counts, setCounts]             = useState<Counts>({ Open: 0, Pending: 0, Resolved: 0, All: 0 });
   const [loading, setLoading]           = useState(true);
@@ -584,7 +598,11 @@ export function Helpline() {
   const fetchTickets = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
     try {
-      const p = new URLSearchParams(); if (search) p.set("search", search);
+      const p = new URLSearchParams(); 
+      if (search) p.set("search", search);
+      if (!isStaff && user?.id) {
+        p.set("submitted_by", user.id);
+      }
       const res = await fetch(`${API_BASE}/live/helpline/tickets?${p}`);
       const data = await res.json();
       setTickets(data.tickets || []); setCounts(data.counts || { Open:0, Pending:0, Resolved:0, All:0 });
@@ -593,7 +611,7 @@ export function Helpline() {
         if (tr.ok) setActiveTicket(await tr.json());
       }
     } catch { if (!silent) toast.error("Failed to load"); } finally { setLoading(false); }
-  }, [search, activeTicket?.ticket_id]);
+  }, [search, activeTicket?.ticket_id, user?.id, isStaff]);
 
   useEffect(() => { fetchTickets(); const id = setInterval(() => fetchTickets(true), 5000); return () => clearInterval(id); }, []);
   useEffect(() => { const t = setTimeout(() => fetchTickets(), 300); return () => clearTimeout(t); }, [search]);

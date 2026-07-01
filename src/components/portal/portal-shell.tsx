@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard,
@@ -77,6 +77,11 @@ export function PortalShell({ children }: { children: ReactNode }) {
   const allNavItems = [...MODULES, ...GOVERNANCE];
   const activeItem = allNavItems.find(item => item.to === "/portal" ? pathname === "/portal" : pathname.startsWith(item.to)) || { label: "Portal Workspace" };
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const initials = user?.name
     ? user.name.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2)
     : "?";
@@ -136,7 +141,7 @@ export function PortalShell({ children }: { children: ReactNode }) {
               <button className="flex items-center gap-2 outline-none ml-2">
                 <Avatar className="h-9 w-9 border-2 border-white shadow-sm rounded-xl">
                   <AvatarFallback className="bg-indigo-100 text-indigo-700 text-xs font-bold rounded-xl">
-                    {initials}
+                    {mounted ? initials : "?"}
                   </AvatarFallback>
                 </Avatar>
               </button>

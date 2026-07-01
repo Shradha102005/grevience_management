@@ -43,76 +43,167 @@ function LightLanding3D() {
       </div>
 
       {/* ── 3D HERO SECTION ── */}
-      <section className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden perspective-[2000px]">
+      <section className="relative min-h-screen flex items-center pt-20 overflow-hidden perspective-[2000px]">
         
-        {/* Abstract 3D Geometric Core */}
-        <motion.div 
-          style={{ y, opacity, rotateX: transformY, rotateY: transformX }}
-          className="absolute inset-0 flex items-center justify-center pointer-events-none transform-style-3d z-0"
-        >
-          <div className="relative w-[600px] h-[600px] flex items-center justify-center">
-            {/* Core Glow */}
-            <div className="absolute w-[200px] h-[200px] bg-indigo-500/20 rounded-full blur-[100px]" />
-            <div className="absolute w-[300px] h-[300px] bg-cyan-400/20 rounded-full blur-[120px] mix-blend-multiply" />
-            
-            {/* 3D Wireframe Rings */}
-            {[...Array(6)].map((_, i) => (
-              <div 
-                key={i}
-                className="absolute inset-0 rounded-full border border-indigo-300/40 shadow-[0_0_50px_rgba(99,102,241,0.05)_inset]"
-                style={{
-                  transform: `rotateX(${i * 30}deg) rotateY(${i * 15}deg)`,
-                  animation: `spin-slow ${20 + i * 5}s linear infinite ${i % 2 === 0 ? 'reverse' : ''}`
-                }}
-              />
-            ))}
-            
-            {/* Outer Data Particles */}
-            <div className="absolute inset-[-50%] border border-cyan-400/20 rounded-full border-dashed animate-[spin_60s_linear_infinite]" />
-            <div className="absolute inset-[-100%] border border-indigo-400/10 rounded-full animate-[spin_90s_linear_infinite_reverse]" />
-          </div>
-        </motion.div>
+
 
         {/* Ambient Grid */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(99,102,241,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(99,102,241,0.05)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,black,transparent)] pointer-events-none z-0" style={{ transform: "perspective(1000px) rotateX(60deg) translateY(-200px) scale(3)", transformOrigin: "top" }} />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(99,102,241,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(99,102,241,0.05)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_80%_80%_at_50%_50%,black,transparent)] pointer-events-none z-0" style={{ transform: "perspective(1000px) rotateX(60deg) translateY(-200px) scale(3)", transformOrigin: "top" }} />
 
-        {/* Typography & Content */}
-        <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8 text-center flex flex-col items-center">
+        {/* ── TWO-COLUMN LAYOUT ── */}
+        <div className="relative z-10 mx-auto max-w-7xl w-full px-6 lg:px-8 flex flex-col lg:flex-row items-center gap-12 lg:gap-0 min-h-[calc(100vh-80px)]">
+          
+          {/* LEFT COLUMN — Text & CTAs */}
           <motion.div 
-            initial={{ opacity: 0, y: 30, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
+            initial={{ opacity: 0, x: -40 }}
+            animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-            className="flex flex-col items-center"
+            className="flex-1 flex flex-col items-start text-left"
           >
-            <div className="inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-white/60 backdrop-blur-md px-4 py-1.5 text-xs font-black uppercase tracking-widest text-indigo-600 shadow-sm mb-8">
+            <div className="inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-white/70 backdrop-blur-md px-4 py-1.5 text-xs font-black uppercase tracking-widest text-indigo-600 shadow-sm mb-8">
               <Activity className="h-3.5 w-3.5 text-indigo-500 animate-pulse" />
               Civicos OS Engine v2.0
             </div>
             
-            <h1 className="text-5xl md:text-7xl lg:text-[90px] font-black text-slate-900 tracking-tighter leading-[0.9] mb-8">
+            <h1 className="text-5xl md:text-7xl lg:text-[80px] xl:text-[90px] font-black text-slate-900 tracking-tighter leading-[0.9] mb-8">
               Build the <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-sky-500">
                 Future.
               </span>
             </h1>
             
-            <p className="text-xl md:text-2xl text-slate-500 font-medium max-w-2xl mx-auto mb-12 leading-relaxed">
+            <p className="text-lg md:text-xl text-slate-500 font-medium max-w-xl mb-12 leading-relaxed">
               A deeply integrated, AI-native operating system for modern governance. Data-driven, spatial, and infinitely scalable.
             </p>
             
-            <div className="flex flex-col sm:flex-row items-center gap-6 justify-center w-full">
-              <Button asChild className="h-16 px-10 rounded-full bg-indigo-600 text-white font-black text-lg transition-transform hover:scale-105 active:scale-95 shadow-[0_0_40px_rgba(99,102,241,0.3)] hover:bg-indigo-700">
+            <div className="flex flex-col sm:flex-row items-center gap-5">
+              <Button asChild className="h-14 px-10 rounded-full bg-indigo-600 text-white font-black text-base transition-transform hover:scale-105 active:scale-95 shadow-[0_0_40px_rgba(99,102,241,0.35)] hover:bg-indigo-700">
                 <Link to="/portal">
                   Deploy OS <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
-              <Button asChild variant="outline" className="h-16 px-10 rounded-full bg-white backdrop-blur-md border-slate-200 text-slate-700 font-bold text-lg hover:bg-slate-50 hover:text-indigo-600 transition-transform hover:scale-105 active:scale-95 shadow-sm">
+              <Button asChild variant="outline" className="h-14 px-10 rounded-full bg-white/80 backdrop-blur-md border-slate-200 text-slate-700 font-bold text-base hover:bg-slate-50 hover:text-indigo-600 transition-transform hover:scale-105 active:scale-95 shadow-sm">
                 <Link to="/portal">
                   <Terminal className="mr-2 h-5 w-5 text-slate-400" /> Read the Docs
                 </Link>
               </Button>
             </div>
+
+            {/* Mini stats row */}
+            <div className="mt-14 flex items-center gap-8 flex-wrap">
+              {[
+                { value: "9", label: "Modules" },
+                { value: "10M+", label: "Citizens" },
+                { value: "99.9%", label: "Uptime" },
+              ].map((s) => (
+                <div key={s.label} className="flex flex-col">
+                  <span className="text-2xl font-black text-indigo-600">{s.value}</span>
+                  <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest">{s.label}</span>
+                </div>
+              ))}
+            </div>
           </motion.div>
+
+          {/* RIGHT COLUMN — Orbiting Modules Animation */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.85 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+            className="flex-1 relative h-[480px] sm:h-[580px] w-full flex items-center justify-center"
+          >
+            {/* Glow blob behind orbit */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] h-[340px] bg-indigo-400/10 rounded-full blur-[80px] pointer-events-none" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[220px] h-[220px] bg-cyan-400/10 rounded-full blur-[60px] pointer-events-none" />
+
+            {/* Orbit track rings */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[480px] h-[480px] rounded-full border border-indigo-200/50 border-dashed pointer-events-none hidden sm:block" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[360px] h-[360px] rounded-full border border-indigo-100/40 pointer-events-none hidden sm:block" />
+
+            {/* Orbiting Container — spins the whole ring */}
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+              className="absolute inset-0 w-full h-full flex items-center justify-center"
+              style={{ transformStyle: "preserve-3d" }}
+            >
+              {MODULES.map((module, i) => {
+                const angle = (i / MODULES.length) * Math.PI * 2;
+                const radiusX = 220;
+                const radiusY = 220;
+                const x = Math.cos(angle) * radiusX;
+                const y = Math.sin(angle) * radiusY;
+                return (
+                  <div
+                    key={module.id}
+                    style={{
+                      position: "absolute",
+                      left: `calc(50% + ${x}px)`,
+                      top: `calc(50% + ${y}px)`,
+                      transform: "translate(-50%, -50%)",
+                    }}
+                    className="z-20 hidden sm:block"
+                  >
+                    {/* Counter-rotate icon to stay upright */}
+                    <motion.div
+                      animate={{ rotate: -360 }}
+                      transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+                      style={{ transformStyle: "preserve-3d" }}
+                    >
+                      <motion.button
+                        animate={{ y: [-6, 6, -6] }}
+                        transition={{
+                          y: { duration: 4 + (i % 3), repeat: Infinity, ease: "easeInOut", delay: i * 0.25 },
+                        }}
+                        title={module.short}
+                        className="group flex h-14 w-14 items-center justify-center rounded-2xl bg-white/90 backdrop-blur-xl border border-indigo-100 shadow-[0_8px_30px_rgba(99,102,241,0.12)] hover:bg-indigo-600 hover:border-indigo-600 transition-all duration-300 cursor-pointer"
+                      >
+                        <module.icon className="w-6 h-6 text-indigo-500 group-hover:text-white transition-colors duration-300" />
+                      </motion.button>
+                    </motion.div>
+                  </div>
+                );
+              })}
+            </motion.div>
+
+            {/* Center Core */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 hidden sm:flex h-36 w-36 items-center justify-center">
+              {/* Pulsing rings */}
+              <motion.div
+                animate={{ scale: [1, 1.9, 2.6], opacity: [0.7, 0.3, 0] }}
+                transition={{ duration: 3, repeat: Infinity, ease: "easeOut" }}
+                className="absolute inset-0 rounded-full border-2 border-indigo-400/50"
+              />
+              <motion.div
+                animate={{ scale: [1, 1.9, 2.6], opacity: [0.7, 0.3, 0] }}
+                transition={{ duration: 3, repeat: Infinity, ease: "easeOut", delay: 1 }}
+                className="absolute inset-0 rounded-full border-2 border-cyan-400/50"
+              />
+              <motion.div
+                animate={{ scale: [1, 1.05, 1] }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                className="relative flex h-28 w-28 items-center justify-center rounded-full bg-white shadow-[0_0_60px_rgba(99,102,241,0.25)] border border-indigo-100 z-10"
+              >
+                <div className="flex flex-col items-center gap-0.5">
+                  <Sparkles className="w-6 h-6 text-indigo-500 mb-1" />
+                  <span className="text-[11px] font-black text-transparent bg-clip-text bg-gradient-to-br from-indigo-600 to-cyan-500 tracking-wider leading-tight text-center">CIVICOS</span>
+                  <span className="text-[9px] font-semibold text-slate-400 tracking-widest uppercase">OS v2.0</span>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Mobile fallback — simple icon grid */}
+            <div className="sm:hidden grid grid-cols-3 gap-4 p-4">
+              {MODULES.slice(0, 6).map((module) => (
+                <div key={module.id} className="flex flex-col items-center gap-2">
+                  <div className="h-14 w-14 rounded-2xl bg-white border border-indigo-100 shadow-sm flex items-center justify-center">
+                    <module.icon className="w-6 h-6 text-indigo-500" />
+                  </div>
+                  <span className="text-[10px] font-bold text-slate-500 text-center">{module.short}</span>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+
         </div>
       </section>
 

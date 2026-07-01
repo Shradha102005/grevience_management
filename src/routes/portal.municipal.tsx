@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from "react";
 import {
   Building2, MapPin, RefreshCw, Plus, Search, Filter, Pencil, 
   Clock, CheckCircle2, AlertCircle, ArrowUpCircle, ArrowDownCircle, 
-  MinusCircle, ShieldCheck, ArrowLeft, Send
+  MinusCircle, ShieldCheck, ArrowLeft, Send, ChevronRight, AlignLeft
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";

@@ -1539,6 +1539,7 @@ class HelplineTicket(BaseModel):
     priority: str = "Normal"  # "Low" | "Normal" | "High" | "Critical"
     channel: str = "Web"     # "Web" | "Phone" | "Email" | "App" | "voice"
     language: str = "en"
+    submitted_by: Optional[str] = None
 
 
 class HelplineTicketResponse(BaseModel):
@@ -2135,6 +2136,7 @@ async def get_rural_programs(
 async def list_helpline_tickets(
     status: Optional[str] = Query(default=None),
     search: Optional[str] = Query(default=None),
+    submitted_by: Optional[str] = Query(default=None),
 ) -> dict:
     """List all helpline tickets, optionally filtered by status or keyword."""
     _seed_data()
@@ -2145,14 +2147,25 @@ async def list_helpline_tickets(
     if search:
         q = search.lower()
         results = [t for t in results if q in t["subject"].lower() or q in t["requester_name"].lower() or q in t["query"].lower()]
+    if submitted_by:
+        results = [t for t in results if t.get("submitted_by") == submitted_by]
+
     # Sort newest first
     results = sorted(results, key=lambda t: t["updated_at"], reverse=True)
-    counts = {
-        "Open":     sum(1 for t in _HELPLINE_TICKETS if t["status"] == "Open"),
-        "Pending":  sum(1 for t in _HELPLINE_TICKETS if t["status"] == "Pending"),
-        "Resolved": sum(1 for t in _HELPLINE_TICKETS if t["status"] == "Resolved"),
-        "All":      len(_HELPLINE_TICKETS),
-    }
+    if submitted_by:
+        counts = {
+            "Open":     sum(1 for t in _HELPLINE_TICKETS if t["status"] == "Open" and t.get("submitted_by") == submitted_by),
+            "Pending":  sum(1 for t in _HELPLINE_TICKETS if t["status"] == "Pending" and t.get("submitted_by") == submitted_by),
+            "Resolved": sum(1 for t in _HELPLINE_TICKETS if t["status"] == "Resolved" and t.get("submitted_by") == submitted_by),
+            "All":      len(results),
+        }
+    else:
+        counts = {
+            "Open":     sum(1 for t in _HELPLINE_TICKETS if t["status"] == "Open"),
+            "Pending":  sum(1 for t in _HELPLINE_TICKETS if t["status"] == "Pending"),
+            "Resolved": sum(1 for t in _HELPLINE_TICKETS if t["status"] == "Resolved"),
+            "All":      len(_HELPLINE_TICKETS),
+        }
     return {"tickets": results, "counts": counts, "total": len(results)}
 
 
@@ -2176,6 +2189,7 @@ async def create_helpline_ticket(req: HelplineTicket) -> HelplineTicketResponse:
         "created_at": now_iso,
         "updated_at": now_iso,
         "expected_response": "24 hours",
+        "submitted_by": req.submitted_by,
         "messages": [
             {
                 "sender": req.requester_name or "Citizen",
