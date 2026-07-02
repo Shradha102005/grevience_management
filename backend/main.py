@@ -1,3 +1,10 @@
+# ── Windows event-loop fix: must be before everything else ───────────────────
+import sys
+import asyncio
+if sys.platform == "win32":
+    asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
+# ─────────────────────────────────────────────────────────────────────────────
+
 from dotenv import load_dotenv
 load_dotenv()  # Load .env before any os.getenv() calls in routers
 
@@ -15,19 +22,13 @@ from routers import election as election_router
 from routers import municipal as municipal_router
 from routers import ai_chat as ai_chat_router
 from routers import live_data as live_data_router
+from routers import schemes as schemes_router
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     init_db()
-    # Launch Playwright scheme scraper in the background (non-blocking)
-    try:
-        from routers.scheme_scraper import background_scrape_loop
-        import asyncio
-        asyncio.create_task(background_scrape_loop())
-        logger.info("📡 Scheme scraper background task scheduled.")
-    except Exception as e:
-        logger.warning(f"Could not start scheme scraper: {e}")
+    logger.info("✅ Database initialized.")
     yield
 
 
@@ -63,6 +64,7 @@ app.include_router(election_router.router)
 app.include_router(municipal_router.router)
 app.include_router(ai_chat_router.router)
 app.include_router(live_data_router.router)
+app.include_router(schemes_router.router)
 
 
 # ── Health Check ──────────────────────────────────────────────────────────────

@@ -275,3 +275,27 @@ class ComplaintStatusHistory(Base):
     # Relationships
     complaint: Mapped["MunicipalComplaint"] = relationship("MunicipalComplaint", back_populates="status_history")
     changed_by_user: Mapped["User"] = relationship("User", foreign_keys=[changed_by])
+
+
+# ── Government Schemes ────────────────────────────────────────────────────────
+
+class Scheme(Base):
+    """
+    A government welfare scheme scraped from myscheme.gov.in.
+    Populated by the seed_schemes.py script; served read-only via the API.
+    """
+    __tablename__ = "schemes"
+
+    id: Mapped[str] = mapped_column(String(120), primary_key=True)  # slug e.g. "pmsby"
+    name: Mapped[str] = mapped_column(String(512), nullable=False, index=True)
+    ministry: Mapped[Optional[str]] = mapped_column(String(256), nullable=True, index=True)
+    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    tags: Mapped[Optional[list]] = mapped_column(JSON, nullable=True)     # list[str]
+    category: Mapped[Optional[str]] = mapped_column(String(120), nullable=True, index=True)
+    apply_url: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
+    source: Mapped[str] = mapped_column(String(64), default="myscheme.gov.in")
+    scraped_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        nullable=False,
+    )

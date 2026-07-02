@@ -211,6 +211,79 @@ function EligibilityModal({ open, onClose }: { open: boolean; onClose: () => voi
   );
 }
 
+// ── Custom Searchable Dropdown ────────────────────────────────────────────────
+function SearchableDropdown({ options, value, onChange }: { options: string[], value: string, onChange: (v: string) => void }) {
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const filtered = options.filter(o => o.toLowerCase().includes(search.toLowerCase()));
+
+  return (
+    <div ref={ref} className="relative w-[280px]">
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full h-11 px-4 bg-white/80 backdrop-blur-sm border border-white shadow-sm text-slate-800 hover:bg-white focus:ring-4 focus:ring-indigo-500/10 rounded-xl font-bold outline-none flex justify-between items-center transition-all"
+      >
+        <span className="truncate pr-2">{value === "All" ? "All Categories" : value}</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="opacity-40 shrink-0">
+          <path d="M6 9l6 6 6-6" />
+        </svg>
+      </button>
+      
+      {open && (
+        <div className="absolute top-full left-0 mt-2 w-full bg-white/95 backdrop-blur-xl rounded-xl shadow-2xl border border-white/50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+          <div className="p-2 border-b border-slate-100">
+            <div className="relative">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <input
+                type="text"
+                autoFocus
+                className="w-full bg-slate-100/50 text-slate-800 border-none outline-none pl-9 pr-3 py-2 text-sm rounded-lg font-medium placeholder:text-slate-400 focus:bg-slate-100 transition-colors"
+                placeholder="Search categories..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="max-h-64 overflow-y-auto p-1" style={{ scrollbarWidth: 'none' }}>
+            <button
+              className={`w-full text-left px-3 py-2.5 text-sm font-bold rounded-lg transition-colors ${value === "All" ? "bg-indigo-50 text-indigo-600" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"}`}
+              onClick={() => { onChange("All"); setOpen(false); setSearch(""); }}
+            >
+              All Categories
+            </button>
+            {filtered.map(opt => (
+              <button
+                key={opt}
+                className={`w-full text-left px-3 py-2.5 text-sm font-bold rounded-lg transition-colors ${value === opt ? "bg-indigo-50 text-indigo-600" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"}`}
+                onClick={() => { onChange(opt); setOpen(false); setSearch(""); }}
+              >
+                {opt}
+              </button>
+            ))}
+            {filtered.length === 0 && (
+              <div className="px-4 py-6 text-sm text-slate-400 font-medium text-center">
+                No categories found.
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Main Dashboard ─────────────────────────────────────────────────────────────
 function SchemeAI() {
   const [schemes, setSchemes]         = useState<Scheme[]>([]);
@@ -223,20 +296,36 @@ function SchemeAI() {
   const [chatOpen, setChatOpen]       = useState(false);
   const [scrapeInfo, setScrapeInfo]   = useState<{ source?: string; is_scraping?: boolean; total?: number } | null>(null);
   const [totalCount, setTotalCount]   = useState(0);
+  const [page, setPage]               = useState(1);
+  const [hasMore, setHasMore]         = useState(false);
   const searchTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
-  const fetchSchemes = useCallback(async (q = "", cat = "") => {
+  const fetchSchemes = useCallback(async (q = "", cat = "", p = 1, isLoadMore = false) => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
       if (q) params.set("search", q);
       if (cat && cat !== "All") params.set("category", cat);
-      const res  = await fetch(`${API_BASE}/live/schemes?${params}`);
+      params.set("page", p.toString());
+      params.set("limit", "50");
+
+      const res  = await fetch(`${API_BASE}/schemes/?${params}`);
       const data = await res.json();
-      setSchemes(data.schemes || []);
-      setCategories(data.categories || []);
+      
+      if (isLoadMore) {
+        setSchemes(prev => [...prev, ...(data.schemes || [])]);
+      } else {
+        setSchemes(data.schemes || []);
+        // Only update categories on initial load/search to avoid dropdown flicker
+        if (p === 1 && (!cat || cat === "All")) {
+          setCategories(data.categories || []);
+        }
+      }
+      
       setTotalCount(data.total || 0);
-      setScrapeInfo({ source: data.source, is_scraping: data.is_scraping });
+      setHasMore(data.page < data.pages);
+      setPage(p);
+      setScrapeInfo(prev => ({ ...prev, source: data.source || "myscheme.gov.in" }));
     } catch {
       toast.error("Failed to load schemes");
     } finally {
@@ -245,12 +334,16 @@ function SchemeAI() {
   }, []);
 
   useEffect(() => {
-    fetchSchemes("", "All");
+    fetchSchemes("", "All", 1, false);
     const interval = setInterval(async () => {
       try {
-        const res  = await fetch(`${API_BASE}/live/schemes/scrape-status`);
+        const res  = await fetch(`${API_BASE}/schemes/stats`);
         const data = await res.json();
-        setScrapeInfo(data);
+        setScrapeInfo({
+          source: "myscheme.gov.in",
+          is_scraping: true, // We know the seeder is running in the background right now
+          total: data.total_schemes
+        });
       } catch { /* ignore */ }
     }, 10_000);
     return () => clearInterval(interval);
@@ -259,12 +352,18 @@ function SchemeAI() {
   const handleSearch = (val: string) => {
     setSearch(val);
     clearTimeout(searchTimeout.current);
-    searchTimeout.current = setTimeout(() => fetchSchemes(val, activeCategory), 300);
+    searchTimeout.current = setTimeout(() => fetchSchemes(val, activeCategory, 1, false), 300);
   };
 
   const handleCategory = (cat: string) => {
     setActiveCategory(cat);
-    fetchSchemes(search, cat);
+    fetchSchemes(search, cat, 1, false);
+  };
+
+  const loadMore = () => {
+    if (!loading && hasMore) {
+      fetchSchemes(search, activeCategory, page + 1, true);
+    }
   };
 
   return (
@@ -332,24 +431,16 @@ function SchemeAI() {
         {!selected && (
           <div className="w-full max-w-7xl h-full flex flex-col">
             
-            {/* Categories */}
-            <div className="flex flex-wrap gap-2 mb-6" style={{ scrollbarWidth: "none" }}>
-              {["All", ...categories].map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => handleCategory(cat)}
-                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold border transition-all shadow-sm ${
-                    activeCategory === cat
-                      ? "bg-slate-800 text-white border-slate-800 scale-105"
-                      : "bg-white/70 backdrop-blur-md text-slate-600 border-white hover:bg-white hover:scale-105"
-                  }`}
-                >
-                  {cat !== "All" && (
-                    <span className={`w-2 h-2 rounded-full shrink-0 shadow-sm ${CATEGORY_DOT[cat] || "bg-slate-400"}`} />
-                  )}
-                  {cat}
-                </button>
-              ))}
+            {/* Categories Dropdown */}
+            <div className="mb-6 flex items-center gap-3 relative z-20">
+              <span className="text-slate-500 font-bold text-sm shrink-0">
+                Filter by Category:
+              </span>
+              <SearchableDropdown 
+                options={categories} 
+                value={activeCategory} 
+                onChange={handleCategory} 
+              />
             </div>
             
             <div className="flex-1 overflow-y-auto space-y-4 pr-2 pb-10" style={{ scrollbarWidth: 'none' }}>
@@ -411,6 +502,14 @@ function SchemeAI() {
                       </div>
                     </div>
                   ))}
+                </div>
+              )}
+              {hasMore && (
+                <div className="flex justify-center mt-6 mb-4">
+                  <Button onClick={loadMore} disabled={loading} className="bg-white hover:bg-slate-50 text-indigo-600 border border-slate-200 shadow-sm font-bold px-6 rounded-xl transition-all hover:-translate-y-0.5">
+                    {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
+                    Load More Schemes
+                  </Button>
                 </div>
               )}
             </div>
