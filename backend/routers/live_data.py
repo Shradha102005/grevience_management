@@ -1767,20 +1767,185 @@ async def get_scheme_categories() -> dict:
 
 
 @router.post("/schemes/check-eligibility")
-async def check_eligibility(req: EligibilityRequest) -> dict:
+async def check_eligibility(req: EligibilityRequest, db: Session = Depends(get_db)) -> dict:
     """
     Given a user profile, return matched schemes with an eligibility score.
-    Score is 0–100 based on how many criteria match.
-    Uses curated schemes (with eligibility_criteria) for accurate scoring.
+    Queries real DB schemes (myscheme.gov.in) first; falls back to curated list if DB is empty.
+    Score is 0–100 based on profile-keyword matching against scheme fields.
     """
-    _seed_data()  # always ensure curated data is loaded for eligibility
+    _seed_data()  # ensure curated fallback data is loaded
+
+    # ── Build keyword sets from the user profile ──────────────────────────────
+    occ_keywords: dict[str, list[str]] = {
+        "farmer":        ["farmer", "kisan", "agriculture", "agri", "farm", "crop", "cultivat",
+                          "horticulture", "fisheries", "fisherman", "livestock", "animal husbandry",
+                          "forestry", "soil", "irrigation", "rural"],
+        "student":       ["student", "scholar", "education", "school", "college", "university",
+                          "academic", "stipend", "fellowship", "merit", "exam", "higher education",
+                          "coaching", "apprentice"],
+        "business":      ["business", "entrepreneur", "msme", "startup", "enterprise", "sme",
+                          "industry", "trade", "commerce", "self-employment", "mudra", "udyam",
+                          "manufacturing", "export", "shop", "vendor"],
+        "government":    ["government", "govt", "employee", "pensioner", "central", "state service"],
+        "self-employed": ["self-employed", "self employed", "artisan", "craftsman", "weaver",
+                          "handloom", "khadi", "handicraft", "skill", "freelance"],
+        "labourer":      ["labour", "worker", "migrant", "construction", "building", "unorganised",
+                          "informal", "daily wage", "e-shram", "mgnrega", "employment"],
+        "unemployed":    ["unemployment", "unemployed", "job seeker", "employment", "skill",
+                          "training", "placement", "apprentice", "youth"],
+    }
+
+    category_keywords: dict[str, list[str]] = {
+        "SC":      ["sc", "scheduled caste", "dalit", "ambedkar"],
+        "ST":      ["st", "scheduled tribe", "tribal", "adivasi", "van dhan"],
+        "OBC":     ["obc", "other backward", "backward class"],
+        "EWS":     ["ews", "economically weaker", "general category"],
+        "General": ["general"],
+    }
+
+    gender_keywords: dict[str, list[str]] = {
+        "Female": ["women", "woman", "girl", "mahila", "stree", "maternity", "beti",
+                   "widow", "female", "self help group", "shg", "sakhi"],
+        "Male":   ["men", "male", "man", "boy"],
+    }
+
+    residence_keywords: dict[str, list[str]] = {
+        "rural":       ["rural", "village", "gram", "panchayat", "gramin"],
+        "urban":       ["urban", "city", "municipal", "metro", "town"],
+        "semi-urban":  ["semi-urban", "peri-urban"],
+    }
+
+    # ── Score a single DB scheme dict via keyword matching ────────────────────
+    def _score_db_scheme(s_dict: dict) -> tuple[int, list[str]]:
+        """Return (score, reasons) for a DB scheme using keyword heuristics."""
+        score = 40
+        reasons: list[str] = []
+        text = " ".join(filter(None, [
+            s_dict.get("name", ""),
+            s_dict.get("description", ""),
+            s_dict.get("ministry", ""),
+            " ".join(s_dict.get("tags") or []),
+            s_dict.get("category", ""),
+        ])).lower()
+
+        # Occupation match
+        if req.occupation:
+            kws = occ_keywords.get(req.occupation.lower(), [req.occupation.lower()])
+            matched = [k for k in kws if k in text]
+            if matched:
+                score += 20
+                reasons.append(f"✅ Matches {req.occupation} profile")
+
+        # Category match (SC/ST/OBC/EWS)
+        if req.category and req.category != "General":
+            kws = category_keywords.get(req.category, [req.category.lower()])
+            if any(k in text for k in kws):
+                score += 15
+                reasons.append(f"✅ Targets {req.category} category")
+
+        # Gender match
+        if req.gender and req.gender != "Other":
+            kws = gender_keywords.get(req.gender, [])
+            if any(k in text for k in kws):
+                score += 10
+                reasons.append(f"✅ Includes {req.gender.lower()} beneficiaries")
+
+        # Residence match
+        if req.residence:
+            kws = residence_keywords.get(req.residence.lower(), [req.residence.lower()])
+            if any(k in text for k in kws):
+                score += 10
+                reasons.append(f"✅ Covers {req.residence} residents")
+
+        # Low-income / BPL preference
+        if req.income is not None:
+            bpl_kws = ["bpl", "below poverty", "poor", "low income", "economically weaker",
+                       "ews", "deprived", "underprivileged"]
+            scheme_is_bpl = any(k in text for k in bpl_kws)
+            if scheme_is_bpl and req.income <= 120000:
+                score += 10
+                reasons.append("✅ Income within BPL range")
+            elif scheme_is_bpl and req.income > 300000:
+                score -= 10  # likely not eligible but don't disqualify fully
+
+        # Age heuristics
+        if req.age is not None:
+            if req.age < 18 and "minor" not in text and "child" not in text:
+                score -= 15
+            elif req.age > 60 and any(k in text for k in ["senior", "old age", "pension", "elderly"]):
+                score += 10
+                reasons.append("✅ Senior citizen benefit")
+            elif req.age <= 35 and any(k in text for k in ["youth", "young", "student"]):
+                score += 5
+                reasons.append("✅ Youth scheme")
+
+        if not reasons:
+            reasons.append("✅ Potentially eligible — verify with official portal")
+
+        return max(0, min(100, score)), reasons
+
+    # ── Query real DB schemes ─────────────────────────────────────────────────
+    from models import Scheme as DBScheme
+    from sqlalchemy import or_
+
+    # Build a broad DB query based on occupation/gender/category keywords
+    search_terms: list[str] = []
+    if req.occupation:
+        search_terms.extend(occ_keywords.get(req.occupation.lower(), [req.occupation])[:4])
+    if req.category and req.category != "General":
+        search_terms.extend(category_keywords.get(req.category, [req.category.lower()])[:2])
+    if req.gender and req.gender == "Female":
+        search_terms.extend(["women", "mahila", "girl"])
+
+    db_schemes_raw: list[DBScheme] = []
+    try:
+        q = db.query(DBScheme)
+        if search_terms:
+            filters = []
+            for term in search_terms[:6]:  # limit OR clauses
+                like = f"%{term}%"
+                filters.append(DBScheme.name.ilike(like))
+                filters.append(DBScheme.description.ilike(like))
+                filters.append(DBScheme.ministry.ilike(like))
+            q = q.filter(or_(*filters))
+        # Always fetch at least 200 for scoring variety
+        db_schemes_raw = q.limit(200).all()
+        logger.info(f"[Eligibility] DB returned {len(db_schemes_raw)} candidate schemes")
+    except Exception as exc:
+        logger.warning(f"[Eligibility] DB query failed, using curated only: {exc}")
 
     scored: list[dict] = []
+    seen_ids: set[str] = set()
 
+    # ── Score DB schemes ──────────────────────────────────────────────────────
+    for s in db_schemes_raw:
+        if s.id in seen_ids:
+            continue
+        seen_ids.add(s.id)
+        s_dict = {
+            "id": s.id,
+            "name": s.name,
+            "ministry": s.ministry,
+            "description": s.description,
+            "tags": s.tags or [],
+            "category": s.category,
+            "apply_url": s.apply_url,
+            "portal_url": s.apply_url,
+            "source": s.source or "myscheme.gov.in",
+        }
+        sc, reasons = _score_db_scheme(s_dict)
+        if sc >= 40:  # only include reasonable matches
+            scored.append({"scheme": s_dict, "score": sc, "reasons": reasons})
+
+    # ── Score curated in-memory schemes (with detailed eligibility_criteria) ──
     for scheme in _SCHEMES:
+        if scheme.get("id") in seen_ids:
+            continue
+        seen_ids.add(scheme.get("id", ""))
+
         crit = scheme.get("eligibility_criteria", {})
         score = 50  # base score
-        reasons = []
+        reasons: list[str] = []
         disqualified = False
 
         # Age check
@@ -1797,7 +1962,7 @@ async def check_eligibility(req: EligibilityRequest) -> dict:
 
         # Gender check
         if req.gender and crit.get("gender") not in (None, "any"):
-            if crit["gender"] != req.gender:
+            if crit["gender"].lower() != req.gender.lower():
                 disqualified = True
             else:
                 score += 10
@@ -1866,24 +2031,20 @@ async def check_eligibility(req: EligibilityRequest) -> dict:
             continue
 
         score = max(0, min(100, score))
-
         if not reasons:
             reasons.append("✅ You may be eligible — verify with official portal")
 
-        scored.append({
-            "scheme": scheme,
-            "score": score,
-            "reasons": reasons,
-        })
+        scored.append({"scheme": scheme, "score": score, "reasons": reasons})
 
-    # Sort by score descending
+    # Sort by score descending, return top 20
     scored.sort(key=lambda x: x["score"], reverse=True)
+    top = scored[:20]
 
-    # Return top 15 matches
     return {
         "profile": req.model_dump(),
         "matched_count": len(scored),
-        "matches": scored[:15],
+        "matches": top,
+        "source": "database" if db_schemes_raw else "curated",
         "checked_at": datetime.now(timezone.utc).isoformat(),
     }
 

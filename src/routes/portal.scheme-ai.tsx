@@ -380,7 +380,7 @@ function SchemeAI() {
       <div className="absolute inset-0 z-0 pointer-events-none" style={{ backgroundImage: "radial-gradient(rgba(148, 163, 184, 0.1) 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
 
       {/* ── Top Header Glass ── */}
-      <div className="flex items-center justify-between px-8 py-5 z-10 shrink-0" style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.5)" }}>
+      {!selected && (<div className="flex items-center justify-between px-8 py-5 z-10 shrink-0" style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.5)" }}>
         <div className="flex items-center gap-4">
           <div className="h-12 w-12 rounded-2xl flex items-center justify-center text-indigo-600 shadow-xl shadow-indigo-500/10" style={{ background: "linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%)", border: "1px solid rgba(255,255,255,0.8)" }}>
             <HeartHandshake className="h-6 w-6" />
@@ -422,10 +422,10 @@ function SchemeAI() {
             {chatOpen ? <><X className="mr-2 h-4 w-4" /> Close AI</> : <><Bot className="mr-2 h-4 w-4" /> Scheme Assistant</>}
           </Button>
         </div>
-      </div>
+      </div>)}
 
       {/* ── Main Canvas Area ── */}
-      <div className="flex-1 flex overflow-hidden p-8 justify-center z-10 relative">
+      <div className="flex-1 flex overflow-hidden p-3 justify-center z-10 relative">
         
         {/* VIEW 1: Scheme Grid / List */}
         {!selected && (
@@ -518,130 +518,106 @@ function SchemeAI() {
 
         {/* VIEW 2: Premium Detail HUD */}
         {selected && (
-          <div className="w-full max-w-5xl h-full flex flex-col bg-white/80 backdrop-blur-3xl border border-white shadow-2xl shadow-slate-300/60 rounded-[2.5rem] overflow-hidden animate-in zoom-in-95 duration-300">
+          <div className="w-full max-w-full h-full flex flex-col bg-white/80 backdrop-blur-3xl border border-white shadow-2xl shadow-slate-300/60 rounded-[2rem] overflow-hidden animate-in zoom-in-95 duration-300">
             
-            <div className={`h-2 w-full ${CATEGORY_DOT[selected.category] || "bg-slate-300"}`} />
+            <div className={`h-1.5 w-full ${CATEGORY_DOT[selected.category] || "bg-slate-300"}`} />
 
-            {/* HUD Header */}
-            <div className="px-10 py-8 border-b border-white bg-white/50 flex justify-between items-start">
-              <div className="flex items-start gap-6">
-                <Button variant="ghost" size="icon" onClick={() => setSelected(null)} className="h-12 w-12 bg-white hover:bg-slate-50 border border-slate-100 text-slate-600 rounded-full shadow-sm shrink-0 transition-transform hover:scale-105 mt-1">
-                  <ArrowLeft className="h-5 w-5" />
-                </Button>
-                <div>
-                  <div className="flex items-center gap-3 mb-4">
-                    <span className={`text-[11px] font-extrabold uppercase tracking-widest px-3 py-1 rounded-lg border shadow-sm ${getCategoryPill(selected.category)}`}>
-                      {selected.category}
+            {/* HUD Header — compact */}
+            <div className="px-6 py-4 border-b border-slate-100/80 bg-white/60 flex items-center gap-4 shrink-0">
+              <Button variant="ghost" size="icon" onClick={() => setSelected(null)} className="h-9 w-9 bg-white hover:bg-slate-50 border border-slate-100 text-slate-600 rounded-full shadow-sm shrink-0 transition-transform hover:scale-105">
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className={`text-[10px] font-extrabold uppercase tracking-widest px-2.5 py-0.5 rounded-md border ${getCategoryPill(selected.category)}`}>
+                    {selected.category}
+                  </span>
+                  {selected.state && selected.state !== "Central" && (
+                    <span className="flex items-center gap-1 text-[10px] font-bold text-slate-500 bg-slate-50 border border-slate-200 px-2 py-0.5 rounded-md">
+                      <MapPin className="w-3 h-3" /> {selected.state}
                     </span>
-                    {selected.state && selected.state !== "Central" && (
-                      <span className="flex items-center gap-1.5 text-xs font-bold text-slate-500 bg-white border border-slate-200 px-3 py-1 rounded-lg shadow-sm">
-                        <MapPin className="w-3.5 h-3.5" /> {selected.state}
-                      </span>
-                    )}
-                  </div>
-                  <h2 className="text-4xl font-black text-slate-900 tracking-tight leading-tight mb-2">{selected.name}</h2>
-                  {selected.full_name && selected.full_name !== selected.name && (
-                    <p className="text-sm text-slate-500 font-semibold italic">{selected.full_name}</p>
-                  )}
-                  {selected.ministry && (
-                    <p className="text-sm text-slate-600 mt-4 flex items-center gap-2 font-bold bg-white/50 w-fit px-4 py-2 rounded-xl border border-slate-100">
-                      <Building2 className="w-4 h-4 text-indigo-500" /> {selected.ministry}
-                    </p>
                   )}
                 </div>
+                <h2 className="text-2xl font-black text-slate-900 tracking-tight leading-snug line-clamp-2">{selected.name}</h2>
+                {selected.ministry && (
+                  <p className="text-sm text-slate-500 mt-0.5 flex items-center gap-1.5 font-semibold truncate">
+                    <Building2 className="w-3.5 h-3.5 text-indigo-400 shrink-0" /> {selected.ministry}
+                  </p>
+                )}
               </div>
             </div>
 
-            {/* HUD Body */}
-            <div className="p-10 flex-1 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                
-                {/* Main Detail Area */}
-                <div className="lg:col-span-2 space-y-8">
-                  {(selected.benefit || selected.description) && (
-                    <div className="bg-white rounded-3xl p-8 border border-white shadow-xl shadow-slate-200/40">
-                      <p className="text-[11px] font-black uppercase tracking-widest text-indigo-500 mb-4 flex items-center gap-2"><Sparkles className="w-4 h-4" /> Benefits & Details</p>
-                      <p className="text-[16px] text-slate-700 font-medium leading-relaxed whitespace-pre-wrap">
-                        {selected.benefit || selected.description}
-                      </p>
-                    </div>
-                  )}
+            {/* HUD Body — single column, buttons at bottom */}
+            <div className="px-10 py-8 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
+              <div className="space-y-8">
 
-                  {selected.eligibility && (
-                    <div className="bg-slate-900 rounded-3xl p-8 text-white shadow-2xl relative overflow-hidden">
-                      <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: "linear-gradient(45deg, #1e293b 25%, transparent 25%, transparent 75%, #1e293b 75%, #1e293b), linear-gradient(45deg, #1e293b 25%, transparent 25%, transparent 75%, #1e293b 75%, #1e293b)", backgroundSize: "20px 20px", backgroundPosition: "0 0, 10px 10px" }} />
-                      <div className="relative z-10">
-                        <p className="text-[11px] font-black uppercase tracking-widest text-indigo-400 mb-4 flex items-center gap-2">Who is Eligible?</p>
-                        <p className="text-[15px] font-medium leading-relaxed whitespace-pre-wrap text-slate-200">
-                          {selected.eligibility}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                  
-                  {selected.documents && (
-                    <div className="bg-white rounded-3xl p-8 border border-white shadow-xl shadow-slate-200/40">
-                      <p className="text-[11px] font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2"><FileText className="w-4 h-4 text-slate-500" /> Required Documents</p>
-                      <p className="text-[15px] text-slate-700 font-medium leading-relaxed whitespace-pre-wrap">
-                        {selected.documents}
-                      </p>
-                    </div>
-                  )}
-                </div>
+                {/* Benefits & Details — plain */}
+                {(selected.benefit || selected.description) && (
+                  <div>
+                    <p className="text-[11px] font-black uppercase tracking-widest text-indigo-500 mb-4 flex items-center gap-1.5"><Sparkles className="w-3 h-3" /> Benefits & Details</p>
+                    <p className="text-base text-slate-700 font-medium leading-relaxed whitespace-pre-wrap">
+                      {selected.benefit || selected.description}
+                    </p>
+                  </div>
+                )}
 
-                {/* Sidebar Info & CTA */}
-                <div className="space-y-8">
-                  
-                  {/* Action Card */}
-                  <div className="bg-indigo-600 rounded-3xl p-8 text-white shadow-2xl shadow-indigo-600/30 flex flex-col gap-4">
-                    <h3 className="font-black text-xl mb-2">Ready to apply?</h3>
-                    {(selected.apply_url || selected.portal_url) && (
-                      <a
-                        href={selected.apply_url || selected.portal_url}
-                        target="_blank" rel="noopener noreferrer"
-                        className="flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-indigo-700 font-black py-4 px-6 rounded-2xl transition-transform hover:-translate-y-1 shadow-lg text-lg"
-                      >
-                        Apply Online <ArrowUpRight className="w-5 h-5" />
-                      </a>
-                    )}
+                {/* Tags — plain */}
+                {selected.tags && selected.tags.length > 0 && (
+                  <div>
+                    <p className="text-[11px] font-black uppercase tracking-widest text-slate-400 mb-4">Tags</p>
+                    <div className="flex flex-wrap gap-2">
+                      {selected.tags.map((tag, i) => (
+                        <span key={i} className="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 bg-slate-50 text-slate-600">{tag}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Eligibility */}
+                {selected.eligibility && (
+                  <div className="bg-slate-900 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
+                    <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: "linear-gradient(45deg, #1e293b 25%, transparent 25%, transparent 75%, #1e293b 75%, #1e293b), linear-gradient(45deg, #1e293b 25%, transparent 25%, transparent 75%, #1e293b 75%, #1e293b)", backgroundSize: "20px 20px", backgroundPosition: "0 0, 10px 10px" }} />
+                    <div className="relative z-10">
+                      <p className="text-[11px] font-black uppercase tracking-widest text-indigo-400 mb-4 flex items-center gap-2">Who is Eligible?</p>
+                      <p className="text-base font-medium leading-relaxed whitespace-pre-wrap text-slate-200">{selected.eligibility}</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Documents */}
+                {selected.documents && (
+                  <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
+                    <p className="text-[11px] font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2"><FileText className="w-3.5 h-3.5 text-slate-500" /> Required Documents</p>
+                    <p className="text-base text-slate-700 font-medium leading-relaxed whitespace-pre-wrap">{selected.documents}</p>
+                  </div>
+                )}
+
+                {/* Action Buttons — bottom row with divider */}
+                <div className="flex flex-wrap items-center gap-3 pt-6 border-t border-slate-100">
+                  {(selected.apply_url || selected.portal_url) && (
                     <a
-                      href={`https://www.myscheme.gov.in/schemes/${selected.id}`}
+                      href={selected.apply_url || selected.portal_url}
                       target="_blank" rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-2 border border-indigo-400 hover:bg-indigo-700 text-indigo-50 font-bold py-4 px-6 rounded-2xl transition-colors text-base"
+                      className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-black py-3.5 px-7 rounded-xl transition-transform hover:-translate-y-0.5 shadow-md shadow-indigo-500/20 text-sm"
                     >
-                      View on myScheme <ExternalLink className="w-4 h-4" />
+                      Apply Online <ArrowUpRight className="w-4 h-4" />
                     </a>
-                  </div>
-
-                  {/* Metadata Card */}
-                  <div className="bg-white rounded-3xl p-8 border border-white shadow-xl shadow-slate-200/40 space-y-6">
-                    {selected.launched_year && (
-                      <div>
-                        <p className="text-[10px] uppercase font-black text-slate-400 tracking-wider mb-2">Launched In</p>
-                        <span className="text-lg font-bold text-slate-800 flex items-center gap-2"><Clock className="w-5 h-5 text-indigo-500" /> {selected.launched_year}</span>
-                      </div>
-                    )}
-                    {selected.helpline && (
-                      <div>
-                        <p className="text-[10px] uppercase font-black text-slate-400 tracking-wider mb-2">Helpline</p>
-                        <span className="text-lg font-bold text-slate-800 flex items-center gap-2"><Phone className="w-5 h-5 text-indigo-500" /> {selected.helpline}</span>
-                      </div>
-                    )}
-                    {selected.tags && selected.tags.length > 0 && (
-                      <div>
-                        <p className="text-[10px] uppercase font-black text-slate-400 tracking-wider mb-3">Tags</p>
-                        <div className="flex flex-wrap gap-2">
-                          {selected.tags.map((tag, i) => (
-                            <span key={i} className="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-slate-50 text-slate-600">
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
+                  )}
+                  <a
+                    href={`https://www.myscheme.gov.in/schemes/${selected.id}`}
+                    target="_blank" rel="noopener noreferrer"
+                    className="flex items-center gap-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-bold py-3.5 px-7 rounded-xl transition-colors shadow-sm text-sm"
+                  >
+                    View on myScheme <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                  {selected.launched_year && (
+                    <span className="flex items-center gap-1.5 text-xs text-slate-400 font-bold ml-auto"><Clock className="w-3.5 h-3.5 text-indigo-400" /> Est. {selected.launched_year}</span>
+                  )}
+                  {selected.helpline && (
+                    <span className="flex items-center gap-1.5 text-xs text-slate-400 font-bold"><Phone className="w-3.5 h-3.5 text-indigo-400" /> {selected.helpline}</span>
+                  )}
                 </div>
+
               </div>
             </div>
           </div>
