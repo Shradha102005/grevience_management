@@ -299,3 +299,29 @@ class Scheme(Base):
         default=lambda: datetime.now(timezone.utc),
         nullable=False,
     )
+
+
+# ── Helpline Ticket ────────────────────────────────────────────────────────────
+
+class HelplineTicket(Base):
+    """Persisted support ticket raised via the AI Helpline bot or directly."""
+    __tablename__ = "helpline_tickets"
+
+    ticket_id:       Mapped[str]            = mapped_column(String(30),  primary_key=True)
+    subject:         Mapped[str]            = mapped_column(String(255), nullable=False)
+    query:           Mapped[str]            = mapped_column(Text,        nullable=False)
+    requester_name:  Mapped[str]            = mapped_column(String(150), nullable=False, default="Citizen")
+    priority:        Mapped[str]            = mapped_column(String(30),  nullable=False, default="Normal")
+    channel:         Mapped[str]            = mapped_column(String(30),  nullable=False, default="Web")
+    language:        Mapped[str]            = mapped_column(String(10),  nullable=False, default="en")
+    status:          Mapped[str]            = mapped_column(String(30),  nullable=False, default="Open")
+    expected_response: Mapped[str]          = mapped_column(String(50),  nullable=False, default="24 hours")
+    submitted_by:    Mapped[Optional[str]]  = mapped_column(String(40),  nullable=True)   # user UUID as str
+    messages:        Mapped[list]           = mapped_column(JSON,        nullable=False, default=list)
+    created_at:      Mapped[datetime]       = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False
+    )
+    updated_at:      Mapped[datetime]       = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc), nullable=False
+    )

@@ -23,6 +23,7 @@ from routers import municipal as municipal_router
 from routers import ai_chat as ai_chat_router
 from routers import live_data as live_data_router
 from routers import schemes as schemes_router
+from routers import voice as voice_router
 
 
 @asynccontextmanager
@@ -65,6 +66,7 @@ app.include_router(municipal_router.router)
 app.include_router(ai_chat_router.router)
 app.include_router(live_data_router.router)
 app.include_router(schemes_router.router)
+app.include_router(voice_router.router)
 
 
 # ── Health Check ──────────────────────────────────────────────────────────────

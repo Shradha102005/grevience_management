@@ -1,13 +1,12 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect, useRef, useCallback } from "react";
 import {
   Search, Terminal, Command, Sparkles, Building2, Landmark, 
-  MapPin, MessageSquareWarning, Briefcase, FileText, X, ChevronRight, Mic
+  MapPin, MessageSquareWarning, Briefcase, FileText, X, ChevronRight, Mic,
+  LayoutDashboard, Siren, Megaphone, PhoneCall, Sprout, Leaf
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { VoiceOrb, type VoiceOrbState } from "@/components/portal/voice-orb";
 import { toast } from "sonner";
 
@@ -30,6 +29,146 @@ function VoiceAssistant() {
 
   const recognitionRef = useRef<any>(null);
   const synthRef = useRef<SpeechSynthesis | null>(null);
+  const navigate = useNavigate();
+
+  // Refs to avoid React state closure traps inside event handlers
+  const orbStateRef = useRef(orbState);
+  const latestTranscriptRef = useRef("");
+
+  useEffect(() => {
+    orbStateRef.current = orbState;
+  }, [orbState]);
+
+  // Clean up SpeechSynthesis when navigating away or unmounting
+  useEffect(() => {
+    return () => {
+      synthRef.current?.cancel();
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.stop();
+        } catch (e) {
+          // ignore
+        }
+      }
+    };
+  }, []);
+
+  const speak = useCallback((text: string) => {
+    if (!synthRef.current) return;
+    synthRef.current.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 1.05;
+    utterance.pitch = 1.0;
+    
+    // Pick a premium voice or fallback to native BCP-47 match
+    const voices = synthRef.current.getVoices();
+    const premiumVoice = voices.find(v => v.name.includes("Google") || v.name.includes("Premium") || v.lang === "en-US");
+    if (premiumVoice) utterance.voice = premiumVoice;
+
+    utterance.onend = () => setOrbState("idle");
+    utterance.onerror = () => setOrbState("idle");
+
+    synthRef.current.speak(utterance);
+  }, []);
+
+  const handleProcessQuery = useCallback(async (text: string) => {
+    if (!text.trim()) return;
+    setOrbState("processing");
+    setTranscript(text);
+
+    try {
+      const res = await fetch("http://localhost:8000/ai/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          module: "voice",
+          message: text,
+          language: "en",
+          history: [],
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
+
+      const data = await res.json();
+      const reply = data.reply || "I didn't receive a response from the service. Please try again.";
+
+      // Dynamically determine matching system modules based on query or response keywords
+      const lowerQuery = text.toLowerCase();
+      let intent = "Voice Assistant Help";
+      let actions: Array<{ label: string; route: string; icon: any; color: string }> = [];
+
+      if (lowerQuery.includes("scheme") || lowerQuery.includes("eligibility") || lowerQuery.includes("welfare") || lowerQuery.includes("apply")) {
+        intent = "Scheme Discovery & Eligibility";
+        actions = [
+          { label: "Search Schemes via AI", route: "/portal/scheme-ai", icon: Landmark, color: "#10b981" },
+          { label: "View Portal Dashboard", route: "/portal", icon: LayoutDashboard, color: "#6366f1" }
+        ];
+      } else if (lowerQuery.includes("grievance") || lowerQuery.includes("complaint") || lowerQuery.includes("report") || lowerQuery.includes("status")) {
+        intent = "Grievance & Issue Resolution";
+        actions = [
+          { label: "Check Grievances Dashboard", route: "/portal/grievances", icon: MessageSquareWarning, color: "#f59e0b" },
+          { label: "Go to Dashboard", route: "/portal", icon: LayoutDashboard, color: "#6366f1" }
+        ];
+      } else if (lowerQuery.includes("traffic") || lowerQuery.includes("city") || lowerQuery.includes("water") || lowerQuery.includes("power") || lowerQuery.includes("municipal") || lowerQuery.includes("road")) {
+        intent = "Municipal Services & Smart City";
+        actions = [
+          { label: "View Municipal Services", route: "/portal/municipal", icon: Building2, color: "#3b82f6" },
+          { label: "View Smart City Dashboard", route: "/portal/smart-city", icon: Building2, color: "#06b6d4" }
+        ];
+      } else if (lowerQuery.includes("rural") || lowerQuery.includes("panchayat") || lowerQuery.includes("village") || lowerQuery.includes("mgnrega")) {
+        intent = "Rural Welfare & Schemes";
+        actions = [
+          { label: "Go to Rural Portal", route: "/portal/rural", icon: Sprout, color: "#84cc16" }
+        ];
+      } else if (lowerQuery.includes("crop") || lowerQuery.includes("soil") || lowerQuery.includes("farm") || lowerQuery.includes("agriculture") || lowerQuery.includes("pest")) {
+        intent = "Agriculture Advisor";
+        actions = [
+          { label: "Get Crop Diagnosis", route: "/portal/agriculture", icon: Leaf, color: "#16a34a" }
+        ];
+      } else if (lowerQuery.includes("disaster") || lowerQuery.includes("weather") || lowerQuery.includes("emergency") || lowerQuery.includes("alert") || lowerQuery.includes("flood") || lowerQuery.includes("cyclone")) {
+        intent = "Disaster & Emergency Alerts";
+        actions = [
+          { label: "View Live Alerts", route: "/portal/disaster", icon: Siren, color: "#ef4444" }
+        ];
+      } else if (lowerQuery.includes("campaign") || lowerQuery.includes("election") || lowerQuery.includes("outreach") || lowerQuery.includes("speech")) {
+        intent = "Public Campaigns & Election";
+        actions = [
+          { label: "Campaign & Outreach manager", route: "/portal/election", icon: Megaphone, color: "#a855f7" }
+        ];
+      } else if (lowerQuery.includes("help") || lowerQuery.includes("helpline") || lowerQuery.includes("support")) {
+        intent = "Citizen Support Helpline";
+        actions = [
+          { label: "Connect with Helpline Chat", route: "/portal/helpline", icon: PhoneCall, color: "#ec4899" }
+        ];
+      } else {
+        // General fallback
+        intent = "CIVICOS Unified Assistant";
+        actions = [
+          { label: "Explore Portal Dashboard", route: "/portal", icon: LayoutDashboard, color: "#6366f1" },
+          { label: "Ask Helpline", route: "/portal/helpline", icon: PhoneCall, color: "#ec4899" }
+        ];
+      }
+
+      setResults({
+        intent,
+        summary: reply,
+        actions
+      });
+
+      setOrbState("speaking");
+      speak(reply);
+
+    } catch (err) {
+      console.error("AI voice query error:", err);
+      const errorMsg = "I'm having trouble communicating with the backend. Please ensure the server is running.";
+      setTranscript(errorMsg);
+      setOrbState("idle");
+      toast.error("Failed to connect to backend AI Chat service.");
+    }
+  }, [speak]);
 
   useEffect(() => {
     synthRef.current = window.speechSynthesis;
@@ -46,18 +185,26 @@ function VoiceAssistant() {
         setOrbState("listening");
         setResults(null);
         setTranscript("Listening...");
+        latestTranscriptRef.current = "";
       };
 
       recognitionRef.current.onresult = (event: any) => {
         const current = event.resultIndex;
         const transcriptText = event.results[current][0].transcript;
         setTranscript(transcriptText);
+        latestTranscriptRef.current = transcriptText;
       };
 
       recognitionRef.current.onend = () => {
-        if (orbState === "listening") {
-          // If we stopped naturally, process the query
-          handleProcessQuery();
+        // Use ref to read current state and avoid stale closure bug
+        if (orbStateRef.current === "listening") {
+          const spoken = latestTranscriptRef.current.trim();
+          if (spoken) {
+            handleProcessQuery(spoken);
+          } else {
+            setOrbState("idle");
+            setTranscript("I didn't catch that. Tap the orb to try again.");
+          }
         }
       };
 
@@ -67,7 +214,7 @@ function VoiceAssistant() {
         setTranscript("Tap the orb to try again.");
       };
     }
-  }, []);
+  }, [handleProcessQuery]);
 
   const toggleVoice = () => {
     if (orbState === "listening") {
@@ -87,60 +234,15 @@ function VoiceAssistant() {
     }
   };
 
-  const handleProcessQuery = useCallback(() => {
-    setOrbState("processing");
-    // Simulate AI processing the voice or text intent
-    setTimeout(() => {
-      const responseText = "I found 3 active high-priority traffic alerts in Sector 4. The main congestion is at MG Road due to an accident reported 15 minutes ago. Would you like me to dispatch traffic police?";
-      
-      setResults({
-        intent: "Traffic Incident Analysis",
-        summary: responseText,
-        actions: [
-          { label: "Dispatch Traffic Police", icon: Terminal, color: "#ef4444" },
-          { label: "View Smart Dashboard", icon: Building2, color: "#3b82f6" },
-        ]
-      });
-
-      setOrbState("speaking");
-      speak(responseText);
-    }, 1500);
-  }, []);
-
   // Sync text input with manual submit
   const handleTextSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!queryInput.trim()) return;
-    setTranscript(queryInput);
+    const text = queryInput;
+    setTranscript(text);
     setQueryInput("");
-    handleProcessQuery();
+    handleProcessQuery(text);
   };
-
-  const speak = (text: string) => {
-    if (!synthRef.current) return;
-    synthRef.current.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 1.05;
-    utterance.pitch = 1.0;
-    
-    // Pick a nice voice if available
-    const voices = synthRef.current.getVoices();
-    const premiumVoice = voices.find(v => v.name.includes("Google") || v.name.includes("Premium") || v.lang === "en-US");
-    if (premiumVoice) utterance.voice = premiumVoice;
-
-    utterance.onend = () => setOrbState("idle");
-    utterance.onerror = () => setOrbState("idle");
-
-    synthRef.current.speak(utterance);
-  };
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      synthRef.current?.cancel();
-      if (orbState === "listening") recognitionRef.current?.stop();
-    };
-  }, []);
 
   return (
     <div style={{ position: "relative", display: "flex", flexDirection: "column", height: "calc(100vh - 4rem)", overflow: "hidden", background: "#f8fafc", color: "#0f172a", alignItems: "center", justifyItems: "center", justifyContent: "center" }} className="-m-6">
@@ -178,7 +280,7 @@ function VoiceAssistant() {
         
         {/* The Voice Orb */}
         <div style={{ marginBottom: results ? "40px" : "60px", transition: "all 0.5s cubic-bezier(0.16,1,0.3,1)", transform: results ? "scale(0.8) translateY(-20px)" : "scale(1) translateY(0)" }}>
-          <VoiceOrb state={orbState} onClick={toggleVoice} size="lg" className="shadow-[0_10px_40px_rgba(139,92,246,0.2)] rounded-full" />
+          <VoiceOrb state={orbState} onClick={toggleVoice} size="lg" className="shadow-[0_10px_40px_rgba(139,92,246,0.2)] rounded-full cursor-pointer" />
         </div>
 
         {/* Live Transcript / Response */}
@@ -211,7 +313,13 @@ function VoiceAssistant() {
                 
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
                   {results.actions.map((a: any, i: number) => (
-                    <button key={i} style={{ padding: "14px", borderRadius: "16px", background: "#f8fafc", border: "1px solid #e2e8f0", color: "#0f172a", display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", transition: "all 0.2s" }} onMouseEnter={e => e.currentTarget.style.background = "#f1f5f9"} onMouseLeave={e => e.currentTarget.style.background = "#f8fafc"}>
+                    <button 
+                      key={i} 
+                      onClick={() => navigate({ to: a.route })}
+                      style={{ padding: "14px", borderRadius: "16px", background: "#f8fafc", border: "1px solid #e2e8f0", color: "#0f172a", display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", transition: "all 0.2s" }} 
+                      onMouseEnter={e => e.currentTarget.style.background = "#f1f5f9"} 
+                      onMouseLeave={e => e.currentTarget.style.background = "#f8fafc"}
+                    >
                       <div style={{ width: "28px", height: "28px", borderRadius: "8px", background: `${a.color}15`, display: "flex", alignItems: "center", justifyContent: "center" }}>
                         <a.icon style={{ width: 14, height: 14, color: a.color }} />
                       </div>
@@ -233,7 +341,7 @@ function VoiceAssistant() {
         {!results && orbState === "idle" && (
           <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", justifyContent: "center", maxWidth: "800px" }}>
             {QUICK_ACTIONS.map((a, i) => (
-              <button key={i} onClick={() => { setTranscript(a.label); handleProcessQuery(); }} style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 16px", borderRadius: "20px", background: "white", border: "1px solid #e2e8f0", color: "#334155", fontSize: "13px", fontWeight: 600, cursor: "pointer", boxShadow: "0 2px 8px rgba(0,0,0,0.02)", transition: "all 0.2s" }} onMouseEnter={e => e.currentTarget.style.background = "#f8fafc"} onMouseLeave={e => e.currentTarget.style.background = "white"}>
+              <button key={i} onClick={() => { setTranscript(a.label); handleProcessQuery(a.label); }} style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 16px", borderRadius: "20px", background: "white", border: "1px solid #e2e8f0", color: "#334155", fontSize: "13px", fontWeight: 600, cursor: "pointer", boxShadow: "0 2px 8px rgba(0,0,0,0.02)", transition: "all 0.2s" }} onMouseEnter={e => e.currentTarget.style.background = "#f8fafc"} onMouseLeave={e => e.currentTarget.style.background = "white"}>
                 <a.icon style={{ width: 14, height: 14, color: a.color }} />
                 {a.label}
               </button>

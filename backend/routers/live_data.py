@@ -25,7 +25,7 @@ from sqlalchemy.orm import Session
 
 from database import get_db
 from dependencies import get_current_user
-from models import User
+from models import User, HelplineTicket as HelplineTicketORM
 
 logger = logging.getLogger(__name__)
 
@@ -40,92 +40,65 @@ _CITY_SERVICES: list[dict] = []
 _DEPARTMENTS: list[dict] = []
 _SCHEMES: list[dict] = []
 _RURAL_PROGRAMS: list[dict] = []
-_HELPLINE_TICKETS: list[dict] = []
-_TICKETS_SEEDED = False
+def _seed_helpline_tickets_db(db: Session):
+    """Seed 4 demo helpline tickets into the DB — runs once, only if table is empty."""
+    if db.query(HelplineTicketORM).count() > 0:
+        return
+    now = datetime.now(timezone.utc)
+
+    def minsago(n: int) -> datetime:
+        return now - dt_module.timedelta(minutes=n)
+
+    seed_rows = [
+        HelplineTicketORM(
+            ticket_id="HLP-90214", subject="Ration Card Renewal Failed",
+            query="I tried renewing my ration card online but the OTP never arrives.",
+            requester_name="Rajesh K.", priority="High", channel="Phone", language="en",
+            status="Open", expected_response="2 hours",
+            created_at=minsago(30), updated_at=minsago(10),
+            messages=[{"sender": "Rajesh K.", "sender_type": "user",
+                       "text": "I tried renewing my ration card online but the OTP never arrives to my registered mobile.",
+                       "time": minsago(30).isoformat()}],
+        ),
+        HelplineTicketORM(
+            ticket_id="HLP-90213", subject="Birth Certificate — Documents Required",
+            query="What documents are required for a birth certificate?",
+            requester_name="Meena S.", priority="Normal", channel="Web", language="en",
+            status="Pending", expected_response="4 hours",
+            created_at=minsago(90), updated_at=minsago(60),
+            messages=[
+                {"sender": "Meena S.", "sender_type": "user", "text": "What documents are required for a birth certificate application?", "time": minsago(90).isoformat()},
+                {"sender": "Agent", "sender_type": "agent", "text": "Hello Meena, you need the hospital discharge summary and both parents' Aadhaar cards. If born at home, a declaration from the local Panchayat is needed.", "time": minsago(60).isoformat()},
+            ],
+        ),
+        HelplineTicketORM(
+            ticket_id="HLP-90210", subject="Property Tax Portal Down",
+            query="I cannot pay my property tax, the payment gateway keeps crashing.",
+            requester_name="Ahmed R.", priority="Critical", channel="Email", language="en",
+            status="Open", expected_response="1 hour",
+            created_at=minsago(150), updated_at=minsago(120),
+            messages=[{"sender": "Ahmed R.", "sender_type": "user",
+                       "text": "I cannot pay my property tax online. The payment gateway crashes every time I click 'Pay Now'. I need to pay before the deadline tomorrow.",
+                       "time": minsago(150).isoformat()}],
+        ),
+        HelplineTicketORM(
+            ticket_id="HLP-90205", subject="Streetlight Not Working — Sector 4",
+            query="The streetlight near sector 4 park has been broken for 3 days.",
+            requester_name="Priya V.", priority="Low", channel="App", language="en",
+            status="Resolved", expected_response="48 hours",
+            created_at=minsago(60 * 26), updated_at=minsago(60 * 2),
+            messages=[
+                {"sender": "Priya V.", "sender_type": "user", "text": "The streetlight near sector 4 park has been broken for 3 days. It is very dark and unsafe at night.", "time": minsago(60 * 26).isoformat()},
+                {"sender": "Agent", "sender_type": "agent", "text": "Thank you for reporting, Priya. We have raised a work order with the municipal electrical team. Estimated fix: 48 hours.", "time": minsago(60 * 20).isoformat()},
+                {"sender": "Agent", "sender_type": "agent", "text": "The streetlight has been repaired. Closing this ticket. Thank you for your patience!", "time": minsago(60 * 2).isoformat()},
+            ],
+        ),
+    ]
+    db.add_all(seed_rows)
+    db.commit()
 
 _DATA_INITIALIZED = False
 
-
-def _seed_helpline_tickets():
-    """Seed 4 realistic demo helpline tickets (runs once)."""
-    global _HELPLINE_TICKETS, _TICKETS_SEEDED
-    if _TICKETS_SEEDED:
-        return
-    _TICKETS_SEEDED = True
-    now = datetime.now(timezone.utc)
-
-    def minsago(n: int) -> str:
-        return (now - dt_module.timedelta(minutes=n)).isoformat()
-
-    _HELPLINE_TICKETS = [
-        {
-            "ticket_id": "HLP-90214",
-            "subject": "Ration Card Renewal Failed",
-            "query": "I tried renewing my ration card online but the OTP never arrives.",
-            "requester_name": "Rajesh K.",
-            "priority": "High",
-            "channel": "Phone",
-            "language": "en",
-            "status": "Open",
-            "created_at": minsago(30),
-            "updated_at": minsago(10),
-            "expected_response": "2 hours",
-            "messages": [
-                {"sender": "Rajesh K.", "sender_type": "user",  "text": "I tried renewing my ration card online but the OTP never arrives to my registered mobile.", "time": minsago(30)},
-            ],
-        },
-        {
-            "ticket_id": "HLP-90213",
-            "subject": "Birth Certificate — Documents Required",
-            "query": "What documents are required for a birth certificate?",
-            "requester_name": "Meena S.",
-            "priority": "Normal",
-            "channel": "Web",
-            "language": "en",
-            "status": "Pending",
-            "created_at": minsago(90),
-            "updated_at": minsago(60),
-            "expected_response": "4 hours",
-            "messages": [
-                {"sender": "Meena S.",  "sender_type": "user",  "text": "What documents are required for a birth certificate application?",                                        "time": minsago(90)},
-                {"sender": "Agent",     "sender_type": "agent", "text": "Hello Meena, you need the hospital discharge summary and both parents' Aadhaar cards. If born at home, a declaration from the local Panchayat is needed.", "time": minsago(60)},
-            ],
-        },
-        {
-            "ticket_id": "HLP-90210",
-            "subject": "Property Tax Portal Down",
-            "query": "I cannot pay my property tax, the payment gateway keeps crashing.",
-            "requester_name": "Ahmed R.",
-            "priority": "Critical",
-            "channel": "Email",
-            "language": "en",
-            "status": "Open",
-            "created_at": minsago(150),
-            "updated_at": minsago(120),
-            "expected_response": "1 hour",
-            "messages": [
-                {"sender": "Ahmed R.",  "sender_type": "user",  "text": "I cannot pay my property tax online. The payment gateway crashes every time I click 'Pay Now'. I need to pay before the deadline tomorrow.", "time": minsago(150)},
-            ],
-        },
-        {
-            "ticket_id": "HLP-90205",
-            "subject": "Streetlight Not Working — Sector 4",
-            "query": "The streetlight near sector 4 park has been broken for 3 days.",
-            "requester_name": "Priya V.",
-            "priority": "Low",
-            "channel": "App",
-            "language": "en",
-            "status": "Resolved",
-            "created_at": minsago(60 * 26),
-            "updated_at": minsago(60 * 2),
-            "expected_response": "48 hours",
-            "messages": [
-                {"sender": "Priya V.",  "sender_type": "user",  "text": "The streetlight near sector 4 park has been broken for 3 days. It is very dark and unsafe at night.", "time": minsago(60 * 26)},
-                {"sender": "Agent",     "sender_type": "agent", "text": "Thank you for reporting, Priya. We have raised a work order with the municipal electrical team. Estimated fix: 48 hours.",                "time": minsago(60 * 20)},
-                {"sender": "Agent",     "sender_type": "agent", "text": "The streetlight has been repaired. Closing this ticket. Thank you for your patience!",                                                             "time": minsago(60 * 2)},
-            ],
-        },
-    ]
 
 
 def _seed_data():
@@ -1532,7 +1505,7 @@ class CityServiceUpdate(BaseModel):
     status: str  # "ok" | "warn" | "alert"
 
 
-class HelplineTicket(BaseModel):
+class HelplineTicketCreate(BaseModel):
     query: str
     subject: str = ""
     requester_name: str = "Citizen"
@@ -2215,142 +2188,144 @@ async def get_rural_programs(
 
 
 # ── Helpline Tickets ──────────────────────────────────────────────────────────
-
 @router.get("/helpline/tickets")
 async def list_helpline_tickets(
     status: Optional[str] = Query(default=None),
     search: Optional[str] = Query(default=None),
     submitted_by: Optional[str] = Query(default=None),
+    db: Session = Depends(get_db),
 ) -> dict:
-    """List all helpline tickets, optionally filtered by status or keyword."""
     _seed_data()
-    _seed_helpline_tickets()
-    results = list(_HELPLINE_TICKETS)
+    _seed_helpline_tickets_db(db)
+
+    query = db.query(HelplineTicketORM)
+    if submitted_by:
+        query = query.filter(HelplineTicketORM.submitted_by == submitted_by)
+    all_for_counts = query.all()
+
+    results = list(all_for_counts)
     if status and status.lower() != "all":
-        results = [t for t in results if t["status"].lower() == status.lower()]
+        results = [t for t in results if t.status.lower() == status.lower()]
     if search:
         q = search.lower()
-        results = [t for t in results if q in t["subject"].lower() or q in t["requester_name"].lower() or q in t["query"].lower()]
-    if submitted_by:
-        results = [t for t in results if t.get("submitted_by") == submitted_by]
+        results = [t for t in results if q in t.subject.lower() or q in t.requester_name.lower() or q in t.query.lower()]
+    results = sorted(results, key=lambda t: t.updated_at, reverse=True)
 
-    # Sort newest first
-    results = sorted(results, key=lambda t: t["updated_at"], reverse=True)
-    if submitted_by:
-        counts = {
-            "Open":     sum(1 for t in _HELPLINE_TICKETS if t["status"] == "Open" and t.get("submitted_by") == submitted_by),
-            "Pending":  sum(1 for t in _HELPLINE_TICKETS if t["status"] == "Pending" and t.get("submitted_by") == submitted_by),
-            "Resolved": sum(1 for t in _HELPLINE_TICKETS if t["status"] == "Resolved" and t.get("submitted_by") == submitted_by),
-            "All":      len(results),
+    counts = {
+        "Open": sum(1 for t in all_for_counts if t.status == "Open"),
+        "Pending": sum(1 for t in all_for_counts if t.status == "Pending"),
+        "Resolved": sum(1 for t in all_for_counts if t.status == "Resolved"),
+        "All": len(all_for_counts),
+    }
+
+    def serialize(t: HelplineTicketORM) -> dict:
+        return {
+            "ticket_id": t.ticket_id, "subject": t.subject, "query": t.query,
+            "requester_name": t.requester_name, "priority": t.priority, "channel": t.channel,
+            "language": t.language, "status": t.status,
+            "created_at": t.created_at.isoformat(), "updated_at": t.updated_at.isoformat(),
+            "expected_response": t.expected_response, "submitted_by": t.submitted_by,
+            "messages": t.messages,
         }
-    else:
-        counts = {
-            "Open":     sum(1 for t in _HELPLINE_TICKETS if t["status"] == "Open"),
-            "Pending":  sum(1 for t in _HELPLINE_TICKETS if t["status"] == "Pending"),
-            "Resolved": sum(1 for t in _HELPLINE_TICKETS if t["status"] == "Resolved"),
-            "All":      len(_HELPLINE_TICKETS),
-        }
-    return {"tickets": results, "counts": counts, "total": len(results)}
+
+    return {"tickets": [serialize(t) for t in results], "counts": counts, "total": len(results)}
+
+
+
+
+
 
 
 @router.post("/helpline/ticket", response_model=HelplineTicketResponse)
-async def create_helpline_ticket(req: HelplineTicket) -> HelplineTicketResponse:
-    """Create a tracked helpline query ticket."""
+async def create_helpline_ticket(req: HelplineTicketCreate, db: Session = Depends(get_db)) -> HelplineTicketResponse:
     _seed_data()
-    _seed_helpline_tickets()
+    _seed_helpline_tickets_db(db)
+
     tid = f"HLP-{str(uuid.uuid4())[:8].upper()}"
-    now_iso = datetime.now(timezone.utc).isoformat()
+    now = datetime.now(timezone.utc)
     subject = req.subject.strip() or req.query[:60].strip()
-    ticket = {
-        "ticket_id": tid,
-        "subject": subject,
-        "query": req.query,
-        "requester_name": req.requester_name or "Citizen",
-        "priority": req.priority,
-        "channel": req.channel,
-        "language": req.language,
-        "status": "Open",
-        "created_at": now_iso,
-        "updated_at": now_iso,
-        "expected_response": "24 hours",
-        "submitted_by": req.submitted_by,
-        "messages": [
-            {
-                "sender": req.requester_name or "Citizen",
-                "sender_type": "user",
-                "text": req.query,
-                "time": now_iso,
-            }
-        ],
-    }
-    _HELPLINE_TICKETS.append(ticket)
+
+    ticket = HelplineTicketORM(
+        ticket_id=tid, subject=subject, query=req.query,
+        requester_name=req.requester_name or "Citizen",
+        priority=req.priority, channel=req.channel, language=req.language,
+        status="Open", expected_response="24 hours", submitted_by=req.submitted_by,
+        messages=[{"sender": req.requester_name or "Citizen", "sender_type": "user",
+                   "text": req.query, "time": now.isoformat()}],
+    )
+    db.add(ticket)
+    db.commit()
+    db.refresh(ticket)
+
     logger.info(f"Helpline ticket created: {tid} — {subject[:60]}")
     return HelplineTicketResponse(
-        ticket_id=ticket["ticket_id"], # type: ignore
-        subject=ticket["subject"], # type: ignore
-        query=ticket["query"], # type: ignore
-        requester_name=ticket["requester_name"], # type: ignore
-        priority=ticket["priority"], # type: ignore
-        channel=ticket["channel"], # type: ignore
-        status=ticket["status"], # type: ignore
-        created_at=ticket["created_at"], # type: ignore
-        updated_at=ticket["updated_at"], # type: ignore
-        expected_response=ticket["expected_response"], # type: ignore
+        ticket_id=ticket.ticket_id, subject=ticket.subject, query=ticket.query,
+        requester_name=ticket.requester_name, priority=ticket.priority, channel=ticket.channel,
+        status=ticket.status, created_at=ticket.created_at.isoformat(),
+        updated_at=ticket.updated_at.isoformat(), expected_response=ticket.expected_response,
     )
-
-
 @router.get("/helpline/ticket/{ticket_id}")
-async def get_ticket_detail(ticket_id: str) -> dict:
-    """Get a single ticket with its full message thread."""
+async def get_ticket_detail(ticket_id: str, db: Session = Depends(get_db)) -> dict:
+    """Open to any logged-in role — no staff/citizen restriction."""
     _seed_data()
-    _seed_helpline_tickets()
-    ticket = next((t for t in _HELPLINE_TICKETS if t["ticket_id"] == ticket_id.upper()), None)
+    _seed_helpline_tickets_db(db)
+    ticket = db.get(HelplineTicketORM, ticket_id.upper())
     if not ticket:
         raise HTTPException(status_code=404, detail="Ticket not found")
-    return ticket
-
+    return {
+        "ticket_id": ticket.ticket_id, "subject": ticket.subject, "query": ticket.query,
+        "requester_name": ticket.requester_name, "priority": ticket.priority, "channel": ticket.channel,
+        "language": ticket.language, "status": ticket.status,
+        "created_at": ticket.created_at.isoformat(), "updated_at": ticket.updated_at.isoformat(),
+        "expected_response": ticket.expected_response, "submitted_by": ticket.submitted_by,
+        "messages": ticket.messages,
+    }
 
 @router.post("/helpline/ticket/{ticket_id}/reply")
-async def reply_to_ticket(ticket_id: str, reply: HelplineReply) -> dict:
-    """Append a reply message to a ticket thread."""
+async def reply_to_ticket(ticket_id: str, reply: HelplineReply, db: Session = Depends(get_db)) -> dict:
+    """Append a reply. No role restriction — any logged-in user can continue the thread."""
     _seed_data()
-    _seed_helpline_tickets()
-    ticket = next((t for t in _HELPLINE_TICKETS if t["ticket_id"] == ticket_id.upper()), None)
+    _seed_helpline_tickets_db(db)
+    ticket = db.get(HelplineTicketORM, ticket_id.upper())
     if not ticket:
         raise HTTPException(status_code=404, detail="Ticket not found")
-    now_iso = datetime.now(timezone.utc).isoformat()
-    msg = {
-        "sender": reply.sender,
-        "sender_type": reply.sender_type,
-        "text": reply.text,
-        "time": now_iso,
-    }
-    ticket.setdefault("messages", []).append(msg)
-    ticket["updated_at"] = now_iso
+
+    now = datetime.now(timezone.utc)
+    msg = {"sender": reply.sender, "sender_type": reply.sender_type, "text": reply.text, "time": now.isoformat()}
+
+    msgs = list(ticket.messages)  # must reassign — JSON columns don't track in-place .append()
+    msgs.append(msg)
+    ticket.messages = msgs
+    ticket.updated_at = now
+    db.commit()
+
     logger.info(f"Reply added to {ticket_id} by {reply.sender}")
     return {"message": "Reply added", "ticket_id": ticket_id, "msg": msg}
 
 
 @router.patch("/helpline/ticket/{ticket_id}/status")
-async def update_ticket_status(ticket_id: str, update: HelplineStatusUpdate) -> dict:
-    """Update the status of a helpline ticket."""
+async def update_ticket_status(ticket_id: str, update: HelplineStatusUpdate, db: Session = Depends(get_db)) -> dict:
+    """Open to any role — no admin/officer restriction."""
     _seed_data()
-    _seed_helpline_tickets()
+    _seed_helpline_tickets_db(db)
     valid = {"Open", "Pending", "Resolved"}
     if update.status not in valid:
         raise HTTPException(status_code=400, detail=f"Status must be one of {valid}")
-    ticket = next((t for t in _HELPLINE_TICKETS if t["ticket_id"] == ticket_id.upper()), None)
+
+    ticket = db.get(HelplineTicketORM, ticket_id.upper())
     if not ticket:
         raise HTTPException(status_code=404, detail="Ticket not found")
-    ticket["status"] = update.status
-    ticket["updated_at"] = datetime.now(timezone.utc).isoformat()
+
+    ticket.status = update.status
+    ticket.updated_at = datetime.now(timezone.utc)
+    db.commit()
+
     logger.info(f"Ticket {ticket_id} status → {update.status}")
     return {"message": "Status updated", "ticket_id": ticket_id, "status": update.status}
 
 
 @router.get("/status")
-async def live_status() -> dict:
-    """Health check for live data endpoints."""
+async def live_status(db: Session = Depends(get_db)) -> dict:
     _seed_data()
     try:
         from routers.scheme_scraper import get_scrape_status
@@ -2365,5 +2340,5 @@ async def live_status() -> dict:
         "departments_count": len(_DEPARTMENTS),
         "city_services_count": len(_CITY_SERVICES),
         "rural_programs_count": len(_RURAL_PROGRAMS),
-        "helpline_tickets": len(_HELPLINE_TICKETS),
+        "helpline_tickets": db.query(HelplineTicketORM).count(),
     }
