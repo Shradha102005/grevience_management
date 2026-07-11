@@ -68,12 +68,15 @@ api.interceptors.response.use(
         processQueue(null, newToken);
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
         return api(originalRequest);
-      } catch (refreshError) {
+      } catch (refreshError: any) {
         processQueue(refreshError, null);
         if (typeof window !== "undefined") {
-          localStorage.removeItem("access_token");
-          localStorage.removeItem("civicos_user");
-          window.location.href = "/login";
+          // Only force logout if the refresh definitively failed due to auth (e.g. 401)
+          if (refreshError.response?.status === 401 || refreshError.response?.status === 403) {
+            localStorage.removeItem("access_token");
+            localStorage.removeItem("civicos_user");
+            window.location.href = "/login";
+          }
         }
         return Promise.reject(refreshError);
       } finally {

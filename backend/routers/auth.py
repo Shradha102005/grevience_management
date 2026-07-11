@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from database import get_db
 from models import User
-from schemas import RegisterRequest, LoginRequest, TokenResponse, UserResponse, MessageResponse
+from schemas import RegisterRequest, LoginRequest, TokenResponse, UserResponse, MessageResponse, UpdateProfileRequest
 from auth import hash_password, verify_password, create_access_token, create_refresh_token, decode_token
 from dependencies import get_current_user
 
@@ -93,6 +93,24 @@ def login(body: LoginRequest, response: Response, db: Session = Depends(get_db))
 
 @router.get("/me", response_model=UserResponse)
 def me(current_user: User = Depends(get_current_user)):
+    return UserResponse.model_validate(current_user)
+
+
+@router.patch("/me", response_model=UserResponse)
+def update_me(
+    body: UpdateProfileRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Update current user's city preference, zone, or phone number."""
+    if body.city is not None:
+        current_user.city = body.city.strip() or None
+    if body.zone is not None:
+        current_user.zone = body.zone.strip() or None
+    if body.phone_number is not None:
+        current_user.phone_number = body.phone_number.strip() or None
+    db.commit()
+    db.refresh(current_user)
     return UserResponse.model_validate(current_user)
 
 

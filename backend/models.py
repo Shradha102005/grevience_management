@@ -56,6 +56,8 @@ class User(Base):
     # Disaster alert fields
     phone_number: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
     zone: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    # Smart City preference
+    city: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
@@ -325,3 +327,84 @@ class HelplineTicket(Base):
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc),
         onupdate=lambda: datetime.now(timezone.utc), nullable=False
     )
+
+
+# ── Smart City Models ─────────────────────────────────────────────────────────
+
+class CityEvent(Base):
+    """City event / public announcement (marathon, road closure, festival, etc.)"""
+    __tablename__ = "city_events"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    city: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
+    title: Mapped[str] = mapped_column(String(255), nullable=False)
+    description: Mapped[str] = mapped_column(Text, nullable=False)
+    category: Mapped[str] = mapped_column(String(60), nullable=False)  # marathon/festival/road_closure/exhibition/announcement
+    location: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    event_date: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    end_date: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    status: Mapped[str] = mapped_column(String(20), nullable=False, default="draft")  # draft/published/archived
+    created_by: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
+    published_by: Mapped[Optional[uuid.UUID]] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc), nullable=False
+    )
+
+    creator: Mapped["User"] = relationship("User", foreign_keys=[created_by])
+    publisher: Mapped[Optional["User"]] = relationship("User", foreign_keys=[published_by])
+
+
+class NearbyService(Base):
+    """Admin-managed nearby essential services (hospitals, police, ATMs, EV charging, etc.)"""
+    __tablename__ = "nearby_services"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    city: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    service_type: Mapped[str] = mapped_column(String(60), nullable=False, index=True)
+    # hospital/police/fire/atm/toilet/ev_charging/pharmacy
+    address: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    lat: Mapped[Optional[float]] = mapped_column(nullable=True)
+    lng: Mapped[Optional[float]] = mapped_column(nullable=True)
+    phone: Mapped[Optional[str]] = mapped_column(String(30), nullable=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    added_by: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False
+    )
+
+    adder: Mapped["User"] = relationship("User", foreign_keys=[added_by])
+
+
+class ParkingLocation(Base):
+    """City parking spots with live occupancy managed by officers/admin."""
+    __tablename__ = "parking_locations"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    city: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    address: Mapped[str] = mapped_column(String(255), nullable=False)
+    lat: Mapped[Optional[float]] = mapped_column(nullable=True)
+    lng: Mapped[Optional[float]] = mapped_column(nullable=True)
+    total_slots: Mapped[int] = mapped_column(Integer, nullable=False, default=100)
+    available_slots: Mapped[int] = mapped_column(Integer, nullable=False, default=100)
+    parking_type: Mapped[str] = mapped_column(String(30), nullable=False, default="open")  # open/covered/multi-level
+    is_paid: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    rate_per_hour: Mapped[Optional[float]] = mapped_column(nullable=True)  # INR
+    last_updated_by: Mapped[Optional[uuid.UUID]] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=True)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc), nullable=False
+    )
+
+    updater: Mapped[Optional["User"]] = relationship("User", foreign_keys=[last_updated_by])

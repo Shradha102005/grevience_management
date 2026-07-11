@@ -78,11 +78,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(data);
         setLocalStorage("civicos_user", JSON.stringify(data));
       })
-      .catch(() => {
-        // Token invalid or expired and refresh failed → clear everything
-        removeLocalStorage("access_token");
-        removeLocalStorage("civicos_user");
-        setUser(null);
+      .catch((error: any) => {
+        // Only clear if auth definitively failed, avoid clearing on network errors (server restarts)
+        if (error.response?.status === 401 || error.response?.status === 403) {
+          removeLocalStorage("access_token");
+          removeLocalStorage("civicos_user");
+          setUser(null);
+        }
       })
       .finally(() => setIsLoading(false));
   }, []);

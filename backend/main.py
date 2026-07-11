@@ -23,6 +23,7 @@ from routers import live_data as live_data_router
 from routers import schemes as schemes_router
 from routers import voice as voice_router
 from routers import agriculture as agriculture_router
+from routers import smart_city as smart_city_router
 
 
 @asynccontextmanager
@@ -67,6 +68,7 @@ app.include_router(live_data_router.router)
 app.include_router(schemes_router.router)
 app.include_router(voice_router.router)
 app.include_router(agriculture_router.router)
+app.include_router(smart_city_router.router)
 
 
 # ── Health Check ──────────────────────────────────────────────────────────────

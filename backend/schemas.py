@@ -48,6 +48,7 @@ class UserResponse(BaseModel):
     is_active: bool
     phone_number: Optional[str] = None
     zone: Optional[str] = None
+    city: Optional[str] = None
     created_at: datetime
 
     model_config = {"from_attributes": True}
@@ -57,6 +58,13 @@ class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
     user: UserResponse
+
+
+class UpdateProfileRequest(BaseModel):
+    """Partial update for the logged-in user's profile."""
+    city: Optional[str] = None
+    zone: Optional[str] = None
+    phone_number: Optional[str] = None
 
 
 class MessageResponse(BaseModel):
