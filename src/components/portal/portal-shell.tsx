@@ -126,10 +126,6 @@ export function PortalShell({ children }: { children: ReactNode }) {
           </div>
           
           <div className="flex items-center gap-1 border-l border-slate-200 pl-4">
-            <ThemeToggle />
-            <Button variant="ghost" size="icon" className="h-9 w-9 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-xl">
-              <HelpCircle className="h-4 w-4" />
-            </Button>
             <Button variant="ghost" size="icon" className="relative h-9 w-9 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-xl">
               <Bell className="h-4 w-4" />
               <span className="absolute right-2.5 top-2.5 h-1.5 w-1.5 rounded-full bg-rose-500 ring-2 ring-white" />

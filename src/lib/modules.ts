@@ -2,6 +2,7 @@ import {
   Landmark,
   Megaphone,
   PhoneCall,
+  Headset,
   Building2,
   Siren,
   Sprout,
@@ -45,7 +46,7 @@ export const MODULES: ModuleDef[] = [
     short: "Helpline",
     description:
       "Voice and chat bots for government information, department directory and citizen query tracking.",
-    icon: PhoneCall,
+    icon: Headset,
     href: "/portal/helpline",
   },
   {
