@@ -26,8 +26,7 @@ Exits with code 0 on success, 1 on failure.
 # ── MUST be first: event-loop policy before any imports ───────────────────────
 import sys
 import asyncio
-if sys.platform == "win32":
-    asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
+# Windows event-loop fix is no longer needed in Python 3.8+ (Proactor is default)
 
 import json
 import logging

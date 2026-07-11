@@ -1,8 +1,6 @@
-# ── Windows event-loop fix: must be before everything else ───────────────────
+# Windows event-loop fix is no longer needed in Python 3.8+ (Proactor is default)
 import sys
 import asyncio
-if sys.platform == "win32":
-    asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
 # ─────────────────────────────────────────────────────────────────────────────
 
 from dotenv import load_dotenv
@@ -24,6 +22,7 @@ from routers import ai_chat as ai_chat_router
 from routers import live_data as live_data_router
 from routers import schemes as schemes_router
 from routers import voice as voice_router
+from routers import agriculture as agriculture_router
 
 
 @asynccontextmanager
@@ -67,6 +66,7 @@ app.include_router(ai_chat_router.router)
 app.include_router(live_data_router.router)
 app.include_router(schemes_router.router)
 app.include_router(voice_router.router)
+app.include_router(agriculture_router.router)
 
 
 # ── Health Check ──────────────────────────────────────────────────────────────

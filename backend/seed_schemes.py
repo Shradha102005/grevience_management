@@ -20,10 +20,8 @@ if hasattr(sys.stdout, "reconfigure"):
 if hasattr(sys.stderr, "reconfigure"):
     sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
-# ── Windows event-loop fix ────────────────────────────────────────────────────
+# Windows event-loop fix is no longer needed in Python 3.8+ (Proactor is default)
 import asyncio
-if sys.platform == "win32":
-    asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
 
 import json
 import logging
@@ -106,7 +104,7 @@ def save_to_db(schemes: list[dict]) -> int:
 
                 existing = db.query(Scheme).filter(Scheme.id == slug).first()
                 if existing:
-                    existing.name        = s.get("name", slug)
+                    existing.name        = s.get("name") or slug
                     existing.ministry    = s.get("ministry") or None
                     existing.description = s.get("description") or None
                     existing.tags        = s.get("tags") or []
@@ -116,7 +114,7 @@ def save_to_db(schemes: list[dict]) -> int:
                 else:
                     db.add(Scheme(
                         id          = slug,
-                        name        = s.get("name", slug),
+                        name        = s.get("name") or slug,
                         ministry    = s.get("ministry") or None,
                         description = s.get("description") or None,
                         tags        = s.get("tags") or [],
