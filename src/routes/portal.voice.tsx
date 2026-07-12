@@ -1,4 +1,4 @@
-﻿import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect, useRef, useCallback } from "react";
 import {
   Terminal, Command, Sparkles, Building2, Landmark, 
@@ -48,7 +48,7 @@ function VoiceAssistant() {
     };
   }, []);
 
-  // ΓöÇΓöÇ Sarvam TTS ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+  // ── Sarvam TTS ──────────────────────────────────────────────────────────
   const playNextTTSChunk = useCallback(async () => {
     if (isPlayingTTS.current || ttsQueue.current.length === 0) {
       if (ttsQueue.current.length === 0 && !isStreaming) setOrbState("idle");
@@ -84,7 +84,7 @@ function VoiceAssistant() {
     playNextTTSChunk();
   }, [playNextTTSChunk]);
 
-  // ΓöÇΓöÇ Streaming AI query ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+  // ── Streaming AI query ───────────────────────────────────────────────────
   const handleProcessQuery = useCallback(async (text: string) => {
     if (!text.trim()) return;
     setOrbState("processing");
@@ -180,9 +180,9 @@ function VoiceAssistant() {
       setOrbState("idle");
       setIsStreaming(false);
     }
-  }, [speak]);
+  }, [enqueueTTSChunk]);
 
-  // ΓöÇΓöÇ Sarvam STT via MediaRecorder (with Live Browser Fallback for UX) ΓöÇΓöÇΓöÇΓöÇ
+  // ── Sarvam STT via MediaRecorder (with Live Browser Fallback for UX) ────
   const startRecording = useCallback(async () => {
     if (!navigator.mediaDevices?.getUserMedia) {
       toast.error("Microphone not available in this browser.");
@@ -219,10 +219,10 @@ function VoiceAssistant() {
       recorder.onstop = async () => {
         stream.getTracks().forEach((t) => t.stop());
         const blob = new Blob(audioChunksRef.current, { type: mimeType });
-        if (blob.size < 1000) { setOrbState("idle"); setTranscript("Too short ΓÇö tap the orb and speak clearly."); return; }
+        if (blob.size < 1000) { setOrbState("idle"); setTranscript("Too short — tap the orb and speak clearly."); return; }
 
         setOrbState("processing");
-        setTranscript("Transcribing your speechΓÇª");
+        setTranscript("Transcribing your speech…");
         try {
           const fd = new FormData();
           fd.append("audio", blob, "recording.webm");
@@ -243,7 +243,7 @@ function VoiceAssistant() {
       setOrbState("listening");
       setStreamingReply("");
       setResults(null);
-      setTranscript("ListeningΓÇª tap again when done");
+      setTranscript("Listening… tap again when done");
     } catch {
       toast.error("Microphone access denied. Please allow microphone in browser settings.");
     }
@@ -305,7 +305,7 @@ function VoiceAssistant() {
           </div>
           <div>
             <span className="text-base font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-violet-600 to-indigo-600">AI Voice Command</span>
-            <p className="text-xs text-slate-400 font-medium mt-0.5">Sarvam AI ┬╖ Groq llama-3.1</p>
+            <p className="text-xs text-slate-400 font-medium mt-0.5">Sarvam AI · Groq llama-3.1</p>
           </div>
         </div>
         {orbState !== "idle" && (

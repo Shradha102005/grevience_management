@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, type ReactNode } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   Search,
@@ -87,7 +87,7 @@ export function PortalShell({ children }: { children: ReactNode }) {
   return (
     <div className="flex h-screen w-full flex-col overflow-hidden bg-[#FAFBFF] dark:bg-[#0B0F19] font-sans text-slate-900 dark:text-slate-50 relative">
       
-      {/* ΓöÇΓöÇ Global Ambient Mesh Background ΓöÇΓöÇ */}
+      {/* ── Global Ambient Mesh Background ── */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-indigo-400/20 dark:bg-indigo-900/30 blur-[120px] animate-pulse" style={{ animationDuration: '8s' }} />
         <div className="absolute top-[20%] -right-[10%] w-[40%] h-[60%] rounded-full bg-purple-400/15 dark:bg-purple-900/20 blur-[100px] animate-pulse" style={{ animationDuration: '12s', animationDelay: '2s' }} />
@@ -118,7 +118,7 @@ export function PortalShell({ children }: { children: ReactNode }) {
               placeholder="Search services, schemes, or ask AI..."
             />
             <kbd className="hidden sm:inline-flex h-5 items-center gap-1 rounded border border-slate-200/60 dark:border-white/10 bg-white/60 dark:bg-white/5 px-1.5 font-sans text-[10px] font-bold text-slate-400 shadow-sm">
-              ΓîÿK
+              ⌘K
             </kbd>
           </div>
         </div>
@@ -232,6 +232,43 @@ export function PortalShell({ children }: { children: ReactNode }) {
       <main className="flex-1 overflow-y-auto relative w-full flex flex-col z-10">
         {children}
       </main>
+    </div>
+  );
+}
+
+export function PageHeader({
+  title,
+  description,
+  actions,
+  icon: Icon,
+}: {
+  title: string;
+  description?: string;
+  actions?: ReactNode;
+  icon?: LucideIcon;
+}) {
+  return (
+    <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between border-b border-slate-200/60 dark:border-white/10 pb-4">
+      <div className="flex items-center gap-4">
+        {Icon && (
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-500/20 shadow-sm">
+            <Icon className="h-6 w-6" />
+          </div>
+        )}
+        <div>
+          <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+            {title}
+          </h1>
+          {description && (
+            <p className="text-sm font-semibold text-slate-500 dark:text-slate-400 mt-1">
+              {description}
+            </p>
+          )}
+        </div>
+      </div>
+      {actions && (
+        <div className="flex shrink-0 items-center gap-2">{actions}</div>
+      )}
     </div>
   );
 }

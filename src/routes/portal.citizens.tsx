@@ -1,4 +1,4 @@
-﻿import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Users, Search } from "lucide-react";
 import { PageHeader } from "@/components/portal/portal-shell";
@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/table";
 
 export const Route = createFileRoute("/portal/citizens")({
-  head: () => ({ meta: [{ title: "Citizen Directory ΓÇö CivicSaathi" }] }),
+  head: () => ({ meta: [{ title: "Citizen Directory — CivicSaathi" }] }),
   component: Citizens,
 });
 

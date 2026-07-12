@@ -1,4 +1,4 @@
-﻿import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect, useCallback, useRef } from "react";
 import {
   Megaphone, Sparkles, Phone, MessageSquare, Send, Copy,
@@ -28,11 +28,11 @@ interface CampaignSession {
 }
 
 const AUDIENCE_OPTIONS = [
-  { value: "all_voters", label: "All Voters", icon: "≡ƒæÑ" },
-  { value: "youth", label: "Youth (18ΓÇô29)", icon: "≡ƒÄô" },
-  { value: "farmers", label: "Farmers", icon: "≡ƒî╛" },
-  { value: "urban", label: "Urban Professionals", icon: "≡ƒÆ╝" },
-  { value: "senior", label: "Senior Citizens", icon: "≡ƒæ┤" },
+  { value: "all_voters", label: "All Voters", icon: "👥" },
+  { value: "youth", label: "Youth (18–29)", icon: "🎓" },
+  { value: "farmers", label: "Farmers", icon: "🌾" },
+  { value: "urban", label: "Urban Professionals", icon: "💼" },
+  { value: "senior", label: "Senior Citizens", icon: "👴" },
 ];
 
 function timeAgo(iso: string) {
@@ -287,7 +287,7 @@ function Election() {
                           <textarea placeholder="List main promises..." value={newCampForm.key_points} onChange={e => setNewCampForm(f => ({ ...f, key_points: e.target.value }))} style={{ width: "100%", height: "70px", padding: "10px 12px", borderRadius: "8px", background: "var(--color-background)", border: "1px solid var(--color-border)", color: "var(--color-foreground)", fontSize: "14px", outline: "none", resize: "none" }} onFocus={e => e.target.style.borderColor = "#8b5cf6"} onBlur={e => e.target.style.borderColor = "var(--color-border)"} />
                         </div>
                         <button onClick={handleGenerate} disabled={generating} style={{ height: "40px", borderRadius: "8px", background: generating ? "rgba(139,92,246,0.15)" : "linear-gradient(135deg,#8b5cf6,#6d28d9)", border: "none", color: generating ? "#8b5cf6" : "white", fontSize: "14px", fontWeight: 700, cursor: generating ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", boxShadow: generating ? "none" : "0 4px 12px rgba(139,92,246,0.25)" }}>
-                          {generating ? <><Loader2 style={{ width: 14, height: 14 }} className="animate-spin" />Building AssetsΓÇª</> : <><Sparkles style={{ width: 14, height: 14 }} />Generate Campaign</>}
+                          {generating ? <><Loader2 style={{ width: 14, height: 14 }} className="animate-spin" />Building Assets…</> : <><Sparkles style={{ width: 14, height: 14 }} />Generate Campaign</>}
                         </button>
                       </div>
                     </div>
@@ -339,7 +339,7 @@ function Election() {
                       </div>
  
                       <button onClick={handleLaunchOutreach} disabled={launching} style={{ width: "100%", height: "40px", borderRadius: "8px", background: launching ? "rgba(16,185,129,0.15)" : "linear-gradient(135deg,#10b981,#059669)", border: "none", color: launching ? "#10b981" : "white", fontSize: "14px", fontWeight: 700, cursor: launching ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", boxShadow: launching ? "none" : "0 4px 12px rgba(16,185,129,0.25)" }}>
-                        {launching ? <><Loader2 style={{ width: 14, height: 14 }} className="animate-spin" />ExecutingΓÇª</> : <><Play style={{ width: 14, height: 14 }} />Execute Outreach</>}
+                        {launching ? <><Loader2 style={{ width: 14, height: 14 }} className="animate-spin" />Executing…</> : <><Play style={{ width: 14, height: 14 }} />Execute Outreach</>}
                       </button>
                     </div>
                   </ChatBubble>

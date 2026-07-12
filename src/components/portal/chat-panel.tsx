@@ -1,5 +1,5 @@
-﻿/**
- * ChatPanel ΓÇö CivicSaathi
+/**
+ * ChatPanel — CivicSaathi
  * Real-time streaming: tokens streamed via SSE from Groq backend
  * Voice input:  Sarvam AI saaras:v3 (server-side STT via /voice/stt)
  * Voice output: Sarvam AI bulbul:v3 (server-side TTS via /voice/tts, with browser fallback)
@@ -82,7 +82,7 @@ export function ChatPanel({
       }));
   }, [messages]);
 
-  // ΓöÇΓöÇ Server-side TTS via Sarvam AI ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+  // ── Server-side TTS via Sarvam AI ─────────────────────────────────────────
   const speakText = useCallback(
     async (text: string) => {
       if (!voiceEnabled || !text.trim()) return;
@@ -193,7 +193,7 @@ export function ChatPanel({
     setIsSpeaking(false);
   }, []);
 
-  // ΓöÇΓöÇ Streaming SSE chat ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+  // ── Streaming SSE chat ────────────────────────────────────────────────────
   const sendMessage = useCallback(
     async (text: string) => {
       const q = text.trim();
@@ -288,7 +288,7 @@ export function ChatPanel({
         }
       } catch (err: any) {
         if (err.name === "AbortError") {
-          // User stopped ΓÇö finalize whatever we have
+          // User stopped — finalize whatever we have
           setMessages((m) =>
             m.map((msg, i) =>
               i === streamingIndexRef.current ? { ...msg, streaming: false } : msg,
@@ -304,7 +304,7 @@ export function ChatPanel({
                 : msg,
             ),
           );
-          setError("Connection error ΓÇö using offline response.");
+          setError("Connection error — using offline response.");
         }
       } finally {
         setLoading(false);
@@ -368,7 +368,7 @@ export function ChatPanel({
 
         const blob = new Blob(audioChunksRef.current, { type: mimeType });
         if (blob.size < 1000) {
-          setError("Too short ΓÇö please hold and speak clearly.");
+          setError("Too short — please hold and speak clearly.");
           return;
         }
 
@@ -390,7 +390,7 @@ export function ChatPanel({
             setInput(transcript);
             sendMessage(transcript);
           } else {
-            setError("Could not understand ΓÇö please try again.");
+            setError("Could not understand — please try again.");
           }
         } catch (err) {
           console.warn("Sarvam STT failed, trying browser fallback:", err);
@@ -550,7 +550,7 @@ export function ChatPanel({
         <Input
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder={isListening ? "ListeningΓÇª release to send" : "Type or use voiceΓÇª"}
+          placeholder={isListening ? "Listening… release to send" : "Type or use voice…"}
           className="h-9"
           disabled={loading || isListening}
         />

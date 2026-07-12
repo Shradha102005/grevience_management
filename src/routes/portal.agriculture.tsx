@@ -1,4 +1,4 @@
-﻿import { useState, useRef, useCallback, useEffect, type ChangeEvent } from "react";
+import { useState, useRef, useCallback, useEffect, type ChangeEvent } from "react";
 import { createPortal } from "react-dom";
 import { createFileRoute } from "@tanstack/react-router";
 import {
@@ -38,20 +38,20 @@ const SOILS = ["loamy", "sandy", "clayey", "black", "red"];
 const CROP_STAGES = ["sowing", "vegetative", "flowering", "maturity"];
 
 const PEST_ALERTS = [
-  { title: "Fall Armyworm", area: "Central India", risk: "critical", color: "rose", icon: "≡ƒ¬▓", desc: "Immediate Spinosad spray recommended." },
-  { title: "Aphid Surge", area: "Punjab & Haryana", risk: "high", color: "amber", icon: "≡ƒÉ¢", desc: "Monitor cotton. >10/leaf triggers spray." },
-  { title: "Locust Watch", area: "Rajasthan border", risk: "moderate", color: "yellow", icon: "≡ƒªù", desc: "Monitoring underway. Prepare organophosphate." },
-  { title: "Brown Planthopper", area: "Tamil Nadu", risk: "high", color: "amber", icon: "≡ƒ¬░", desc: "Apply Buprofezin at 3 mL/L in rice." },
-  { title: "Favorable: Kharif", area: "Vidarbha region", risk: "low", color: "emerald", icon: "≡ƒî▒", desc: "Good soil moisture ΓÇö ideal for sowing." },
+  { title: "Fall Armyworm", area: "Central India", risk: "critical", color: "rose", icon: "🪲", desc: "Immediate Spinosad spray recommended." },
+  { title: "Aphid Surge", area: "Punjab & Haryana", risk: "high", color: "amber", icon: "🐛", desc: "Monitor cotton. >10/leaf triggers spray." },
+  { title: "Locust Watch", area: "Rajasthan border", risk: "moderate", color: "yellow", icon: "🦗", desc: "Monitoring underway. Prepare organophosphate." },
+  { title: "Brown Planthopper", area: "Tamil Nadu", risk: "high", color: "amber", icon: "🪰", desc: "Apply Buprofezin at 3 mL/L in rice." },
+  { title: "Favorable: Kharif", area: "Vidarbha region", risk: "low", color: "emerald", icon: "🌱", desc: "Good soil moisture — ideal for sowing." },
 ];
 
 const EXPERT_TIPS = [
-  { title: "Monsoon Soil Prep", tag: "Kharif Season", icon: "≡ƒîº∩╕Å", color: "sky", tip: "Plough fields 2ΓÇô3 weeks before sowing to improve moisture retention. Add FYM at 5 t/acre for organic matter boost." },
-  { title: "Integrated Pest Management", tag: "Pest Control", icon: "≡ƒ¢í∩╕Å", color: "emerald", tip: "Use sticky traps and pheromone traps first. Resort to pesticides only when economic threshold is crossed." },
-  { title: "Drip Irrigation Savings", tag: "Water Management", icon: "≡ƒÆº", color: "indigo", tip: "Drip irrigation saves 30ΓÇô50% water vs. flood irrigation. Eligible for 90% PM KUSUM subsidy in most states." },
-  { title: "Rabi Wheat Timing", tag: "Rabi Season", icon: "≡ƒî╛", color: "amber", tip: "Optimal sowing window for wheat is Oct 25ΓÇôNov 15. Late sowing past Nov 25 can reduce yield by 1.5% per day." },
-  { title: "Soil Testing First", tag: "Soil Health", icon: "≡ƒº¬", color: "violet", tip: "Test soil pH and NPK every 3 years. Free soil health cards available at Krishi Vigyan Kendras near you." },
-  { title: "Post-Harvest Storage", tag: "Storage", icon: "≡ƒÅÜ∩╕Å", color: "orange", tip: "Dry grains below 14% moisture before storage. Use hermetic bags to reduce pest losses by up to 98%." },
+  { title: "Monsoon Soil Prep", tag: "Kharif Season", icon: "🌧️", color: "sky", tip: "Plough fields 2–3 weeks before sowing to improve moisture retention. Add FYM at 5 t/acre for organic matter boost." },
+  { title: "Integrated Pest Management", tag: "Pest Control", icon: "🛡️", color: "emerald", tip: "Use sticky traps and pheromone traps first. Resort to pesticides only when economic threshold is crossed." },
+  { title: "Drip Irrigation Savings", tag: "Water Management", icon: "💧", color: "indigo", tip: "Drip irrigation saves 30–50% water vs. flood irrigation. Eligible for 90% PM KUSUM subsidy in most states." },
+  { title: "Rabi Wheat Timing", tag: "Rabi Season", icon: "🌾", color: "amber", tip: "Optimal sowing window for wheat is Oct 25–Nov 15. Late sowing past Nov 25 can reduce yield by 1.5% per day." },
+  { title: "Soil Testing First", tag: "Soil Health", icon: "🧪", color: "violet", tip: "Test soil pH and NPK every 3 years. Free soil health cards available at Krishi Vigyan Kendras near you." },
+  { title: "Post-Harvest Storage", tag: "Storage", icon: "🏚️", color: "orange", tip: "Dry grains below 14% moisture before storage. Use hermetic bags to reduce pest losses by up to 98%." },
 ];
 
 const PEST_MAP_STATES: Record<string, string> = {
@@ -83,7 +83,7 @@ function WeatherDrawer({ weather, loading, onClose }: { weather: WeatherResponse
               <div key={i} className="bg-white border border-slate-100 rounded-2xl p-4 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow">
                 <span className="text-3xl">{w.icon}</span>
                 <div className="flex-1">
-                  <div className="flex justify-between items-center"><span className="font-bold text-slate-800">{w.day}</span><div className="flex gap-2"><span className="font-black text-slate-900">{w.high}┬░</span><span className="text-slate-400 font-semibold">{w.low}┬░</span></div></div>
+                  <div className="flex justify-between items-center"><span className="font-bold text-slate-800">{w.day}</span><div className="flex gap-2"><span className="font-black text-slate-900">{w.high}°</span><span className="text-slate-400 font-semibold">{w.low}°</span></div></div>
                   <p className="text-sm text-slate-500 mt-1">{w.description}</p>
                   <div className="flex gap-3 mt-1.5">
                     <span className="flex items-center gap-1 text-sm text-slate-400 font-bold"><Droplets className="w-3 h-3" />{w.humidity}%</span>
@@ -216,7 +216,7 @@ function DashboardTab() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
         {[
           { icon: Droplets, label: "Soil Moisture", value: "42%", status: "Optimal", color: "sky" },
-          { icon: Thermometer, label: "Avg Temp", value: "28┬░C", status: "Normal", color: "amber" },
+          { icon: Thermometer, label: "Avg Temp", value: "28°C", status: "Normal", color: "amber" },
           { icon: Activity, label: "Health Index", value: "8.4", status: "Good", color: "emerald" },
           { icon: ShieldAlert, label: "Active Alerts", value: "2", status: "Review", color: "rose" },
         ].map((pod, i) => (
@@ -366,14 +366,14 @@ function PlannerTab() {
             <div><label className={labelCls}>Crop</label><select className={selectCls} value={irrigCrop} onChange={e => setIrrigCrop(e.target.value)}>{CROPS.map(c => <option key={c}>{c}</option>)}</select></div>
             <div><label className={labelCls}>Crop Stage</label><select className={selectCls} value={irrigStage} onChange={e => setIrrigStage(e.target.value)}>{CROP_STAGES.map(s => <option key={s}>{s}</option>)}</select></div>
             <div><label className={labelCls}>Soil Moisture %</label><input className={inputCls} type="number" value={irrigMoisture} onChange={e => setIrrigMoisture(e.target.value)} /></div>
-            <div><label className={labelCls}>Temperature ┬░C</label><input className={inputCls} type="number" value={irrigTemp} onChange={e => setIrrigTemp(e.target.value)} /></div>
+            <div><label className={labelCls}>Temperature °C</label><input className={inputCls} type="number" value={irrigTemp} onChange={e => setIrrigTemp(e.target.value)} /></div>
             <div className="col-span-2"><label className={labelCls}>Humidity %</label><input className={inputCls} type="number" value={irrigHumidity} onChange={e => setIrrigHumidity(e.target.value)} /></div>
           </div>
           <button onClick={fetchIrrigation} disabled={irrigLoading} className="w-full h-10 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-lg shadow-sky-400/20 disabled:opacity-70">{irrigLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Gauge className="w-4 h-4" />}Get Advice</button>
           {irrigResult && (
             <div className="mt-5 flex flex-col gap-3">
               <div className={`p-4 rounded-2xl border ${irrigResult.should_irrigate ? "bg-sky-50 border-sky-100" : "bg-emerald-50 border-emerald-100"} flex items-center gap-4`}>
-                <div className={`text-3xl font-black ${irrigResult.should_irrigate ? "text-sky-600" : "text-emerald-600"}`}>{irrigResult.should_irrigate ? "≡ƒÆº" : "Γ£à"}</div>
+                <div className={`text-3xl font-black ${irrigResult.should_irrigate ? "text-sky-600" : "text-emerald-600"}`}>{irrigResult.should_irrigate ? "💧" : "✅"}</div>
                 <div>
                   <h4 className={`font-black text-base ${irrigResult.should_irrigate ? "text-sky-700" : "text-emerald-700"}`}>{irrigResult.should_irrigate ? "Irrigate Now" : "No Irrigation Needed"}</h4>
                   <Badge className={`bg-${(urgencyColor as Record<string, string>)[irrigResult.urgency] || "slate"}-100 text-${(urgencyColor as Record<string, string>)[irrigResult.urgency] || "slate"}-700 border-none text-sm font-black mt-1`}>{irrigResult.urgency.replace("_", " ")}</Badge>
@@ -428,14 +428,14 @@ function MarketsTab() {
       const item = marketData.find(m => m.crop.toLowerCase() === a.crop.toLowerCase());
       if (!item) return;
       const triggered = a.direction === "above" ? item.modal_price > a.threshold : item.modal_price < a.threshold;
-      if (triggered) toast.warning(`≡ƒöö Alert: ${a.crop} is ${a.direction} Γé╣${a.threshold.toLocaleString()}/q! Current: Γé╣${item.modal_price.toLocaleString()}/q`, { duration: 8000 });
+      if (triggered) toast.warning(`🔔 Alert: ${a.crop} is ${a.direction} ₹${a.threshold.toLocaleString()}/q! Current: ₹${item.modal_price.toLocaleString()}/q`, { duration: 8000 });
     });
   }, [marketData]);
 
   const saveAlert = () => {
     const newAlerts = [...alerts, { id: Date.now().toString(), crop: alertCrop, threshold: parseFloat(alertThreshold), direction: alertDir }];
     setAlerts(newAlerts); localStorage.setItem("agri_price_alerts", JSON.stringify(newAlerts));
-    toast.success(`Alert set: ${alertCrop} ${alertDir} Γé╣${alertThreshold}/q`);
+    toast.success(`Alert set: ${alertCrop} ${alertDir} ₹${alertThreshold}/q`);
   };
 
   const deleteAlert = (id: string) => {
@@ -449,9 +449,9 @@ function MarketsTab() {
     fill: { type: "gradient", gradient: { shadeIntensity: 1, opacityFrom: 0.3, opacityTo: 0.01 } },
     colors: ["#6366f1"],
     xaxis: { categories: priceHistory?.weeks || [], labels: { style: { fontFamily: "inherit", fontWeight: "700", fontSize: "14px" }, rotate: 0 }, axisBorder: { show: false }, axisTicks: { show: false } },
-    yaxis: { labels: { formatter: (v: number) => `Γé╣${Math.round(v).toLocaleString()}`, style: { fontFamily: "inherit", fontWeight: "700", fontSize: "14px" } }, min: (min: number) => Math.round(min * 0.95), max: (max: number) => Math.round(max * 1.05) },
+    yaxis: { labels: { formatter: (v: number) => `₹${Math.round(v).toLocaleString()}`, style: { fontFamily: "inherit", fontWeight: "700", fontSize: "14px" } }, min: (min: number) => Math.round(min * 0.95), max: (max: number) => Math.round(max * 1.05) },
     grid: { borderColor: "#f1f5f9", padding: { left: 10, right: 10 } },
-    tooltip: { theme: "light", y: { formatter: (v: number) => `Γé╣${Math.round(v).toLocaleString()}/q` } },
+    tooltip: { theme: "light", y: { formatter: (v: number) => `₹${Math.round(v).toLocaleString()}/q` } },
     dataLabels: { enabled: false },
   };
 
@@ -481,7 +481,7 @@ function MarketsTab() {
         </div>
         {chartLoading ? <div className="h-48 flex items-center justify-center"><Loader2 className="w-6 h-6 text-indigo-400 animate-spin" /></div>
           : priceHistory && <Chart options={chartOptions} series={[{ name: chartCrop, data: priceHistory.prices }]} type="area" height={200} />}
-        {priceHistory && <div className="flex gap-4 mt-2"><div className="bg-indigo-50 border border-indigo-100 rounded-xl px-4 py-2"><p className="text-sm font-black text-indigo-500">Current</p><p className="font-black text-slate-800">Γé╣{Math.round(priceHistory.current_price).toLocaleString()}/q</p></div></div>}
+        {priceHistory && <div className="flex gap-4 mt-2"><div className="bg-indigo-50 border border-indigo-100 rounded-xl px-4 py-2"><p className="text-sm font-black text-indigo-500">Current</p><p className="font-black text-slate-800">₹{Math.round(priceHistory.current_price).toLocaleString()}/q</p></div></div>}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -498,7 +498,7 @@ function MarketsTab() {
             {marketLoading ? <div className="flex justify-center py-8"><Loader2 className="w-4 h-4 text-slate-300 animate-spin" /></div>
               : marketData.length === 0 ? <div className="text-center py-8 text-sm font-bold text-slate-400">No active feeds.</div>
               : <table className="w-full text-sm"><thead><tr className="border-b border-slate-100"><th className="text-left text-sm font-black text-slate-400 pb-2 uppercase tracking-wider">Crop</th><th className="text-right text-sm font-black text-slate-400 pb-2 uppercase tracking-wider">Min</th><th className="text-right text-sm font-black text-slate-400 pb-2 uppercase tracking-wider">Modal</th><th className="text-right text-sm font-black text-slate-400 pb-2 uppercase tracking-wider">Max</th></tr></thead>
-                <tbody>{marketData.map((item, i) => <tr key={i} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors"><td className="py-2.5"><p className="font-bold text-slate-800">{item.crop}</p><p className="text-sm text-slate-400">{item.state}</p></td><td className="text-right text-sm font-bold text-slate-500">Γé╣{Math.round(item.min_price).toLocaleString()}</td><td className="text-right font-black text-emerald-600">Γé╣{Math.round(item.modal_price).toLocaleString()}</td><td className="text-right text-sm font-bold text-slate-500">Γé╣{Math.round(item.max_price).toLocaleString()}</td></tr>)}</tbody>
+                <tbody>{marketData.map((item, i) => <tr key={i} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors"><td className="py-2.5"><p className="font-bold text-slate-800">{item.crop}</p><p className="text-sm text-slate-400">{item.state}</p></td><td className="text-right text-sm font-bold text-slate-500">₹{Math.round(item.min_price).toLocaleString()}</td><td className="text-right font-black text-emerald-600">₹{Math.round(item.modal_price).toLocaleString()}</td><td className="text-right text-sm font-bold text-slate-500">₹{Math.round(item.max_price).toLocaleString()}</td></tr>)}</tbody>
               </table>}
           </div>
         </div>
@@ -511,12 +511,12 @@ function MarketsTab() {
             <select className={`${selectCls} w-28`} value={alertDir} onChange={e => setAlertDir(e.target.value as "above" | "below")}><option value="above">Above</option><option value="below">Below</option></select>
           </div>
           <div className="flex gap-2 mb-4">
-            <input type="number" placeholder="Price Γé╣/q" value={alertThreshold} onChange={e => setAlertThreshold(e.target.value)} className="flex-1 bg-slate-100/80 border-none text-sm font-medium text-slate-800 rounded-xl px-3 py-2 focus:ring-2 focus:ring-amber-400 outline-none" />
+            <input type="number" placeholder="Price ₹/q" value={alertThreshold} onChange={e => setAlertThreshold(e.target.value)} className="flex-1 bg-slate-100/80 border-none text-sm font-medium text-slate-800 rounded-xl px-3 py-2 focus:ring-2 focus:ring-amber-400 outline-none" />
             <button onClick={saveAlert} className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm flex items-center gap-1.5 transition-all shadow-md shadow-amber-400/20"><Bell className="w-4 h-4" />Set</button>
           </div>
           <div className="flex flex-col gap-2 overflow-y-auto max-h-48">
             {alerts.length === 0 ? <p className="text-sm text-center text-slate-400 font-bold py-4">No alerts set.</p>
-              : alerts.map(a => <div key={a.id} className="flex items-center justify-between bg-white border border-slate-100 rounded-xl px-4 py-2.5 shadow-sm"><div><span className="font-bold text-slate-800 text-sm">{a.crop}</span><span className="text-sm text-slate-400 font-medium ml-2">{a.direction} Γé╣{a.threshold.toLocaleString()}/q</span></div><button onClick={() => deleteAlert(a.id)} className="text-slate-400 hover:text-rose-500 transition-colors"><Trash2 className="w-4 h-4" /></button></div>)}
+              : alerts.map(a => <div key={a.id} className="flex items-center justify-between bg-white border border-slate-100 rounded-xl px-4 py-2.5 shadow-sm"><div><span className="font-bold text-slate-800 text-sm">{a.crop}</span><span className="text-sm text-slate-400 font-medium ml-2">{a.direction} ₹{a.threshold.toLocaleString()}/q</span></div><button onClick={() => deleteAlert(a.id)} className="text-slate-400 hover:text-rose-500 transition-colors"><Trash2 className="w-4 h-4" /></button></div>)}
           </div>
         </div>
       </div>
@@ -527,7 +527,7 @@ function MarketsTab() {
         <div className="overflow-auto">
           <table className="w-full text-sm">
             <thead><tr><th className="text-left font-black text-slate-400 pb-2 pr-4 uppercase tracking-wider w-24">Crop</th>{MONTHS.map((m, i) => <th key={i} className="font-black text-slate-400 pb-2 px-1 text-center">{m}</th>)}</tr></thead>
-            <tbody>{Object.entries(HEATMAP).map(([crop, vals]) => <tr key={crop}><td className="font-bold text-slate-700 py-1 pr-4">{crop}</td>{vals.map((v, i) => <td key={i} className="px-0.5 py-1"><div className={`w-8 h-7 rounded-lg flex items-center justify-center font-bold text-sm mx-auto ${heatColor(v)}`}>{v === 5 ? "Γÿà" : v === 1 ? "Γ£ù" : ""}</div></td>)}</tr>)}</tbody>
+            <tbody>{Object.entries(HEATMAP).map(([crop, vals]) => <tr key={crop}><td className="font-bold text-slate-700 py-1 pr-4">{crop}</td>{vals.map((v, i) => <td key={i} className="px-0.5 py-1"><div className={`w-8 h-7 rounded-lg flex items-center justify-center font-bold text-sm mx-auto ${heatColor(v)}`}>{v === 5 ? "★" : v === 1 ? "✗" : ""}</div></td>)}</tr>)}</tbody>
           </table>
         </div>
         <div className="flex gap-4 mt-4 flex-wrap"><div className="flex items-center gap-1.5 text-sm font-bold text-slate-500"><div className="w-3 h-3 rounded bg-emerald-500" /> Best selling months</div><div className="flex items-center gap-1.5 text-sm font-bold text-slate-500"><div className="w-3 h-3 rounded bg-amber-100" /> Moderate prices</div><div className="flex items-center gap-1.5 text-sm font-bold text-slate-500"><div className="w-3 h-3 rounded bg-red-200" /> Avoid selling</div></div>
@@ -656,7 +656,7 @@ function Agriculture() {
             
             <button onClick={() => setShowWeather(true)} className="h-10 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 shadow-xl shadow-emerald-500/30 text-white font-extrabold text-sm hover:scale-105 transition-all flex items-center gap-3">
               {weatherLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Cloud className="w-4 h-4" />}
-              {today ? `${weather?.city ?? "India"}, ${today.high}┬░` : "Weather"}
+              {today ? `${weather?.city ?? "India"}, ${today.high}°` : "Weather"}
             </button>
           </div>
         </div>

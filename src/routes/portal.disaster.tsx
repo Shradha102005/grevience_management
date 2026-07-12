@@ -1,4 +1,4 @@
-﻿import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect, useCallback } from "react";
 import {
   Siren, Radio, MapPin, Phone, ShieldAlert, CheckCircle2, Clock,
@@ -36,9 +36,9 @@ interface AlertStats {
 
 const ZONES = ["North District","South District","East District","West District","Coastal Zone","Central Zone"];
 const DISASTER_TYPES = [
-  { value: "flood", label: "≡ƒîè Flood" }, { value: "cyclone", label: "≡ƒîÇ Cyclone" },
-  { value: "earthquake", label: "≡ƒÅÜ Earthquake" }, { value: "fire", label: "≡ƒöÑ Fire" },
-  { value: "landslide", label: "Γ¢░ Landslide" }, { value: "other", label: "ΓÜá∩╕Å Other" },
+  { value: "flood", label: "🌊 Flood" }, { value: "cyclone", label: "🌀 Cyclone" },
+  { value: "earthquake", label: "🏚 Earthquake" }, { value: "fire", label: "🔥 Fire" },
+  { value: "landslide", label: "⛰ Landslide" }, { value: "other", label: "⚠️ Other" },
 ];
 
 const SEV_CFG = {
@@ -47,7 +47,7 @@ const SEV_CFG = {
   watch:    { color: "#fbbf24", bg: "rgba(251,191,36,0.12)", border: "rgba(251,191,36,0.3)", glow: "rgba(251,191,36,0.15)", label: "WATCH" },
 };
 
-const DT_ICONS: Record<string,string> = { flood:"≡ƒîè", cyclone:"≡ƒîÇ", earthquake:"≡ƒÅÜ", fire:"≡ƒöÑ", landslide:"Γ¢░", other:"ΓÜá∩╕Å" };
+const DT_ICONS: Record<string,string> = { flood:"🌊", cyclone:"🌀", earthquake:"🏚", fire:"🔥", landslide:"⛰", other:"⚠️" };
 
 function timeAgo(iso: string) {
   const m = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
@@ -108,7 +108,7 @@ function BroadcastModal({ onCreated, onClose }: { onCreated: () => void; onClose
           <div>
             <label style={{ fontSize: "14px", fontWeight: 700, color: "var(--color-muted-foreground)", textTransform: "uppercase", letterSpacing: "0.07em", display: "block", marginBottom: "6px" }}>Alert Title</label>
             <input value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
-              placeholder="e.g. Cyclone Warning ΓÇö Coastal Zone"
+              placeholder="e.g. Cyclone Warning — Coastal Zone"
               style={{ width: "100%", height: "40px", padding: "0 12px", borderRadius: "10px", border: "1px solid rgba(244,63,94,0.2)", background: "rgba(244,63,94,0.03)", color: "var(--color-foreground)", fontSize: "14px", outline: "none", boxSizing: "border-box" }}
               onFocus={e => (e.target as HTMLInputElement).style.borderColor = "rgba(244,63,94,0.5)"}
               onBlur={e  => (e.target as HTMLInputElement).style.borderColor = "rgba(244,63,94,0.2)"} />
@@ -128,9 +128,9 @@ function BroadcastModal({ onCreated, onClose }: { onCreated: () => void; onClose
               <Select value={form.severity} onValueChange={v => setForm(f => ({ ...f, severity: v }))}>
                 <SelectTrigger className="h-10 text-sm"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="watch" className="text-sm">≡ƒƒí Watch</SelectItem>
-                  <SelectItem value="high"  className="text-sm">≡ƒƒá High</SelectItem>
-                  <SelectItem value="critical" className="text-sm">≡ƒö┤ Critical</SelectItem>
+                  <SelectItem value="watch" className="text-sm">🟡 Watch</SelectItem>
+                  <SelectItem value="high"  className="text-sm">🟠 High</SelectItem>
+                  <SelectItem value="critical" className="text-sm">🔴 Critical</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -157,7 +157,7 @@ function BroadcastModal({ onCreated, onClose }: { onCreated: () => void; onClose
           <div>
             <label style={{ fontSize: "14px", fontWeight: 700, color: "var(--color-muted-foreground)", textTransform: "uppercase", letterSpacing: "0.07em", display: "block", marginBottom: "6px" }}>Alert Message</label>
             <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-              placeholder="Describe the emergency and any immediate actions citizens should takeΓÇª"
+              placeholder="Describe the emergency and any immediate actions citizens should take…"
               style={{ width: "100%", height: "80px", padding: "10px 12px", borderRadius: "10px", border: "1px solid rgba(244,63,94,0.2)", background: "rgba(244,63,94,0.03)", color: "var(--color-foreground)", fontSize: "14px", resize: "none", outline: "none", fontFamily: "inherit", lineHeight: 1.5, boxSizing: "border-box" }}
               onFocus={e => (e.target as HTMLTextAreaElement).style.borderColor = "rgba(244,63,94,0.5)"}
               onBlur={e  => (e.target as HTMLTextAreaElement).style.borderColor = "rgba(244,63,94,0.2)"} />
@@ -165,7 +165,7 @@ function BroadcastModal({ onCreated, onClose }: { onCreated: () => void; onClose
 
           {/* Broadcast options */}
           <div style={{ display: "flex", gap: "12px" }}>
-            {[{ key: "broadcast_sms", label: "≡ƒô▒ SMS Broadcast" }, { key: "broadcast_call", label: "≡ƒô₧ Voice Call" }].map(({ key, label }) => {
+            {[{ key: "broadcast_sms", label: "📱 SMS Broadcast" }, { key: "broadcast_call", label: "📞 Voice Call" }].map(({ key, label }) => {
               const val = form[key as keyof typeof form] as boolean;
               return (
                 <label key={key} style={{ display: "flex", alignItems: "center", gap: "8px", padding: "8px 14px", borderRadius: "10px", border: `1px solid ${val ? "rgba(244,63,94,0.3)" : "rgba(244,63,94,0.12)"}`, background: val ? "rgba(244,63,94,0.06)" : "transparent", cursor: "pointer", flex: 1 }}>
@@ -178,7 +178,7 @@ function BroadcastModal({ onCreated, onClose }: { onCreated: () => void; onClose
 
           <button onClick={handleSubmit} disabled={loading}
             style={{ height: "44px", borderRadius: "12px", background: loading ? "rgba(244,63,94,0.15)" : "linear-gradient(135deg,#f43f5e,#e11d48)", border: "none", color: loading ? "#f43f5e" : "white", fontSize: "14px", fontWeight: 700, cursor: loading ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", boxShadow: loading ? "none" : "0 4px 20px rgba(244,63,94,0.4)" }}>
-            {loading ? <><Loader2 style={{ width: 16, height: 16 }} className="animate-spin" />BroadcastingΓÇª</> : <><Siren style={{ width: 15, height: 15 }} />Confirm Emergency Broadcast</>}
+            {loading ? <><Loader2 style={{ width: 16, height: 16 }} className="animate-spin" />Broadcasting…</> : <><Siren style={{ width: 15, height: 15 }} />Confirm Emergency Broadcast</>}
           </button>
         </div>
       </div>
@@ -195,7 +195,7 @@ function AlertCard({ alert: a, onAction, actionLabel, actionColor }: {
   const ackPct = a.recipients_count > 0 ? Math.round((a.acknowledged_count / a.recipients_count) * 100) : 0;
   return (
     <div style={{
-      background: "rgba(255,255,255,0.6)", backdropFilter: "blur(24px)", borderRadius: "16px", boxShadow: "0 20px 25px -5px rgba(226, 232, 240, 0.4)", border: "1px solid rgba(255,255,255,0.6)",
+      background: "rgba(255,255,255,0.6)", backdropFilter: "blur(24px)", borderRadius: "16px",
       border: `1px solid ${cfg.border}`,
       boxShadow: `0 4px 20px ${cfg.glow}`, overflow: "hidden",
       transition: "all 0.2s",
@@ -206,7 +206,7 @@ function AlertCard({ alert: a, onAction, actionLabel, actionColor }: {
         {/* Top row */}
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "8px", marginBottom: "10px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
-            <span style={{ fontSize: "14px" }}>{DT_ICONS[a.disaster_type] ?? "ΓÜá∩╕Å"}</span>
+            <span style={{ fontSize: "14px" }}>{DT_ICONS[a.disaster_type] ?? "⚠️"}</span>
             <span style={{ fontSize: "14px", fontWeight: 800, padding: "2px 8px", borderRadius: "20px", background: cfg.bg, color: cfg.color, border: `1px solid ${cfg.border}`, textTransform: "uppercase", letterSpacing: "0.07em" }}>{cfg.label}</span>
             {a.status !== "active" && (
               <span style={{ fontSize: "14px", fontWeight: 700, padding: "2px 8px", borderRadius: "20px", background: "rgba(52,211,153,0.1)", color: "#34d399", border: "1px solid rgba(52,211,153,0.25)" }}>
@@ -319,10 +319,10 @@ function AdminView() {
               <AlertOctagon className="text-rose-500 h-10 w-10 animate-pulse" />
               <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-500/10 border border-rose-500/20 ml-2">
                 <span key={pulseKey} className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
-                <span className="text-sm font-bold text-rose-600 dark:text-rose-400 uppercase tracking-widest">Live ┬╖ 30s</span>
+                <span className="text-sm font-bold text-rose-600 dark:text-rose-400 uppercase tracking-widest">Live · 30s</span>
               </div>
             </h1>
-            <p className="text-slate-500/80 dark:text-slate-400 mt-2 font-medium text-sm md:text-base">Situation Awareness ┬╖ Incident Tracking ┬╖ Mass Communication</p>
+            <p className="text-slate-500/80 dark:text-slate-400 mt-2 font-medium text-sm md:text-base">Situation Awareness · Incident Tracking · Mass Communication</p>
           </div>
           
           <div className="flex items-center gap-4">
@@ -347,7 +347,7 @@ function AdminView() {
           { icon: Users,      label: "Citizens Reached",    value: stats?.total_citizens_reached ?? 0, color: "#a78bfa" },
           { icon: Smartphone, label: "SMS Dispatched",      value: stats?.total_sms_sent ?? 0,         color: "#60a5fa" },
         ].map(({ icon: Icon, label, value, color }) => (
-          <div key={label} style={{ flex: 1, padding: "12px 14px", borderRadius: "12px", background: "rgba(255,255,255,0.6)", backdropFilter: "blur(24px)", borderRadius: "16px", boxShadow: "0 20px 25px -5px rgba(226, 232, 240, 0.4)", border: "1px solid rgba(255,255,255,0.6)", display: "flex", alignItems: "center", gap: "10px" }}>
+          <div key={label} style={{ flex: 1, padding: "12px 14px", background: "rgba(255,255,255,0.6)", backdropFilter: "blur(24px)", borderRadius: "16px", boxShadow: "0 20px 25px -5px rgba(226, 232, 240, 0.4)", border: "1px solid rgba(255,255,255,0.6)", display: "flex", alignItems: "center", gap: "10px" }}>
             <div style={{ width: "34px", height: "34px", borderRadius: "9px", background: `${color}12`, border: `1px solid ${color}25`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
               <Icon style={{ width: 15, height: 15, color }} />
             </div>
@@ -409,7 +409,7 @@ function AdminView() {
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
               <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#f43f5e", display: "block", animation: "pulse 2s infinite" }} />
-              <span style={{ fontSize: "14px", color: "rgba(255,255,255,0.4)", fontFamily: "monospace" }}>LIVE MONITORING ┬╖ {activeAlerts.length} INCIDENTS</span>
+              <span style={{ fontSize: "14px", color: "rgba(255,255,255,0.4)", fontFamily: "monospace" }}>LIVE MONITORING · {activeAlerts.length} INCIDENTS</span>
             </div>
           </div>
         </div>
@@ -449,7 +449,7 @@ function AdminView() {
           {resolvedAlerts.length > 0 && (
             <>
               <div style={{ padding: "10px 16px", borderTop: "1px solid rgba(244,63,94,0.08)", flexShrink: 0 }}>
-                <p style={{ fontSize: "14px", fontWeight: 700, color: "var(--color-muted-foreground)", textTransform: "uppercase", letterSpacing: "0.08em" }}>Recently Resolved ┬╖ {resolvedAlerts.length}</p>
+                <p style={{ fontSize: "14px", fontWeight: 700, color: "var(--color-muted-foreground)", textTransform: "uppercase", letterSpacing: "0.08em" }}>Recently Resolved · {resolvedAlerts.length}</p>
               </div>
               <div style={{ maxHeight: "180px", overflowY: "auto", padding: "0 12px 12px" }}>
                 {resolvedAlerts.slice(0, 3).map(a => (
@@ -458,7 +458,7 @@ function AdminView() {
                       <CheckCircle2 style={{ width: 12, height: 12, color: "#34d399" }} />
                       <span style={{ fontSize: "14px", fontWeight: 700, color: "var(--color-foreground)" }}>{a.title}</span>
                     </div>
-                    <span style={{ fontSize: "14px", color: "var(--color-muted-foreground)" }}>{timeAgo(a.resolved_at ?? a.created_at)} ┬╖ {a.affected_zones[0]}</span>
+                    <span style={{ fontSize: "14px", color: "var(--color-muted-foreground)" }}>{timeAgo(a.resolved_at ?? a.created_at)} · {a.affected_zones[0]}</span>
                   </div>
                 ))}
               </div>
@@ -523,7 +523,7 @@ function OfficerView() {
                 <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">Live</span>
               </div>
             </h1>
-            <p className="text-slate-500/80 dark:text-slate-400 mt-2 font-medium text-sm md:text-base">{user?.zone || "Unassigned Zone"} ┬╖ Officer Dashboard</p>
+            <p className="text-slate-500/80 dark:text-slate-400 mt-2 font-medium text-sm md:text-base">{user?.zone || "Unassigned Zone"} · Officer Dashboard</p>
           </div>
           
           <div className="flex items-center gap-4">
@@ -543,7 +543,7 @@ function OfficerView() {
           { label: "High",      value: activeAlerts.filter(a => a.severity === "high").length,     color: "#f97316", icon: ShieldAlert },
           { label: "Watch",     value: activeAlerts.filter(a => a.severity === "watch").length,    color: "#fbbf24", icon: Eye },
         ].map(({ label, value, color, icon: Icon }) => (
-          <div key={label} style={{ flex: 1, padding: "12px 16px", borderRadius: "12px", background: "rgba(255,255,255,0.6)", backdropFilter: "blur(24px)", borderRadius: "16px", boxShadow: "0 20px 25px -5px rgba(226, 232, 240, 0.4)", border: "1px solid rgba(255,255,255,0.6)", display: "flex", alignItems: "center", gap: "10px" }}>
+          <div key={label} style={{ flex: 1, padding: "12px 16px", background: "rgba(255,255,255,0.6)", backdropFilter: "blur(24px)", borderRadius: "16px", boxShadow: "0 20px 25px -5px rgba(226, 232, 240, 0.4)", border: "1px solid rgba(255,255,255,0.6)", display: "flex", alignItems: "center", gap: "10px" }}>
             <div style={{ width: "34px", height: "34px", borderRadius: "9px", background: `${color}12`, border: `1px solid ${color}25`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
               <Icon style={{ width: 15, height: 15, color }} />
             </div>
@@ -619,7 +619,7 @@ function CitizenView() {
               </span>
               {hasCritical ? <Siren className="text-rose-500 h-10 w-10 animate-bounce" style={{ animationDuration: '2s' }} /> : <Shield className="text-emerald-500 h-10 w-10" />}
             </h1>
-            <p className="text-slate-500/80 dark:text-slate-400 mt-2 font-medium text-sm md:text-base">Official alerts and advisories ┬╖ Auto-refreshes every 30s</p>
+            <p className="text-slate-500/80 dark:text-slate-400 mt-2 font-medium text-sm md:text-base">Official alerts and advisories · Auto-refreshes every 30s</p>
           </div>
           
           {hasCritical && (
@@ -652,7 +652,7 @@ function CitizenView() {
             <div style={{ padding: "12px 16px", borderRadius: "12px", background: "rgba(244,63,94,0.08)", border: "1px solid rgba(244,63,94,0.2)", display: "flex", alignItems: "center", gap: "10px", marginBottom: "4px" }}>
               <Siren style={{ width: 16, height: 16, color: "#f43f5e" }} className="animate-pulse" />
               <p style={{ fontSize: "14px", fontWeight: 700, color: "#f43f5e", margin: 0 }}>
-                {activeAlerts.length} active emergency alert{activeAlerts.length > 1 ? "s" : ""} in your area ΓÇö please follow official instructions.
+                {activeAlerts.length} active emergency alert{activeAlerts.length > 1 ? "s" : ""} in your area — please follow official instructions.
               </p>
             </div>
             {activeAlerts.map(a => <AlertCard key={a.id} alert={a} />)}

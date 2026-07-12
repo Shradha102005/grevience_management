@@ -1,4 +1,4 @@
-﻿import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect, useRef, useCallback } from "react";
 import {
   Inbox, Clock, CheckCircle2,
@@ -57,50 +57,50 @@ const LANGUAGES: { code: string; label: string; native: string; greeting: string
   {
     code: "en", label: "English", native: "EN",
     greeting: "Hello! I'm your AI Helpline Assistant. I can help you with government services, certificates, schemes, and more. What can I help you with today?",
-    placeholder: "Type your questionΓÇª",
+    placeholder: "Type your question…",
     quickPrompts: ["How do I get a birth certificate?", "Ration card renewal process", "Property tax payment help", "Aadhaar update procedure"],
   },
   {
-    code: "hi", label: "Hindi", native: "αñ╣αñ┐αñé",
-    greeting: "αñ¿αñ«αñ╕αÑìαññαÑç! αñ«αÑêαñé αñåαñ¬αñòαñ╛ AI αñ╣αÑçαñ▓αÑìαñ¬αñ▓αñ╛αñçαñ¿ αñ╕αñ╣αñ╛αñ»αñò αñ╣αÑéαñüαÑñ αñ«αÑêαñé αñ╕αñ░αñòαñ╛αñ░αÑÇ αñ╕αÑçαñ╡αñ╛αñôαñé, αñ¬αÑìαñ░αñ«αñ╛αñúαñ¬αññαÑìαñ░αÑïαñé, αñ»αÑïαñ£αñ¿αñ╛αñôαñé αñöαñ░ αñàαñ¿αÑìαñ» αñ╡αñ┐αñ╖αñ»αÑïαñé αñ«αÑçαñé αñåαñ¬αñòαÑÇ αñ«αñªαñª αñòαñ░ αñ╕αñòαññαñ╛ αñ╣αÑéαñüαÑñ αñåαñ£ αñåαñ¬ αñòαÑìαñ»αñ╛ αñ£αñ╛αñ¿αñ¿αñ╛ αñÜαñ╛αñ╣αññαÑç αñ╣αÑêαñé?",
-    placeholder: "αñàαñ¬αñ¿αñ╛ αñ¬αÑìαñ░αñ╢αÑìαñ¿ αñƒαñ╛αñçαñ¬ αñòαñ░αÑçαñéΓÇª",
-    quickPrompts: ["αñ£αñ¿αÑìαñ« αñ¬αÑìαñ░αñ«αñ╛αñú αñ¬αññαÑìαñ░ αñòαÑêαñ╕αÑç αñ¼αñ¿αñ╡αñ╛αñÅαñé?", "αñ░αñ╛αñ╢αñ¿ αñòαñ╛αñ░αÑìαñí αñ¿αñ╡αÑÇαñ¿αÑÇαñòαñ░αñú", "αñ╕αñéαñ¬αññαÑìαññαñ┐ αñòαñ░ αñ¡αÑüαñùαññαñ╛αñ¿", "αñåαñºαñ╛αñ░ αñàαñ¬αñíαÑçαñƒ αñ¬αÑìαñ░αñòαÑìαñ░αñ┐αñ»αñ╛"],
+    code: "hi", label: "Hindi", native: "हिं",
+    greeting: "नमस्ते! मैं आपका AI हेल्पलाइन सहायक हूँ। मैं सरकारी सेवाओं, प्रमाणपत्रों, योजनाओं और अन्य विषयों में आपकी मदद कर सकता हूँ। आज आप क्या जानना चाहते हैं?",
+    placeholder: "अपना प्रश्न टाइप करें…",
+    quickPrompts: ["जन्म प्रमाण पत्र कैसे बनवाएं?", "राशन कार्ड नवीनीकरण", "संपत्ति कर भुगतान", "आधार अपडेट प्रक्रिया"],
   },
   {
-    code: "te", label: "Telugu", native: "α░ñα▒å",
-    greeting: "α░¿α░«α░╕α▒ìα░òα░╛α░░α░é! α░¿α▒çα░¿α▒ü α░«α▒Ç AI α░╣α▒åα░▓α▒ìα░¬α▒ìΓÇîα░▓α▒êα░¿α▒ì α░àα░╕α░┐α░╕α▒ìα░ƒα▒åα░éα░ƒα▒ìΓÇîα░¿α░┐. α░¬α▒ìα░░α░¡α▒üα░ñα▒ìα░╡ α░╕α▒çα░╡α░▓α▒ü, α░╕α░░α▒ìα░ƒα░┐α░½α░┐α░òα▒åα░ƒα▒ìα░▓α▒ü, α░¬α░Ñα░òα░╛α░▓α▒ü α░«α░░α░┐α░»α▒ü α░çα░ñα░░ α░╡α░┐α░╖α░»α░╛α░▓α░▓α▒ï α░¿α▒çα░¿α▒ü α░«α▒Çα░òα▒ü α░╕α░╣α░╛α░»α░é α░Üα▒çα░»α░ùα░▓α░¿α▒ü. α░êα░░α▒ïα░£α▒ü α░«α▒Çα░òα▒ü α░Åα░«α░┐ α░òα░╛α░╡α░╛α░▓α░┐?",
-    placeholder: "α░«α▒Ç α░¬α▒ìα░░α░╢α▒ìα░¿ α░ƒα▒êα░¬α▒ì α░Üα▒çα░»α░éα░íα░┐ΓÇª",
-    quickPrompts: ["α░£α░¿α▒ìα░« α░ºα▒âα░╡α▒Çα░òα░░α░ú α░¬α░ñα▒ìα░░α░é α░Äα░▓α░╛ α░¬α▒èα░éα░ªα░╛α░▓α░┐?", "α░░α▒çα░╖α░¿α▒ì α░òα░╛α░░α▒ìα░íα▒ü α░¿α░╡α▒Çα░òα░░α░ú", "α░åα░╕α▒ìα░ñα░┐ α░¬α░¿α▒ìα░¿α▒ü α░Üα▒åα░▓α▒ìα░▓α░┐α░éα░¬α▒ü", "α░åα░ºα░╛α░░α▒ì α░¿α░╡α▒Çα░òα░░α░ú α░╡α░┐α░ºα░╛α░¿α░é"],
+    code: "te", label: "Telugu", native: "తె",
+    greeting: "నమస్కారం! నేను మీ AI హెల్ప్‌లైన్ అసిస్టెంట్‌ని. ప్రభుత్వ సేవలు, సర్టిఫికెట్లు, పథకాలు మరియు ఇతర విషయాలలో నేను మీకు సహాయం చేయగలను. ఈరోజు మీకు ఏమి కావాలి?",
+    placeholder: "మీ ప్రశ్న టైప్ చేయండి…",
+    quickPrompts: ["జన్మ ధృవీకరణ పత్రం ఎలా పొందాలి?", "రేషన్ కార్డు నవీకరణ", "ఆస్తి పన్ను చెల్లింపు", "ఆధార్ నవీకరణ విధానం"],
   },
   {
-    code: "ta", label: "Tamil", native: "α«ñ",
-    greeting: "α«╡α«úα«òα»ìα«òα««α»ì! α«¿α«╛α«⌐α»ì α«ëα«Öα»ìα«òα«│α»ì AI α«╣α»åα«▓α»ìα«¬α»ìα«▓α»êα«⌐α»ì α«ëα«ñα«╡α«┐α«»α«╛α«│α«░α»ì. α«àα«░α«Üα»ü α«Üα»çα«╡α»êα«òα«│α»ì, α«Üα«╛α«⌐α»ìα«▒α«┐α«ñα«┤α»ìα«òα«│α»ì, α«ñα«┐α«ƒα»ìα«ƒα«Öα»ìα«òα«│α»ì α««α«▒α»ìα«▒α»üα««α»ì α«¬α«▓α«╡α«▒α»ìα«▒α«┐α«▓α»ì α«ëα«ñα«╡ α««α»üα«ƒα«┐α«»α»üα««α»ì. α«çα«⌐α»ìα«▒α»ü α«Äα«⌐α»ìα«⌐ α«ñα»çα«╡α»ê?",
-    placeholder: "α«ëα«Öα»ìα«òα«│α»ì α«òα»çα«│α»ìα«╡α«┐α«»α»ê α«ñα«ƒα»ìα«ƒα«Üα»ìα«Üα»ü α«Üα»åα«»α»ìα«»α»üα«Öα»ìα«òα«│α»ìΓÇª",
-    quickPrompts: ["α«¬α«┐α«▒α«¬α»ìα«¬α»ü α«Üα«╛α«⌐α»ìα«▒α«┐α«ñα«┤α»ì α«Äα«¬α»ìα«¬α«ƒα«┐ α«¬α»åα«▒α»üα«╡α«ñα»ü?", "α«░α»çα«╖α«⌐α»ì α«òα«╛α«░α»ìα«ƒα»ü α«¬α»üα«ñα»üα«¬α»ìα«¬α«┐α«¬α»ìα«¬α»ü", "α«Üα»èα«ñα»ìα«ñα»ü α«╡α«░α«┐ α«Üα»åα«▓α»üα«ñα»ìα«ñα«▓α»ì", "α«åα«ñα«╛α«░α»ì α«¬α»üα«ñα»üα«¬α»ìα«¬α«┐α«¬α»ìα«¬α»ü"],
+    code: "ta", label: "Tamil", native: "த",
+    greeting: "வணக்கம்! நான் உங்கள் AI ஹெல்ப்லைன் உதவியாளர். அரசு சேவைகள், சான்றிதழ்கள், திட்டங்கள் மற்றும் பலவற்றில் உதவ முடியும். இன்று என்ன தேவை?",
+    placeholder: "உங்கள் கேள்வியை தட்டச்சு செய்யுங்கள்…",
+    quickPrompts: ["பிறப்பு சான்றிதழ் எப்படி பெறுவது?", "ரேஷன் கார்டு புதுப்பிப்பு", "சொத்து வரி செலுத்தல்", "ஆதார் புதுப்பிப்பு"],
   },
   {
-    code: "kn", label: "Kannada", native: "α▓ò",
-    greeting: "α▓¿α▓«α▓╕α│ìα▓òα▓╛α▓░! α▓¿α▓╛α▓¿α│ü α▓¿α▓┐α▓«α│ìα▓« AI α▓╣α│åα▓▓α│ìα▓¬α│ìΓÇîα▓▓α│êα▓¿α│ì α▓╕α▓╣α▓╛α▓»α▓ò. α▓╕α▓░α│ìα▓òα▓╛α▓░α▓┐ α▓╕α│çα▓╡α│åα▓ùα▓│α│ü, α▓¬α│ìα▓░α▓«α▓╛α▓ú α▓¬α▓ñα│ìα▓░α▓ùα▓│α│ü α▓«α▓ñα│ìα▓ñα│ü α▓»α│ïα▓£α▓¿α│åα▓ùα▓│ α▓¼α▓ùα│ìα▓ùα│å α▓╕α▓╣α▓╛α▓» α▓«α▓╛α▓íα▓¼α▓▓α│ìα▓▓α│å. α▓çα▓éα▓ªα│ü α▓Åα▓¿α│ü α▓¼α│çα▓òα│ü?",
-    placeholder: "α▓¿α▓┐α▓«α│ìα▓« α▓¬α│ìα▓░α▓╢α│ìα▓¿α│å α▓ƒα│êα▓¬α│ì α▓«α▓╛α▓íα▓┐ΓÇª",
-    quickPrompts: ["α▓£α▓¿α▓¿ α▓¬α│ìα▓░α▓«α▓╛α▓ú α▓¬α▓ñα│ìα▓░ α▓╣α│çα▓ùα│å α▓¬α▓íα│åα▓»α▓¼α│çα▓òα│ü?", "α▓░α│çα▓╖α▓¿α│ì α▓òα▓╛α▓░α│ìα▓íα│ì α▓¿α▓╡α│Çα▓òα▓░α▓ú", "α▓åα▓╕α│ìα▓ñα▓┐ α▓ñα│åα▓░α▓┐α▓ùα│å α▓¬α▓╛α▓╡α▓ñα▓┐", "α▓åα▓ºα▓╛α▓░α│ì α▓¿α▓╡α│Çα▓òα▓░α▓ú"],
+    code: "kn", label: "Kannada", native: "ಕ",
+    greeting: "ನಮಸ್ಕಾರ! ನಾನು ನಿಮ್ಮ AI ಹೆಲ್ಪ್‌ಲೈನ್ ಸಹಾಯಕ. ಸರ್ಕಾರಿ ಸೇವೆಗಳು, ಪ್ರಮಾಣ ಪತ್ರಗಳು ಮತ್ತು ಯೋಜನೆಗಳ ಬಗ್ಗೆ ಸಹಾಯ ಮಾಡಬಲ್ಲೆ. ಇಂದು ಏನು ಬೇಕು?",
+    placeholder: "ನಿಮ್ಮ ಪ್ರಶ್ನೆ ಟೈಪ್ ಮಾಡಿ…",
+    quickPrompts: ["ಜನನ ಪ್ರಮಾಣ ಪತ್ರ ಹೇಗೆ ಪಡೆಯಬೇಕು?", "ರೇಷನ್ ಕಾರ್ಡ್ ನವೀಕರಣ", "ಆಸ್ತಿ ತೆರಿಗೆ ಪಾವತಿ", "ಆಧಾರ್ ನವೀಕರಣ"],
   },
   {
-    code: "ml", label: "Malayalam", native: "α┤«",
-    greeting: "α┤¿α┤«α┤╕α╡ìα┤òα┤╛α┤░α┤é! α┤₧α┤╛α╡╗ α┤¿α┤┐α┤Öα╡ìα┤Öα┤│α╡üα┤ƒα╡å AI α┤╣α╡åα╡╜α┤¬α╡ìΓÇîα┤▓α╡êα╡╗ α┤àα┤╕α┤┐α┤╕α╡ìα┤▒α╡ìα┤▒α┤¿α╡ìα┤▒α╡ì α┤åα┤úα╡ì. α┤╕α╡╝α┤òα╡ìα┤òα┤╛α╡╝ α┤╕α╡çα┤╡α┤¿α┤Öα╡ìα┤Öα╡╛, α┤╕α╡╝α┤ƒα╡ìα┤ƒα┤┐α┤½α┤┐α┤òα╡ìα┤òα┤▒α╡ìα┤▒α╡üα┤òα╡╛, α┤¬α┤ªα╡ìα┤ºα┤ñα┤┐α┤òα╡╛ α┤Äα┤¿α╡ìα┤¿α┤┐α┤╡α┤»α┤┐α╡╜ α┤╕α┤╣α┤╛α┤»α┤┐α┤òα╡ìα┤òα┤╛α╡╗ α┤òα┤┤α┤┐α┤»α╡üα┤é. α┤çα┤¿α╡ìα┤¿α╡ì α┤Äα┤¿α╡ìα┤ñα╡ì α┤╕α┤╣α┤╛α┤»α┤é α┤╡α╡çα┤úα┤é?",
-    placeholder: "α┤¿α┤┐α┤Öα╡ìα┤Öα┤│α╡üα┤ƒα╡å α┤Üα╡ïα┤ªα╡ìα┤»α┤é α┤ƒα╡êα┤¬α╡ìα┤¬α╡ì α┤Üα╡åα┤»α╡ìα┤»α╡éΓÇª",
-    quickPrompts: ["α┤£α┤¿α┤¿ α┤╕α╡╝α┤ƒα╡ìα┤ƒα┤┐α┤½α┤┐α┤òα╡ìα┤òα┤▒α╡ìα┤▒α╡ì α┤Äα┤Öα╡ìα┤Öα┤¿α╡å α┤▓α┤¡α┤┐α┤òα╡ìα┤òα╡üα┤é?", "α┤▒α╡çα┤╖α╡╗ α┤òα┤╛α╡╝α┤íα╡ì α┤¬α╡üα┤ñα╡üα┤òα╡ìα┤òα╡╜", "α┤¡α╡éα┤¿α┤┐α┤òα╡üα┤ñα┤┐ α┤àα┤ƒα┤»α╡ìα┤òα╡ìα┤òα╡╜", "α┤åα┤ºα┤╛α╡╝ α┤àα┤¬α╡ìα┤íα╡çα┤▒α╡ìα┤▒α╡ì"],
+    code: "ml", label: "Malayalam", native: "മ",
+    greeting: "നമസ്കാരം! ഞാൻ നിങ്ങളുടെ AI ഹെൽപ്‌ലൈൻ അസിസ്റ്റന്റ് ആണ്. സർക്കാർ സേവനങ്ങൾ, സർട്ടിഫിക്കറ്റുകൾ, പദ്ധതികൾ എന്നിവയിൽ സഹായിക്കാൻ കഴിയും. ഇന്ന് എന്ത് സഹായം വേണം?",
+    placeholder: "നിങ്ങളുടെ ചോദ്യം ടൈപ്പ് ചെയ്യൂ…",
+    quickPrompts: ["ജനന സർട്ടിഫിക്കറ്റ് എങ്ങനെ ലഭിക്കും?", "റേഷൻ കാർഡ് പുതുക്കൽ", "ഭൂനികുതി അടയ്ക്കൽ", "ആധാർ അപ്ഡേറ്റ്"],
   },
   {
-    code: "mr", label: "Marathi", native: "αñ«",
-    greeting: "αñ¿αñ«αñ╕αÑìαñòαñ╛αñ░! αñ«αÑÇ αññαÑüαñ«αñÜαñ╛ AI αñ╣αÑçαñ▓αÑìαñ¬αñ▓αñ╛αñçαñ¿ αñ╕αñ╣αñ╛αñ»αÑìαñ»αñò αñåαñ╣αÑç. αñ╕αñ░αñòαñ╛αñ░αÑÇ αñ╕αÑçαñ╡αñ╛, αñ¬αÑìαñ░αñ«αñ╛αñúαñ¬αññαÑìαñ░αÑç, αñ»αÑïαñ£αñ¿αñ╛ αñ»αñ╛αñéαñ¼αñªαÑìαñªαñ▓ αñ«αñªαññ αñòαñ░αÑé αñ╢αñòαññαÑï. αñåαñ£ αññαÑüαñ«αÑìαñ╣αñ╛αñ▓αñ╛ αñòαñ╛αñ» αñ╣αñ╡αÑç αñåαñ╣αÑç?",
-    placeholder: "αññαÑüαñ«αñÜαñ╛ αñ¬αÑìαñ░αñ╢αÑìαñ¿ αñƒαñ╛αñçαñ¬ αñòαñ░αñ╛ΓÇª",
-    quickPrompts: ["αñ£αñ¿αÑìαñ« αñªαñ╛αñûαñ▓αñ╛ αñòαñ╕αñ╛ αñ«αñ┐αñ│αñ╡αñ╛αñ»αñÜαñ╛?", "αñ░αÑçαñ╢αñ¿ αñòαñ╛αñ░αÑìαñí αñ¿αÑéαññαñ¿αÑÇαñòαñ░αñú", "αñ«αñ╛αñ▓αñ«αññαÑìαññαñ╛ αñòαñ░ αñ¡αñ░αñúαñ╛", "αñåαñºαñ╛αñ░ αñàαñªαÑìαñ»αññαñ¿ αñ¬αÑìαñ░αñòαÑìαñ░αñ┐αñ»αñ╛"],
+    code: "mr", label: "Marathi", native: "म",
+    greeting: "नमस्कार! मी तुमचा AI हेल्पलाइन सहाय्यक आहे. सरकारी सेवा, प्रमाणपत्रे, योजना यांबद्दल मदत करू शकतो. आज तुम्हाला काय हवे आहे?",
+    placeholder: "तुमचा प्रश्न टाइप करा…",
+    quickPrompts: ["जन्म दाखला कसा मिळवायचा?", "रेशन कार्ड नूतनीकरण", "मालमत्ता कर भरणा", "आधार अद्यतन प्रक्रिया"],
   },
   {
-    code: "bn", label: "Bengali", native: "αª¼αª╛αªé",
-    greeting: "αª¿αª«αª╕αºìαªòαª╛αª░! αªåαª«αª┐ αªåαª¬αª¿αª╛αª░ AI αª╣αºçαª▓αºìαª¬αª▓αª╛αªçαª¿ αª╕αª╣αªòαª╛αª░αºÇαÑñ αª╕αª░αªòαª╛αª░αª┐ αª╕αºçαª¼αª╛, αª╕αª╛αª░αºìαªƒαª┐αª½αª┐αªòαºçαªƒ, αª¬αºìαª░αªòαª▓αºìαª¬ αªçαªñαºìαª»αª╛αªªαª┐αªñαºç αª╕αª╛αª╣αª╛αª»αºìαª» αªòαª░αªñαºç αª¬αª╛αª░αª┐αÑñ αªåαª£ αªòαºÇαª¡αª╛αª¼αºç αª╕αª╛αª╣αª╛αª»αºìαª» αªòαª░αª¼?",
-    placeholder: "αªåαª¬αª¿αª╛αª░ αª¬αºìαª░αª╢αºìαª¿ αªƒαª╛αªçαª¬ αªòαª░αºüαª¿ΓÇª",
-    quickPrompts: ["αª£αª¿αºìαª« αª╕αª¿αªª αªòαºÇαª¡αª╛αª¼αºç αª¬αª╛αª¼?", "αª░αºçαª╢αª¿ αªòαª╛αª░αºìαªí αª¿αª¼αª╛αª»αª╝αª¿", "αª╕αª«αºìαª¬αªñαºìαªñαª┐ αªòαª░ αª¬αª░αª┐αª╢αºïαªº", "αªåαªºαª╛αª░ αªåαª¬αªíαºçαªƒ αª¬αªªαºìαªºαªñαª┐"],
+    code: "bn", label: "Bengali", native: "বাং",
+    greeting: "নমস্কার! আমি আপনার AI হেল্পলাইন সহকারী। সরকারি সেবা, সার্টিফিকেট, প্রকল্প ইত্যাদিতে সাহায্য করতে পারি। আজ কীভাবে সাহায্য করব?",
+    placeholder: "আপনার প্রশ্ন টাইপ করুন…",
+    quickPrompts: ["জন্ম সনদ কীভাবে পাব?", "রেশন কার্ড নবায়ন", "সম্পত্তি কর পরিশোধ", "আধার আপডেট পদ্ধতি"],
   },
 ];
 
@@ -140,12 +140,12 @@ const CHANNEL_CONFIG: Record<string, { icon: React.ReactNode; color: string }> =
 };
 
 const MACROS = [
-  { label: "Request Aadhaar",  emoji: "≡ƒ¬¬", text: "Could you please share the last 4 digits of your Aadhaar for verification?" },
-  { label: "Link to Portal",   emoji: "≡ƒöù", text: "You can complete this at: https://civicos.gov.in/services" },
-  { label: "Escalate to L2",   emoji: "Γ¼å∩╕Å", text: "Escalating to Level 2 support. They will contact you within 2 hours." },
-  { label: "Close Ticket",     emoji: "Γ£à", text: "This issue has been resolved. Closing ticket. Have a great day!" },
-  { label: "Need More Info",   emoji: "≡ƒôï", text: "To help you better, could you please provide more details about your issue?" },
-  { label: "MeeSeva Link",     emoji: "≡ƒÅ¢∩╕Å", text: "Please visit your nearest MeeSeva centre or portal.meeseva.telangana.gov.in to complete this process." },
+  { label: "Request Aadhaar",  emoji: "🪪", text: "Could you please share the last 4 digits of your Aadhaar for verification?" },
+  { label: "Link to Portal",   emoji: "🔗", text: "You can complete this at: https://civicos.gov.in/services" },
+  { label: "Escalate to L2",   emoji: "⬆️", text: "Escalating to Level 2 support. They will contact you within 2 hours." },
+  { label: "Close Ticket",     emoji: "✅", text: "This issue has been resolved. Closing ticket. Have a great day!" },
+  { label: "Need More Info",   emoji: "📋", text: "To help you better, could you please provide more details about your issue?" },
+  { label: "MeeSeva Link",     emoji: "🏛️", text: "Please visit your nearest MeeSeva centre or portal.meeseva.telangana.gov.in to complete this process." },
 ];
 
 //  Animated AI Orb 
@@ -256,7 +256,7 @@ function BotBubble({
             fontSize: "8px", padding: "1px 5px", borderRadius: "8px",
             background: "rgba(34,211,238,0.1)", color: "rgba(34,211,238,0.7)",
             border: "1px solid rgba(34,211,238,0.2)",
-          }}>≡ƒÄñ voice</span>
+          }}>🎤 voice</span>
         )}
       </div>
 
@@ -488,7 +488,7 @@ function NewTicketModal({ open, onClose, onCreated, prefillQuery = "", prefillNa
                 display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
                 boxShadow: loading ? "none" : "0 0 24px rgba(56,189,248,0.4)", transition: "all 0.2s",
               }}>
-              {loading ? <><Loader2 className="w-4 h-4 animate-spin" />CreatingΓÇª</> : <><TicketIcon className="w-4 h-4" />Create Ticket</>}
+              {loading ? <><Loader2 className="w-4 h-4 animate-spin" />Creating…</> : <><TicketIcon className="w-4 h-4" />Create Ticket</>}
             </button>
           </div>
         </div>
@@ -613,9 +613,9 @@ function TicketCard({ t, onClick }: { t: Ticket; onClick: () => void }) {
 //  Status Timeline 
 function StatusTimeline({ status }: { status: string }) {
   const steps = [
-    { key: "Open",     label: "Opened",     icon: "≡ƒô⌐" },
-    { key: "Pending",  label: "Attending",   icon: "≡ƒæ¿ΓÇì≡ƒÆ╝" },
-    { key: "Resolved", label: "Resolved",    icon: "Γ£à" },
+    { key: "Open",     label: "Opened",     icon: "📩" },
+    { key: "Pending",  label: "Attending",   icon: "👨‍💼" },
+    { key: "Resolved", label: "Resolved",    icon: "✅" },
   ];
   const activeIdx = status === "Open" ? 0 : status === "Pending" ? 1 : 2;
   return (
@@ -638,7 +638,7 @@ function StatusTimeline({ status }: { status: string }) {
                 boxShadow: current ? "0 0 12px rgba(139,92,246,0.2)" : "none",
                 transition: "all 0.3s ease",
               }}>
-                {done ? "Γ£ô" : s.icon}
+                {done ? "✓" : s.icon}
               </div>
               <span style={{
                 fontSize: "14px", fontWeight: current ? 800 : 600,
@@ -832,7 +832,7 @@ function ConversationDrawer({ ticket, onClose, onUpdate }: {
                 boxShadow: active ? "none" : "0 1px 2px rgba(0,0,0,0.05)",
               }}>
                 {active && ssc.icon}
-                {active ? "Γ£ô " : ""}{s}
+                {active ? "✓ " : ""}{s}
               </button>
             );
           })}
@@ -863,7 +863,7 @@ function ConversationDrawer({ ticket, onClose, onUpdate }: {
               justifyContent: "center", height: "100%", gap: "10px", opacity: 0.6,
             }}>
               <MessageSquare style={{ width: 32, height: 32, color: "#94a3b8" }} />
-              <p style={{ fontSize: "14px", color: "#64748b", fontWeight: 500 }}>No messages yet ΓÇö start the conversation</p>
+              <p style={{ fontSize: "14px", color: "#64748b", fontWeight: 500 }}>No messages yet — start the conversation</p>
             </div>
           )}
 
@@ -962,7 +962,7 @@ function ConversationDrawer({ ticket, onClose, onUpdate }: {
                     <span style={{
                       fontSize: "14px", fontWeight: 700, color: "#94a3b8",
                       alignSelf: "center", letterSpacing: "0.08em", marginRight: "1px",
-                    }}>≡ƒÆ¼ suggest:</span>
+                    }}>💬 suggest:</span>
                     {MACROS.map((mac, j) => (
                       <button key={j}
                         onClick={() => setReplyText(p => p ? p + "\n" + mac.text : mac.text)}
@@ -1056,14 +1056,14 @@ function ConversationDrawer({ ticket, onClose, onUpdate }: {
                 background: senderColor, boxShadow: `0 0 6px ${senderColor}80`,
               }} />
               <span style={{ fontSize: "14px", fontWeight: 700, color: "#64748b", letterSpacing: "0.06em" }}>
-                REPLYING AS <span style={{ color: senderColor }}>{senderName.toUpperCase()}</span> ┬╖ <span style={{ fontWeight: 600, opacity: 0.7 }}>{senderBadge}</span>
+                REPLYING AS <span style={{ color: senderColor }}>{senderName.toUpperCase()}</span> · <span style={{ fontWeight: 600, opacity: 0.7 }}>{senderBadge}</span>
               </span>
             </div>
 
             <Textarea
               value={replyText}
               onChange={e => setReplyText(e.target.value)}
-              placeholder={`Type your reply hereΓÇª`}
+              placeholder={`Type your reply here…`}
               style={{
                 width: "100%", resize: "none", fontSize: "14px",
                 border: "none", background: "transparent", outline: "none",
@@ -1082,7 +1082,7 @@ function ConversationDrawer({ ticket, onClose, onUpdate }: {
               background: "#f8fafc",
             }}>
               <p style={{ fontSize: "14px", color: "#94a3b8", fontWeight: 600 }}>
-                Γîÿ + Γå╡ to send
+                ⌘ + ↵ to send
               </p>
               <div style={{ display: "flex", alignItems: "center", gap: "7px" }}>
                 <Select value={submitAs} onValueChange={setSubmitAs}>
@@ -1416,7 +1416,7 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
       }]);
       toast.success(`Ticket ${ticket_id} auto-created`);
     } catch {
-      toast.error("Auto-escalation failed ΓÇö please create a ticket manually");
+      toast.error("Auto-escalation failed — please create a ticket manually");
     }
   }, [autoEscalated, messages, user, unresolvedTurns, onTicketCreated]);
 
@@ -1599,10 +1599,10 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
   };
 
   const stateLabel: Record<OrbState, string> = {
-    idle:      voiceMode ? "Voice mode ΓÇö tap orb to speak" : "Ready to help",
-    listening: "ListeningΓÇª",
-    thinking:  "ThinkingΓÇª",
-    speaking:  "SpeakingΓÇª",
+    idle:      voiceMode ? "Voice mode — tap orb to speak" : "Ready to help",
+    listening: "Listening…",
+    thinking:  "Thinking…",
+    speaking:  "Speaking…",
   };
 
   //  Waveform bars (react to live audio level) 
@@ -1682,7 +1682,7 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
               <p style={{ fontSize: "14px", fontWeight: 800, color: "white", margin: 0, letterSpacing: "-0.01em" }}>CivicSaathi</p>
               <p style={{ fontSize: "14px", color: "rgba(34,197,94,0.85)", fontWeight: 600, margin: 0, display: "flex", alignItems: "center", gap: "3px" }}>
                 <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#22c55e", display: "inline-block" }} />
-                We're online ┬╖ {sttEngine ? `STT: ${sttEngine}` : lang.label}
+                We're online · {sttEngine ? `STT: ${sttEngine}` : lang.label}
               </p>
             </div>
           </div>
@@ -1717,7 +1717,7 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
                       }}>
                       <span style={{ fontSize: "14px", fontWeight: 700, color: "#38bdf8", width: "24px" }}>{l.native}</span>
                       <span style={{ fontSize: "14px", color: i === langIdx ? "#38bdf8" : "rgba(255,255,255,0.6)", fontWeight: i === langIdx ? 700 : 400 }}>{l.label}</span>
-                      {i === langIdx && <span style={{ marginLeft: "auto", color: "#38bdf8", fontSize: "14px" }}>Γ£ô</span>}
+                      {i === langIdx && <span style={{ marginLeft: "auto", color: "#38bdf8", fontSize: "14px" }}>✓</span>}
                     </button>
                   ))}
                 </div>
@@ -1751,9 +1751,9 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
                 animation: isRecording ? "dotPulse 0.6s ease-in-out infinite alternate" : "none",
               }} />
               <span style={{ fontSize: "14px", color: "#22d3ee", fontWeight: 700 }}>
-                {isRecording ? "Listening ΓÇö speak now" : orbState === "thinking" ? "ProcessingΓÇª" : orbState === "speaking" ? "SpeakingΓÇª" : "Voice mode active"}
+                {isRecording ? "Listening — speak now" : orbState === "thinking" ? "Processing…" : orbState === "speaking" ? "Speaking…" : "Voice mode active"}
               </span>
-              {isRecording && <span style={{ fontSize: "14px", color: "rgba(34,211,238,0.6)", fontWeight: 600 }}>ΓùÅ REC</span>}
+              {isRecording && <span style={{ fontSize: "14px", color: "rgba(34,211,238,0.6)", fontWeight: 600 }}>● REC</span>}
 
               {detectedLang && detectedLang !== lang.code && (
                 <span style={{ fontSize: "14px", padding: "2px 7px", borderRadius: "10px", background: "rgba(168,85,247,0.15)", border: "1px solid rgba(168,85,247,0.3)", color: "#c4b5fd", fontWeight: 700 }}>
@@ -1964,7 +1964,7 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={voiceMode ? "Voice mode active ΓÇö or type here" : lang.placeholder}
+              placeholder={voiceMode ? "Voice mode active — or type here" : lang.placeholder}
               rows={1}
               disabled={orbState === "thinking"}
               style={{
@@ -2018,7 +2018,7 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
             </button>
           </div>
           <p style={{ fontSize: "14px", color: "rgba(56,189,248,0.3)", textAlign: "center", marginTop: "5px", fontWeight: 500 }}>
-            Γå╡ send ┬╖ Shift+Γå╡ new line ┬╖ tap ≡ƒÄñ for voice conversation
+            ↵ send · Shift+↵ new line · tap 🎤 for voice conversation
           </p>
         </div>
 
@@ -2139,7 +2139,7 @@ function Helpline() {
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
-              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search ticketsΓÇª"
+              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search tickets…"
                 className="w-[200px] h-10 pl-9 pr-8 bg-white/70 backdrop-blur-md border border-white/60 rounded-xl text-sm text-slate-800 outline-none focus:ring-4 focus:ring-teal-500/20 focus:border-teal-300 transition-all placeholder:text-slate-400 shadow-sm" />
               {search && (
                 <button onClick={() => setSearch("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 hover:bg-slate-200/50 rounded-full transition-colors cursor-pointer border-none bg-transparent">
@@ -2250,8 +2250,8 @@ function Helpline() {
       />
 
       <style>{`
-        /* ΓöÇΓöÇ Core sphere pulse animations ΓöÇΓöÇ */
-        /* ΓöÇΓöÇ Orb heartbeat ΓÇö whole orb scales as one unit ΓöÇΓöÇ */
+        /* ── Core sphere pulse animations ── */
+        /* ── Orb heartbeat — whole orb scales as one unit ── */
         @keyframes orbHeartbeat {
           0%   { transform: scale(1);    }
           14%  { transform: scale(1.18); }
@@ -2260,33 +2260,33 @@ function Helpline() {
           56%  { transform: scale(1);    }
           100% { transform: scale(1);    }
         }
-        /* ΓöÇΓöÇ Idle gentle breath ΓöÇΓöÇ */
+        /* ── Idle gentle breath ── */
         @keyframes orbIdle { 0%,100% { transform: scale(1); } 50% { transform: scale(1.04); } }
 
-        /* ΓöÇΓöÇ Wave bars (listening / speaking) ΓöÇΓöÇ */
+        /* ── Wave bars (listening / speaking) ── */
         @keyframes waveBar { 0% { transform: scaleY(0.35); opacity: 0.55; } 100% { transform: scaleY(1.6); opacity: 1; } }
 
-        /* ΓöÇΓöÇ Thinking spinner ΓöÇΓöÇ */
+        /* ── Thinking spinner ── */
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        /* ΓöÇΓöÇ Chat bubbles ΓöÇΓöÇ */
+        /* ── Chat bubbles ── */
         @keyframes typingDot { 0%,60%,100% { transform: translateY(0); opacity: 0.4; } 30% { transform: translateY(-6px); opacity: 1; } }
         @keyframes bubbleIn  { from { opacity: 0; transform: translateY(8px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
-        /* ΓöÇΓöÇ Background particles ΓöÇΓöÇ */
+        /* ── Background particles ── */
         @keyframes floatParticle { from { transform: translateY(0) translateX(0); opacity: 0.15; } to { transform: translateY(-12px) translateX(6px); opacity: 0.35; } }
 
-        /* ΓöÇΓöÇ Drawer / overlay ΓöÇΓöÇ */
+        /* ── Drawer / overlay ── */
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes fadeIn  { from { opacity: 0; } to { opacity: 1; } }
 
-        /* ΓöÇΓöÇ Live dot ΓöÇΓöÇ */
+        /* ── Live dot ── */
         @keyframes pulse { 0%,100% { box-shadow: 0 0 6px rgba(34,197,94,0.6); } 50% { box-shadow: 0 0 14px rgba(34,197,94,0.9); } }
 
-        /* ΓöÇΓöÇ Voice mode dot pulse ΓöÇΓöÇ */
+        /* ── Voice mode dot pulse ── */
         @keyframes dotPulse { 0% { opacity: 0.5; transform: scale(0.85); } 100% { opacity: 1; transform: scale(1.2); } }
 
-        /* ΓöÇΓöÇ Online indicator pulse ΓöÇΓöÇ */
+        /* ── Online indicator pulse ── */
         @keyframes onlinePulse { 0%,100% { box-shadow: 0 0 4px rgba(34,197,94,0.5); opacity: 1; } 50% { box-shadow: 0 0 10px rgba(34,197,94,0.9); opacity: 0.8; } }
       `}</style>
     </div>

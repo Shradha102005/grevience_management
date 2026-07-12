@@ -1,4 +1,4 @@
-﻿import { Link } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 
 const COLUMNS = [
   { title: "Platform", links: ["Services", "Departments", "Modules", "Voice Interface"] },
@@ -16,14 +16,14 @@ export function SiteFooter() {
               CivicSaathi <span className="text-accent">AI</span>
             </div>
             <p className="mt-3 text-sm text-muted-foreground">
-              The unified AI-powered platform for citizen governance ΓÇö schemes, grievances,
+              The unified AI-powered platform for citizen governance — schemes, grievances,
               emergency response and municipal services in one secure system.
             </p>
             <Link
               to="/portal"
               className="mt-5 inline-flex text-sm font-semibold text-primary hover:underline"
             >
-              Enter the governance portal ΓåÆ
+              Enter the governance portal →
             </Link>
           </div>
           {COLUMNS.map((c) => (
@@ -42,8 +42,8 @@ export function SiteFooter() {
           ))}
         </div>
         <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-border pt-6 text-xs text-muted-foreground sm:flex-row">
-          <p>┬⌐ {new Date().getFullYear()} CivicSaathi. Government technology, reimagined.</p>
-          <p>Built for public-sector scale ┬╖ ISO-aligned ┬╖ Multilingual</p>
+          <p>© {new Date().getFullYear()} CivicSaathi. Government technology, reimagined.</p>
+          <p>Built for public-sector scale · ISO-aligned · Multilingual</p>
         </div>
       </div>
     </footer>

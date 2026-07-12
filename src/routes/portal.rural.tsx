@@ -1,4 +1,4 @@
-﻿import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import {
   Sprout, Home, Briefcase, Droplets, GraduationCap, Users,
@@ -10,7 +10,7 @@ import { LanguageDropdown } from "@/components/portal/language-selector";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/portal/rural")({
-  head: () => ({ meta: [{ title: "Rural Development ΓÇö CivicSaathi" }] }),
+  head: () => ({ meta: [{ title: "Rural Development — CivicSaathi" }] }),
   component: Rural,
 });
 
@@ -22,14 +22,14 @@ const SPEECH_LANG: Record<string, string> = {
 };
 
 const LANG_PLACEHOLDER: Record<string, string> = {
-  en: "Type or speak your questionΓÇª",
-  hi: "αñàαñ¬αñ¿αñ╛ αñ¬αÑìαñ░αñ╢αÑìαñ¿ αñ▓αñ┐αñûαÑçαñé αñ»αñ╛ αñ¼αÑïαñ▓αÑçαñéΓÇª",
-  te: "α░«α▒Ç α░¬α▒ìα░░α░╢α▒ìα░¿ α░ƒα▒êα░¬α▒ì α░Üα▒çα░»α░éα░íα░┐ΓÇª",
-  ta: "α«ëα«Öα»ìα«òα«│α»ì α«òα»çα«│α»ìα«╡α«┐α«»α»ê α«ñα«ƒα»ìα«ƒα«Üα»ìα«Üα»ü α«Üα»åα«»α»ìα«»α»üα«Öα»ìα«òα«│α»ìΓÇª",
-  kn: "α▓¿α▓┐α▓«α│ìα▓« α▓¬α│ìα▓░α▓╢α│ìα▓¿α│å α▓ƒα│êα▓¬α│ì α▓«α▓╛α▓íα▓┐ΓÇª",
-  ml: "α┤¿α┤┐α┤Öα╡ìα┤Öα┤│α╡üα┤ƒα╡å α┤Üα╡ïα┤ªα╡ìα┤»α┤é α┤ƒα╡êα┤¬α╡ìα┤¬α╡ì α┤Üα╡åα┤»α╡ìα┤»α╡éΓÇª",
-  mr: "αñåαñ¬αñ▓αñ╛ αñ¬αÑìαñ░αñ╢αÑìαñ¿ αñƒαñ╛αñçαñ¬ αñòαñ░αñ╛ΓÇª",
-  bn: "αªåαª¬αª¿αª╛αª░ αª¬αºìαª░αª╢αºìαª¿ αªƒαª╛αªçαª¬ αªòαª░αºüαª¿ΓÇª",
+  en: "Type or speak your question…",
+  hi: "अपना प्रश्न लिखें या बोलें…",
+  te: "మీ ప్రశ్న టైప్ చేయండి…",
+  ta: "உங்கள் கேள்வியை தட்டச்சு செய்யுங்கள்…",
+  kn: "ನಿಮ್ಮ ಪ್ರಶ್ನೆ ಟೈಪ್ ಮಾಡಿ…",
+  ml: "നിങ്ങളുടെ ചോദ്യം ടൈപ്പ് ചെയ്യൂ…",
+  mr: "आपला प्रश्न टाइप करा…",
+  bn: "আপনার প্রশ্ন টাইপ করুন…",
 };
 
 const SUGGESTIONS = [
@@ -202,7 +202,7 @@ function SubsidyCalc({ onClose }: { onClose: () => void }) {
     const a = parseFloat(acres);
     if (!a || a <= 0) { toast.error("Enter a valid land size"); return; }
     const pkisan = 6000, fasal = Math.round(a * 1200), total = pkisan + fasal;
-    setResult(`PM-KISAN: Γé╣${pkisan.toLocaleString()}/yr  +  Fasal Bima est.: Γé╣${fasal.toLocaleString()}  =  Γé╣${total.toLocaleString()}/year`);
+    setResult(`PM-KISAN: ₹${pkisan.toLocaleString()}/yr  +  Fasal Bima est.: ₹${fasal.toLocaleString()}  =  ₹${total.toLocaleString()}/year`);
   };
   return (
     <div style={{
@@ -221,7 +221,7 @@ function SubsidyCalc({ onClose }: { onClose: () => void }) {
       </div>
       <p style={{ fontSize: "14px", color: "var(--color-muted-foreground)", marginBottom: "10px" }}>Enter your land size to estimate annual subsidies</p>
       <div style={{ display: "flex", gap: "8px", marginBottom: "10px" }}>
-        <input type="number" placeholder="Land in acresΓÇª" value={acres} onChange={e => setAcres(e.target.value)}
+        <input type="number" placeholder="Land in acres…" value={acres} onChange={e => setAcres(e.target.value)}
           style={{ flex: 1, height: "36px", padding: "0 10px", borderRadius: "9px", border: "1px solid rgba(139,92,246,0.2)", background: "rgba(139,92,246,0.04)", color: "var(--color-foreground)", fontSize: "14px", outline: "none" }} />
         <button onClick={calc}
           style={{ padding: "0 16px", height: "36px", borderRadius: "9px", background: "linear-gradient(135deg,#8b5cf6,#7c3aed)", color: "white", border: "none", cursor: "pointer", fontSize: "14px", fontWeight: 700 }}>
@@ -240,7 +240,7 @@ function SubsidyCalc({ onClose }: { onClose: () => void }) {
 //  Main Rural component 
 function Rural() {
   const [language, setLanguage]         = useState("en");
-  const [messages, setMessages]         = useState<Msg[]>([{ role: "bot", text: "αñ¿αñ«αñ╕αÑìαññαÑç! I'm your Rural Development Assistant. Ask me about MGNREGA, PM Awas, SHG loans, subsidies, or any village welfare scheme." }]);
+  const [messages, setMessages]         = useState<Msg[]>([{ role: "bot", text: "नमस्ते! I'm your Rural Development Assistant. Ask me about MGNREGA, PM Awas, SHG loans, subsidies, or any village welfare scheme." }]);
   const [input, setInput]               = useState("");
   const [loading, setLoading]           = useState(false);
   const [isListening, setIsListening]   = useState(false);
@@ -347,13 +347,13 @@ function Rural() {
                   <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">Online</span>
                 </div>
               </h1>
-              <p className="text-slate-500/80 dark:text-slate-400 mt-2 font-medium text-sm md:text-base">αñùαÑìαñ░αñ╛αñ«αÑÇαñú αñ╕αñ╣αñ╛αñ»αñò ┬╖ Multilingual AI Assistant</p>
+              <p className="text-slate-500/80 dark:text-slate-400 mt-2 font-medium text-sm md:text-base">ग्रामीण सहायक · Multilingual AI Assistant</p>
             </div>
           </div>
 
           <div className="flex items-center gap-4 flex-wrap md:flex-nowrap">
             <div className="flex items-center gap-2 bg-white/60 backdrop-blur-2xl px-4 py-2 rounded-[1.25rem] shadow-xl shadow-slate-200/40 border border-white/60 shrink-0">
-              <span className="text-sm text-slate-500 font-bold uppercase tracking-wider">αñ¡αñ╛αñ╖αñ╛:</span>
+              <span className="text-sm text-slate-500 font-bold uppercase tracking-wider">भाषा:</span>
               <LanguageDropdown value={language} onChange={setLanguage} className="h-10 text-sm" />
             </div>
           {/* Programs button */}
@@ -464,7 +464,7 @@ function Rural() {
             <div style={{ flex: 1, position: "relative" }}>
               <input
                 value={input} onChange={e => setInput(e.target.value)}
-                placeholder={isListening ? "ListeningΓÇª" : LANG_PLACEHOLDER[language] ?? "Type your questionΓÇª"}
+                placeholder={isListening ? "Listening…" : LANG_PLACEHOLDER[language] ?? "Type your question…"}
                 disabled={loading || isListening}
                 style={{ width: "100%", height: "44px", padding: "0 14px", background: "rgba(255,255,255,0.6)", backdropFilter: "blur(24px)", borderRadius: "16px", boxShadow: "0 20px 25px -5px rgba(226, 232, 240, 0.4)", border: "1px solid rgba(255,255,255,0.6)", color: "var(--color-foreground)", fontSize: "14px", outline: "none", boxSizing: "border-box", transition: "border-color 0.2s" }}
                 onFocus={e => (e.target as HTMLInputElement).style.borderColor = "rgba(139,92,246,0.5)"}

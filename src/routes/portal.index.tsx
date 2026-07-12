@@ -1,4 +1,4 @@
-﻿import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   MessageSquareWarning,
   Leaf,
@@ -141,7 +141,7 @@ function MockupDashboard() {
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 animate-gradient-x">
               Welcome back, Shradha!
             </span>
-            <span className="text-3xl animate-bounce" style={{ animationDuration: '2s' }}>≡ƒæï</span>
+            <span className="text-3xl animate-bounce" style={{ animationDuration: '2s' }}>👋</span>
           </h1>
           <p className="text-slate-500/80 dark:text-slate-400 mt-2 font-medium text-sm md:text-base">How can we help you today?</p>
         </div>
@@ -151,7 +151,7 @@ function MockupDashboard() {
           </div>
           <div className="w-px h-5 bg-slate-200 dark:bg-slate-700" />
           <div className="flex items-center gap-2 text-slate-700 dark:text-slate-200">
-            <Sun className="h-4 w-4 text-orange-500" /> 33┬░C <span className="text-slate-400 font-semibold">Clear</span>
+            <Sun className="h-4 w-4 text-orange-500" /> 33°C <span className="text-slate-400 font-semibold">Clear</span>
           </div>
         </div>
       </div>

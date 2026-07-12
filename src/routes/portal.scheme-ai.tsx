@@ -1,4 +1,4 @@
-﻿import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import {
   Search, ExternalLink, Loader2, Bot, X, Sparkles, RefreshCw,
@@ -12,7 +12,7 @@ import { toast } from "sonner";
 import { ChatPanel } from "@/components/portal/chat-panel";
 
 export const Route = createFileRoute("/portal/scheme-ai")({
-  head: () => ({ meta: [{ title: "Scheme Finder ΓÇö CivicSaathi" }] }),
+  head: () => ({ meta: [{ title: "Scheme Finder — CivicSaathi" }] }),
   component: SchemeAI,
 });
 
@@ -132,7 +132,7 @@ function EligibilityModal({ open, onClose }: { open: boolean; onClose: () => voi
               <div className="grid grid-cols-2 gap-6">
                 {[
                   { key: "age",          label: "Age",               placeholder: "e.g. 35",     type: "number" },
-                  { key: "income",       label: "Annual Income (Γé╣)", placeholder: "e.g. 150000", type: "number" },
+                  { key: "income",       label: "Annual Income (₹)", placeholder: "e.g. 150000", type: "number" },
                   { key: "land_hectares",label: "Land (Hectares)",   placeholder: "e.g. 2",      type: "number" },
                 ].map(({ key, label, placeholder, type }) => (
                   <div key={key} className="space-y-2">
@@ -157,7 +157,7 @@ function EligibilityModal({ open, onClose }: { open: boolean; onClose: () => voi
                       onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
                       className="w-full h-11 px-3 rounded-xl border border-slate-200 bg-slate-50/50 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                     >
-                      <option value="">SelectΓÇª</option>
+                      <option value="">Select…</option>
                       {opts.map((o) => <option key={o} value={o}>{o}</option>)}
                     </select>
                   </div>
@@ -165,7 +165,7 @@ function EligibilityModal({ open, onClose }: { open: boolean; onClose: () => voi
               </div>
               <Button onClick={handleCheck} disabled={loading} className="w-full h-12 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-lg shadow-indigo-500/20 text-base">
                 {loading
-                  ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Processing ProfileΓÇª</>
+                  ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Processing Profile…</>
                   : <><Sparkles className="w-4 h-4 mr-2" /> Find My Schemes</>}
               </Button>
             </div>
@@ -175,7 +175,7 @@ function EligibilityModal({ open, onClose }: { open: boolean; onClose: () => voi
                 <p className="text-sm text-indigo-900 font-medium">
                   <span className="font-extrabold text-indigo-700 text-base mr-1">{results.length}</span> schemes matched your profile.
                 </p>
-                <button onClick={() => setChecked(false)} className="text-sm font-bold text-indigo-600 hover:underline">ΓåÉ Edit Profile</button>
+                <button onClick={() => setChecked(false)} className="text-sm font-bold text-indigo-600 hover:underline">← Edit Profile</button>
               </div>
               
               <div className="space-y-4">
@@ -191,7 +191,7 @@ function EligibilityModal({ open, onClose }: { open: boolean; onClose: () => voi
                     </div>
                     <div className="mt-4 flex flex-wrap gap-2">
                       {reasons.slice(0, 3).map((r: string, j: number) => (
-                        <span key={j} className="text-sm font-bold uppercase tracking-wider text-slate-500 bg-slate-50 px-2 py-1 rounded-md border border-slate-100">Γ£ô {r}</span>
+                        <span key={j} className="text-sm font-bold uppercase tracking-wider text-slate-500 bg-slate-50 px-2 py-1 rounded-md border border-slate-100">✓ {r}</span>
                       ))}
                     </div>
                     {(scheme.apply_url || scheme.portal_url) && (

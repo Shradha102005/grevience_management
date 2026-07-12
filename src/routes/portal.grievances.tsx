@@ -1,4 +1,4 @@
-﻿import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect, useCallback } from "react";
 import {
   Search, Filter, MessageSquareWarning, X, ArrowLeft, CheckCircle2,
@@ -16,7 +16,7 @@ import { useAuth } from "@/lib/auth-context";
 import api from "@/lib/api";
 
 export const Route = createFileRoute("/portal/grievances")({
-  head: () => ({ meta: [{ title: "Grievances ΓÇö CivicSaathi" }] }),
+  head: () => ({ meta: [{ title: "Grievances — CivicSaathi" }] }),
   component: Grievances,
 });
 
@@ -193,7 +193,7 @@ function Grievances() {
     },
     {
       label: "Avg. Resolution",
-      value: avgHours != null ? `${avgHours}h` : "ΓÇö",
+      value: avgHours != null ? `${avgHours}h` : "—",
       delta: avgHours != null ? (avgHours < 24 ? "< 1 day" : `${Math.round(avgHours / 24)}d`) : "No data",
       trend: "down" as const,
       color: "text-amber-600",
@@ -237,7 +237,7 @@ function Grievances() {
               {lastUpdated && (
                 <span className="inline-flex items-center gap-1 text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100 font-bold text-sm">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse inline-block" />
-                  Live ┬╖ {lastUpdated.toLocaleTimeString()}
+                  Live · {lastUpdated.toLocaleTimeString()}
                 </span>
               )}
             </p>
@@ -310,7 +310,7 @@ function Grievances() {
                 {loading ? "Syncing..." : `${grievances.length} Grievance${grievances.length !== 1 ? "s" : ""}`}
               </h2>
               <Badge className="bg-white text-rose-600 border-rose-100 shadow-sm px-4 py-1.5 text-sm font-bold rounded-full border">
-                Auto-refresh ┬╖ 3s
+                Auto-refresh · 3s
               </Badge>
             </div>
 
@@ -347,9 +347,9 @@ function Grievances() {
                       </div>
                       <h4 className="font-extrabold text-slate-800 text-base leading-tight truncate group-hover:text-rose-600 transition-colors">{r.title}</h4>
                       <p className="text-sm text-slate-500/90 mt-2 flex items-center gap-2 font-bold">
-                        {r.submitter_name && <><span className="font-extrabold text-slate-700">{r.submitter_name}</span><span className="text-slate-300">ΓÇó</span></>}
+                        {r.submitter_name && <><span className="font-extrabold text-slate-700">{r.submitter_name}</span><span className="text-slate-300">•</span></>}
                         <Building2 className="h-4 w-4 text-slate-400" /> {r.department}
-                        <span className="text-slate-300">ΓÇó</span>
+                        <span className="text-slate-300">•</span>
                         <MapPin className="h-4 w-4 text-slate-400" /> <span className="truncate max-w-[200px]">{r.location}</span>
                       </p>
                     </div>
@@ -392,7 +392,7 @@ function Grievances() {
                   <h2 className="text-3xl font-black text-slate-900 tracking-tight leading-tight">{activeItem.title}</h2>
                   {activeItem.submitter_name && (
                     <p className="text-sm text-slate-500 font-semibold mt-2">
-                      Reported by <span className="font-bold text-slate-700">{activeItem.submitter_name}</span> ┬╖ {timeAgo(activeItem.created_at)}
+                      Reported by <span className="font-bold text-slate-700">{activeItem.submitter_name}</span> · {timeAgo(activeItem.created_at)}
                     </p>
                   )}
                 </div>
