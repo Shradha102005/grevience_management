@@ -20,7 +20,7 @@ export const Route = createFileRoute("/portal/helpline")({
 
 const API_BASE = "http://localhost:8000";
 
-// ── Types ─────────────────────────────────────────────────────────────────────
+//  Types 
 interface Message {
   sender: string; sender_type: "user" | "agent"; text: string; time: string;
 }
@@ -35,7 +35,7 @@ interface BotMessage {
   content: string;
   ts: number;
   isVoice?: boolean;           // true if this message came from mic input
-  resolved?: boolean;          // from AI response — false triggers escalation
+  resolved?: boolean;          // from AI response  false triggers escalation
   suggestedReplies?: string[]; // quick-reply chips shown below the bot bubble
 }
 
@@ -52,7 +52,7 @@ interface HelplineStats {
   top_topics: { topic: string; count: number }[];
 }
 
-// ── Language config ───────────────────────────────────────────────────────────
+//  Language config 
 const LANGUAGES: { code: string; label: string; native: string; greeting: string; placeholder: string; quickPrompts: string[] }[] = [
   {
     code: "en", label: "English", native: "EN",
@@ -104,7 +104,7 @@ const LANGUAGES: { code: string; label: string; native: string; greeting: string
   },
 ];
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+//  Helpers 
 function relativeTime(iso: string): string {
   const s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
   if (s < 60) return `${s}s ago`;
@@ -148,10 +148,10 @@ const MACROS = [
   { label: "MeeSeva Link",     emoji: "🏛️", text: "Please visit your nearest MeeSeva centre or portal.meeseva.telangana.gov.in to complete this process." },
 ];
 
-// ── Animated AI Orb ───────────────────────────────────────────────────────────
+//  Animated AI Orb 
 type OrbState = "idle" | "listening" | "thinking" | "speaking";
 
-// Holographic multi-ring sphere — static rings, pulsing core
+// Holographic multi-ring sphere  static rings, pulsing core
 function AIOrb({ state }: { state: OrbState }) {
   const C = {
     idle:      { c1: "#38bdf8", c2: "#818cf8", c3: "#22d3ee", glow: "rgba(56,189,248,0.22)", nodeBig: "#ffffff", nodeSmall: "#38bdf8", core: "rgba(20,60,120,0.7)"  },
@@ -163,7 +163,7 @@ function AIOrb({ state }: { state: OrbState }) {
 
 
 
-  // Heartbeat animation on the WHOLE orb — faster
+  // Heartbeat animation on the WHOLE orb  faster
   const orbAnim =
     state === "listening" ? "orbHeartbeat 1.4s ease-in-out infinite" :
     state === "speaking"  ? "orbHeartbeat 1.0s ease-in-out infinite" :
@@ -171,13 +171,13 @@ function AIOrb({ state }: { state: OrbState }) {
     "orbIdle 4s ease-in-out infinite";
 
   return (
-    // Outer shell — fixed size, background matches panel so PNG dark areas vanish
+    // Outer shell  fixed size, background matches panel so PNG dark areas vanish
     <div style={{
       position: "relative", width: "220px", height: "220px",
       display: "flex", alignItems: "center", justifyContent: "center",
       background: "transparent",
     }}>
-      {/* Inner orb — entire image heartbeat-pulses as one */}
+      {/* Inner orb  entire image heartbeat-pulses as one */}
       <div style={{
         position: "relative", width: "220px", height: "220px",
         display: "flex", alignItems: "center", justifyContent: "center",
@@ -220,7 +220,7 @@ function AIOrb({ state }: { state: OrbState }) {
 
 
 
-// ── Bot Chat Bubble ────────────────────────────────────────────────────────────
+//  Bot Chat Bubble 
 function BotBubble({
   msg, isBot, userName, onSuggestedReply,
 }: {
@@ -245,12 +245,12 @@ function BotBubble({
         paddingRight: isBot ? "0" : "36px",
       }}>
         <span style={{
-          fontSize: "10px", fontWeight: 700,
+          fontSize: "14px", fontWeight: 700,
           color: isBot ? "rgba(56,189,248,0.75)" : "rgba(167,139,250,0.85)",
         }}>
           {isBot ? "CivicSaathi" : (userName || "You")}
         </span>
-        <span style={{ fontSize: "9px", color: "rgba(100,116,139,0.5)" }}>{timeStr}</span>
+        <span style={{ fontSize: "14px", color: "rgba(100,116,139,0.5)" }}>{timeStr}</span>
         {msg.isVoice && !isBot && (
           <span style={{
             fontSize: "8px", padding: "1px 5px", borderRadius: "8px",
@@ -283,7 +283,7 @@ function BotBubble({
             border: "1px solid rgba(139,92,246,0.45)",
             display: "flex", alignItems: "center", justifyContent: "center",
             boxShadow: "0 0 10px rgba(139,92,246,0.35)",
-            fontSize: "11px", fontWeight: 800, color: "white",
+            fontSize: "14px", fontWeight: 800, color: "white",
           }}>
             {(userName || "Y").slice(0, 1).toUpperCase()}
           </div>
@@ -294,7 +294,7 @@ function BotBubble({
           maxWidth: "75%",
           padding: "10px 14px",
           borderRadius: isBot ? "4px 16px 16px 16px" : "16px 4px 16px 16px",
-          fontSize: "13px", lineHeight: 1.65,
+          fontSize: "14px", lineHeight: 1.65,
           background: isBot
             ? "linear-gradient(135deg,rgba(56,189,248,0.14),rgba(129,140,248,0.10))"
             : "linear-gradient(135deg,rgba(139,92,246,0.28),rgba(99,102,241,0.18))",
@@ -313,7 +313,7 @@ function BotBubble({
         </div>
       </div>
 
-      {/* Suggested reply chips — only on bot messages */}
+      {/* Suggested reply chips  only on bot messages */}
       {isBot && msg.suggestedReplies && msg.suggestedReplies.length > 0 && (
         <div style={{
           display: "flex", flexWrap: "wrap", gap: "5px",
@@ -322,7 +322,7 @@ function BotBubble({
           {msg.suggestedReplies.map((s, i) => (
             <button key={i} onClick={() => onSuggestedReply(s)}
               style={{
-                fontSize: "11px", fontWeight: 600,
+                fontSize: "14px", fontWeight: 600,
                 padding: "5px 12px", borderRadius: "20px",
                 background: "rgba(56,189,248,0.07)",
                 border: "1px solid rgba(56,189,248,0.25)",
@@ -342,11 +342,11 @@ function BotBubble({
   );
 }
 
-// ── Typing Indicator ────────────────────────────────────────────────────────────
+//  Typing Indicator 
 function TypingIndicator() {
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: "4px" }}>
-      <span style={{ fontSize: "10px", fontWeight: 700, color: "rgba(56,189,248,0.6)", paddingLeft: "36px" }}>
+      <span style={{ fontSize: "14px", fontWeight: 700, color: "rgba(56,189,248,0.6)", paddingLeft: "36px" }}>
         CivicSaathi
       </span>
       <div style={{ display: "flex", gap: "8px", alignItems: "flex-end" }}>
@@ -380,7 +380,7 @@ function TypingIndicator() {
 }
 
 
-// ── New Ticket Modal ──────────────────────────────────────────────────────────
+//  New Ticket Modal 
 function NewTicketModal({ open, onClose, onCreated, prefillQuery = "", prefillName = "" }: {
   open: boolean; onClose: () => void; onCreated: (t: Ticket) => void;
   prefillQuery?: string; prefillName?: string;
@@ -419,7 +419,7 @@ function NewTicketModal({ open, onClose, onCreated, prefillQuery = "", prefillNa
   const inputStyle = {
     width: "100%", height: "40px", padding: "0 14px",
     background: "rgba(255,255,255,0.05)", border: "1px solid rgba(56,189,248,0.2)",
-    borderRadius: "10px", color: "white", fontSize: "13px", outline: "none",
+    borderRadius: "10px", color: "white", fontSize: "14px", outline: "none",
     transition: "border-color 0.2s", boxSizing: "border-box" as const, fontFamily: "inherit",
   };
 
@@ -437,42 +437,42 @@ function NewTicketModal({ open, onClose, onCreated, prefillQuery = "", prefillNa
               </div>
               <div>
                 <DialogTitle className="text-base font-bold text-white">Log as Helpline Ticket</DialogTitle>
-                <DialogDescription className="text-xs mt-0.5" style={{ color: "rgba(147,210,234,0.7)" }}>Create a tracked support ticket from this query</DialogDescription>
+                <DialogDescription className="text-sm mt-0.5" style={{ color: "rgba(147,210,234,0.7)" }}>Create a tracked support ticket from this query</DialogDescription>
               </div>
             </div>
           </div>
           <div className="p-7 space-y-5">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase tracking-[0.15em]" style={{ color: "rgba(147,210,234,0.7)" }}>Citizen Name</label>
+                <label className="text-sm font-bold uppercase tracking-[0.15em]" style={{ color: "rgba(147,210,234,0.7)" }}>Citizen Name</label>
                 <input value={form.requester_name} onChange={e => setForm(f => ({ ...f, requester_name: e.target.value }))} placeholder="e.g. Rajesh Kumar" style={inputStyle}
                   onFocus={e => (e.target.style.borderColor = "rgba(56,189,248,0.6)")} onBlur={e => (e.target.style.borderColor = "rgba(56,189,248,0.2)")} />
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase tracking-[0.15em]" style={{ color: "rgba(147,210,234,0.7)" }}>Channel</label>
+                <label className="text-sm font-bold uppercase tracking-[0.15em]" style={{ color: "rgba(147,210,234,0.7)" }}>Channel</label>
                 <select value={form.channel} onChange={e => setForm(f => ({ ...f, channel: e.target.value }))} style={{ ...inputStyle }}>
                   {["Web","Phone","Email","App"].map(c => <option key={c} style={{ background: "#0a1628" }}>{c}</option>)}
                 </select>
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-[10px] font-bold uppercase tracking-[0.15em]" style={{ color: "rgba(147,210,234,0.7)" }}>Subject</label>
+              <label className="text-sm font-bold uppercase tracking-[0.15em]" style={{ color: "rgba(147,210,234,0.7)" }}>Subject</label>
               <input value={form.subject} onChange={e => setForm(f => ({ ...f, subject: e.target.value }))} placeholder="Short subject" style={inputStyle}
                 onFocus={e => (e.target.style.borderColor = "rgba(56,189,248,0.6)")} onBlur={e => (e.target.style.borderColor = "rgba(56,189,248,0.2)")} />
             </div>
             <div className="space-y-2">
-              <label className="text-[10px] font-bold uppercase tracking-[0.15em]" style={{ color: "rgba(147,210,234,0.7)" }}>Description</label>
+              <label className="text-sm font-bold uppercase tracking-[0.15em]" style={{ color: "rgba(147,210,234,0.7)" }}>Description</label>
               <textarea value={form.query} onChange={e => setForm(f => ({ ...f, query: e.target.value }))} rows={4}
                 style={{ ...inputStyle, height: "auto", padding: "12px 14px", resize: "none" }}
                 onFocus={e => (e.target.style.borderColor = "rgba(56,189,248,0.6)")} onBlur={e => (e.target.style.borderColor = "rgba(56,189,248,0.2)")} />
             </div>
             <div className="space-y-2">
-              <label className="text-[10px] font-bold uppercase tracking-[0.15em]" style={{ color: "rgba(147,210,234,0.7)" }}>Priority</label>
+              <label className="text-sm font-bold uppercase tracking-[0.15em]" style={{ color: "rgba(147,210,234,0.7)" }}>Priority</label>
               <div className="flex gap-2">
                 {["Low","Normal","High","Critical"].map(p => (
                   <button key={p} onClick={() => setForm(f => ({ ...f, priority: p }))}
                     style={{
-                      flex: 1, padding: "8px 0", fontSize: "12px", fontWeight: 600, borderRadius: "8px",
+                      flex: 1, padding: "8px 0", fontSize: "14px", fontWeight: 600, borderRadius: "8px",
                       border: form.priority === p ? "1px solid rgba(56,189,248,0.6)" : "1px solid rgba(255,255,255,0.1)",
                       background: form.priority === p ? "linear-gradient(135deg,rgba(56,189,248,0.25),rgba(129,140,248,0.15))" : "rgba(255,255,255,0.03)",
                       color: form.priority === p ? "#38bdf8" : "rgba(255,255,255,0.4)", cursor: "pointer", transition: "all 0.2s",
@@ -497,13 +497,13 @@ function NewTicketModal({ open, onClose, onCreated, prefillQuery = "", prefillNa
   );
 }
 
-// ── Avatar ────────────────────────────────────────────────────────────────────
+//  Avatar 
 function Avatar({ name, isAgent }: { name: string; isAgent: boolean }) {
   return (
     <div style={{
       width: "32px", height: "32px", borderRadius: "50%", flexShrink: 0,
       display: "flex", alignItems: "center", justifyContent: "center",
-      fontSize: "11px", fontWeight: 800,
+      fontSize: "14px", fontWeight: 800,
       background: isAgent ? "linear-gradient(135deg,#8b5cf6,#6366f1)" : "rgba(100,116,139,0.2)",
       border: isAgent ? "1px solid rgba(139,92,246,0.5)" : "1px solid rgba(100,116,139,0.25)",
       color: isAgent ? "white" : "var(--color-muted-foreground)",
@@ -512,7 +512,7 @@ function Avatar({ name, isAgent }: { name: string; isAgent: boolean }) {
   );
 }
 
-// ── Ticket Card ───────────────────────────────────────────────────────────────
+//  Ticket Card 
 function TicketCard({ t, onClick }: { t: Ticket; onClick: () => void }) {
   const sc = STATUS_CONFIG[t.status] ?? STATUS_CONFIG.Open;
   const pc = PRIORITY_CONFIG[t.priority] ?? PRIORITY_CONFIG.Normal;
@@ -550,13 +550,13 @@ function TicketCard({ t, onClick }: { t: Ticket; onClick: () => void }) {
 
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <span style={{
-          fontSize: "10px", fontFamily: "monospace", fontWeight: 700, letterSpacing: "0.08em",
+          fontSize: "14px", fontFamily: "monospace", fontWeight: 700, letterSpacing: "0.08em",
           color: "#7c3aed", background: "#f5f3ff",
           padding: "2px 8px", borderRadius: "5px", border: "1px solid #ddd6fe",
         }}>{t.ticket_id}</span>
         <span style={{
           display: "flex", alignItems: "center", gap: "4px",
-          fontSize: "10px", fontWeight: 700, padding: "3px 9px", borderRadius: "20px",
+          fontSize: "14px", fontWeight: 700, padding: "3px 9px", borderRadius: "20px",
           background: sc.bg, color: sc.color, border: `1px solid ${sc.border}`,
         }}>
           {sc.icon}{sc.label}
@@ -570,7 +570,7 @@ function TicketCard({ t, onClick }: { t: Ticket; onClick: () => void }) {
           display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden",
         }}>{t.subject}</p>
         <p style={{
-          fontSize: "12px", color: "#64748b", lineHeight: 1.5,
+          fontSize: "14px", color: "#64748b", lineHeight: 1.5,
           display: "-webkit-box", WebkitLineClamp: 1, WebkitBoxOrient: "vertical", overflow: "hidden",
         }}>{t.query}</p>
       </div>
@@ -583,21 +583,21 @@ function TicketCard({ t, onClick }: { t: Ticket; onClick: () => void }) {
               display: "flex", alignItems: "center", justifyContent: "center", fontSize: "8px", fontWeight: 800,
               color: "#7c3aed", border: "1px solid #ddd6fe",
             }}>{initials(t.requester_name)}</div>
-            <span style={{ fontSize: "11px", color: "#475569", fontWeight: 500 }}>{t.requester_name}</span>
+            <span style={{ fontSize: "14px", color: "#475569", fontWeight: 500 }}>{t.requester_name}</span>
           </div>
           {ch && (
-            <span style={{ display: "flex", alignItems: "center", gap: "3px", fontSize: "10px", color: ch.color, fontWeight: 600 }}>
+            <span style={{ display: "flex", alignItems: "center", gap: "3px", fontSize: "14px", color: ch.color, fontWeight: 600 }}>
               {ch.icon}{t.channel}
             </span>
           )}
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
           {msgCount > 0 && (
-            <span style={{ display: "flex", alignItems: "center", gap: "3px", fontSize: "10px", color: "#94a3b8" }}>
+            <span style={{ display: "flex", alignItems: "center", gap: "3px", fontSize: "14px", color: "#94a3b8" }}>
               <MessageSquare style={{ width: 10, height: 10 }} />{msgCount}
             </span>
           )}
-          <span style={{ fontSize: "10px", color: "#94a3b8" }}>{relativeTime(t.updated_at)}</span>
+          <span style={{ fontSize: "14px", color: "#94a3b8" }}>{relativeTime(t.updated_at)}</span>
           <div style={{
             width: "20px", height: "20px", borderRadius: "6px",
             background: "#ede9fe", display: "flex", alignItems: "center", justifyContent: "center",
@@ -610,7 +610,7 @@ function TicketCard({ t, onClick }: { t: Ticket; onClick: () => void }) {
   );
 }
 
-// ── Status Timeline ────────────────────────────────────────────────────────────
+//  Status Timeline 
 function StatusTimeline({ status }: { status: string }) {
   const steps = [
     { key: "Open",     label: "Opened",     icon: "📩" },
@@ -627,7 +627,7 @@ function StatusTimeline({ status }: { status: string }) {
           <div key={s.key} style={{ display: "flex", alignItems: "center", flex: 1, minWidth: 0 }}>
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px", flexShrink: 0 }}>
               <div style={{
-                width: "30px", height: "30px", borderRadius: "50%", fontSize: "13px",
+                width: "30px", height: "30px", borderRadius: "50%", fontSize: "14px",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 background: done || current
                   ? current ? "linear-gradient(135deg,#ede9fe,#ddd6fe)" : "#ecfdf5"
@@ -641,7 +641,7 @@ function StatusTimeline({ status }: { status: string }) {
                 {done ? "✓" : s.icon}
               </div>
               <span style={{
-                fontSize: "9px", fontWeight: current ? 800 : 600,
+                fontSize: "14px", fontWeight: current ? 800 : 600,
                 color: current ? "#7c3aed" : done ? "#059669" : "#94a3b8",
                 whiteSpace: "nowrap",
               }}>{s.label}</span>
@@ -662,7 +662,7 @@ function StatusTimeline({ status }: { status: string }) {
   );
 }
 
-// ── Conversation Drawer (quick-commerce helpline style) ───────────────────────
+//  Conversation Drawer (quick-commerce helpline style) 
 function ConversationDrawer({ ticket, onClose, onUpdate }: {
   ticket: Ticket; onClose: () => void; onUpdate: () => void;
 }) {
@@ -675,7 +675,7 @@ function ConversationDrawer({ ticket, onClose, onUpdate }: {
 
   // Role-based identity
   const isOfficer = user?.role === "officer" || user?.role === "admin";
-  // Always use the real logged-in name as sender — citizens get their own name, not "Agent"
+  // Always use the real logged-in name as sender  citizens get their own name, not "Agent"
   const senderName = user?.name || (isOfficer ? "Officer" : "Citizen");
   const senderBadge = user?.role === "admin" ? "ADMIN" : user?.role === "officer" ? "OFFICER" : "CITIZEN";
   const senderColor = user?.role === "admin" ? "#f59e0b" : user?.role === "citizen" ? "#22d3ee" : "#a78bfa";
@@ -737,7 +737,7 @@ function ConversationDrawer({ ticket, onClose, onUpdate }: {
         animation: "slideIn 0.28s cubic-bezier(0.16,1,0.3,1)",
       }}>
 
-        {/* ── TOP HEADER: Ticket identity ── */}
+        {/*  TOP HEADER: Ticket identity  */}
         <div style={{
           padding: "18px 22px 0",
           background: "linear-gradient(180deg,rgba(255,255,255,1) 0%,rgba(248,250,252,1) 100%)",
@@ -750,14 +750,14 @@ function ConversationDrawer({ ticket, onClose, onUpdate }: {
               <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px", flexWrap: "wrap" }}>
                 {/* Ticket ID badge */}
                 <span style={{
-                  fontSize: "10px", fontFamily: "monospace", fontWeight: 800, letterSpacing: "0.12em",
+                  fontSize: "14px", fontFamily: "monospace", fontWeight: 800, letterSpacing: "0.12em",
                   color: "#7c3aed", background: "#f5f3ff",
                   padding: "3px 9px", borderRadius: "6px", border: "1px solid #ddd6fe",
                 }}>{currentTicket.ticket_id}</span>
 
                 {/* Priority badge */}
                 <span style={{
-                  fontSize: "9px", fontWeight: 800, padding: "3px 9px", borderRadius: "20px",
+                  fontSize: "14px", fontWeight: 800, padding: "3px 9px", borderRadius: "20px",
                   background: `${pc.dot}15`, color: pc.dot,
                   border: `1px solid ${pc.dot}30`, letterSpacing: "0.06em",
                   display: "flex", alignItems: "center", gap: "4px",
@@ -768,17 +768,17 @@ function ConversationDrawer({ ticket, onClose, onUpdate }: {
 
                 {/* Channel badge */}
                 {ch && (
-                  <span style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "9px", fontWeight: 700, color: ch.color }}>
+                  <span style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "14px", fontWeight: 700, color: ch.color }}>
                     {ch.icon}{currentTicket.channel}
                   </span>
                 )}
 
                 {/* Time */}
-                <span style={{ fontSize: "9px", color: "#94a3b8", marginLeft: "auto" }}>{relativeTime(currentTicket.created_at)}</span>
+                <span style={{ fontSize: "14px", color: "#94a3b8", marginLeft: "auto" }}>{relativeTime(currentTicket.created_at)}</span>
               </div>
 
               {/* Subject */}
-              <h2 style={{ fontSize: "16px", fontWeight: 800, color: "#0f172a", margin: "0 0 8px", lineHeight: 1.3 }}>{currentTicket.subject}</h2>
+              <h2 style={{ fontSize: "14px", fontWeight: 800, color: "#0f172a", margin: "0 0 8px", lineHeight: 1.3 }}>{currentTicket.subject}</h2>
 
               {/* Requester chip */}
               <div style={{ display: "flex", alignItems: "center", gap: "6px", paddingBottom: "12px" }}>
@@ -789,7 +789,7 @@ function ConversationDrawer({ ticket, onClose, onUpdate }: {
                   fontSize: "8px", fontWeight: 800, color: "#7c3aed",
                   border: "1px solid #c4b5fd", flexShrink: 0,
                 }}>{initials(currentTicket.requester_name)}</div>
-                <span style={{ fontSize: "12px", color: "#475569", fontWeight: 600 }}>{currentTicket.requester_name}</span>
+                <span style={{ fontSize: "14px", color: "#475569", fontWeight: 600 }}>{currentTicket.requester_name}</span>
               </div>
             </div>
 
@@ -810,10 +810,10 @@ function ConversationDrawer({ ticket, onClose, onUpdate }: {
           </div>
         </div>
 
-        {/* ── STATUS TIMELINE (quick-commerce order tracker style) ── */}
+        {/*  STATUS TIMELINE (quick-commerce order tracker style)  */}
         <StatusTimeline status={currentTicket.status} />
 
-        {/* ── STATUS ACTION BUTTONS ── */}
+        {/*  STATUS ACTION BUTTONS  */}
         <div style={{
           display: "flex", gap: "6px", padding: "0 22px 14px",
           borderBottom: "1px solid #e2e8f0", flexShrink: 0,
@@ -823,7 +823,7 @@ function ConversationDrawer({ ticket, onClose, onUpdate }: {
             const active = currentTicket.status === s;
             return (
               <button key={s} onClick={() => changeStatus(s)} style={{
-                padding: "5px 14px", borderRadius: "20px", fontSize: "11px", fontWeight: 700,
+                padding: "5px 14px", borderRadius: "20px", fontSize: "14px", fontWeight: 700,
                 border: `1px solid ${active ? ssc.border : "#e2e8f0"}`,
                 background: active ? ssc.bg : "white",
                 color: active ? ssc.color : "#94a3b8",
@@ -838,7 +838,7 @@ function ConversationDrawer({ ticket, onClose, onUpdate }: {
           })}
         </div>
 
-        {/* ── ORIGINAL QUERY banner ── */}
+        {/*  ORIGINAL QUERY banner  */}
         {currentTicket.query && (
           <div style={{
             margin: "12px 22px 0",
@@ -847,12 +847,12 @@ function ConversationDrawer({ ticket, onClose, onUpdate }: {
             border: "1px solid #e2e8f0",
             flexShrink: 0,
           }}>
-            <p style={{ fontSize: "10px", fontWeight: 800, color: "#64748b", marginBottom: "3px", letterSpacing: "0.08em" }}>ORIGINAL QUERY</p>
-            <p style={{ fontSize: "12px", color: "#334155", lineHeight: 1.6 }}>{currentTicket.query}</p>
+            <p style={{ fontSize: "14px", fontWeight: 800, color: "#64748b", marginBottom: "3px", letterSpacing: "0.08em" }}>ORIGINAL QUERY</p>
+            <p style={{ fontSize: "14px", color: "#334155", lineHeight: 1.6 }}>{currentTicket.query}</p>
           </div>
         )}
 
-        {/* ── CHAT THREAD ── */}
+        {/*  CHAT THREAD  */}
         <div ref={threadRef} style={{
           flex: 1, overflowY: "auto", padding: "10px 22px 14px",
           display: "flex", flexDirection: "column", gap: "14px",
@@ -863,7 +863,7 @@ function ConversationDrawer({ ticket, onClose, onUpdate }: {
               justifyContent: "center", height: "100%", gap: "10px", opacity: 0.6,
             }}>
               <MessageSquare style={{ width: 32, height: 32, color: "#94a3b8" }} />
-              <p style={{ fontSize: "13px", color: "#64748b", fontWeight: 500 }}>No messages yet — start the conversation</p>
+              <p style={{ fontSize: "14px", color: "#64748b", fontWeight: 500 }}>No messages yet — start the conversation</p>
             </div>
           )}
 
@@ -899,14 +899,14 @@ function ConversationDrawer({ ticket, onClose, onUpdate }: {
                   paddingRight: isMine ? "36px" : "0",
                 }}>
                   {isMine && (
-                    <span style={{ fontSize: "9px", color: "#94a3b8" }}>{timeStr}</span>
+                    <span style={{ fontSize: "14px", color: "#94a3b8" }}>{timeStr}</span>
                   )}
                   <span style={{
-                    fontSize: "10px", fontWeight: 700,
+                    fontSize: "14px", fontWeight: 700,
                     color: isMine ? senderColor : "#475569",
                   }}>{displayName}</span>
                   {!isMine && (
-                    <span style={{ fontSize: "9px", color: "#94a3b8" }}>{timeStr}</span>
+                    <span style={{ fontSize: "14px", color: "#94a3b8" }}>{timeStr}</span>
                   )}
                 </div>
 
@@ -923,7 +923,7 @@ function ConversationDrawer({ ticket, onClose, onUpdate }: {
                       border: `1px solid ${senderColor}`,
                       display: "flex", alignItems: "center", justifyContent: "center",
                       boxShadow: `0 2px 8px ${senderColor}40`,
-                      fontSize: "10px", fontWeight: 800, color: "white",
+                      fontSize: "14px", fontWeight: 800, color: "white",
                     }}>
                       {(senderName || "Me").slice(0, 1).toUpperCase()}
                     </div>
@@ -935,7 +935,7 @@ function ConversationDrawer({ ticket, onClose, onUpdate }: {
                         : "linear-gradient(135deg, #f1f5f9, #e2e8f0)",
                       border: isStaff ? "1px solid #c4b5fd" : "1px solid #cbd5e1",
                       display: "flex", alignItems: "center", justifyContent: "center",
-                      fontSize: "10px", fontWeight: 800,
+                      fontSize: "14px", fontWeight: 800,
                       color: isStaff ? "#7c3aed" : "#475569",
                     }}>
                       {initials(displayName || currentTicket.requester_name)}
@@ -946,28 +946,28 @@ function ConversationDrawer({ ticket, onClose, onUpdate }: {
                   <div style={{
                     maxWidth: "72%", padding: "10px 14px",
                     borderRadius: isMine ? "16px 3px 16px 16px" : "3px 16px 16px 16px",
-                    fontSize: "13px", lineHeight: 1.65, color: "#1e293b",
+                    fontSize: "14px", lineHeight: 1.65, color: "#1e293b",
                     background: isMine ? myBubbleBg : otherBubbleBg,
                     border: `1px solid ${isMine ? myBubbleBorder : otherBubbleBorder}`,
                     wordBreak: "break-word",
                   }}>{m.text}</div>
                 </div>
 
-                {/* Suggest chips — only for officers below last citizen message */}
+                {/* Suggest chips  only for officers below last citizen message */}
                 {isOfficer && isLastIncoming && !isMine && (
                   <div style={{
                     display: "flex", flexWrap: "wrap", gap: "5px",
                     paddingLeft: "37px", marginTop: "2px",
                   }}>
                     <span style={{
-                      fontSize: "9px", fontWeight: 700, color: "#94a3b8",
+                      fontSize: "14px", fontWeight: 700, color: "#94a3b8",
                       alignSelf: "center", letterSpacing: "0.08em", marginRight: "1px",
                     }}>💬 suggest:</span>
                     {MACROS.map((mac, j) => (
                       <button key={j}
                         onClick={() => setReplyText(p => p ? p + "\n" + mac.text : mac.text)}
                         style={{
-                          fontSize: "10px", fontWeight: 600, padding: "3px 10px", borderRadius: "20px",
+                          fontSize: "14px", fontWeight: 600, padding: "3px 10px", borderRadius: "20px",
                           background: "#f5f3ff",
                           border: "1px solid #ddd6fe",
                           color: "#7c3aed", cursor: "pointer", transition: "all 0.15s",
@@ -977,7 +977,7 @@ function ConversationDrawer({ ticket, onClose, onUpdate }: {
                         onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "#ede9fe"; }}
                         onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "#f5f3ff"; }}
                       >
-                        <span style={{ fontSize: "9px" }}>{mac.emoji}</span>{mac.label}
+                        <span style={{ fontSize: "14px" }}>{mac.emoji}</span>{mac.label}
                       </button>
                     ))}
                   </div>
@@ -990,7 +990,7 @@ function ConversationDrawer({ ticket, onClose, onUpdate }: {
           {sending && (
             <div style={{ display: "flex", flexDirection: "column", gap: "4px", animation: "bubbleIn 0.2s ease" }}>
               <div style={{ display: "flex", justifyContent: "flex-end", paddingRight: "36px" }}>
-                <span style={{ fontSize: "10px", fontWeight: 700, color: `${senderColor}80` }}>{senderName}</span>
+                <span style={{ fontSize: "14px", fontWeight: 700, color: `${senderColor}80` }}>{senderName}</span>
               </div>
               <div style={{ display: "flex", flexDirection: "row-reverse", gap: "9px", alignItems: "flex-end" }}>
                 <div style={{
@@ -998,7 +998,7 @@ function ConversationDrawer({ ticket, onClose, onUpdate }: {
                   background: `linear-gradient(135deg,${senderColor}e6,${senderColor}b3)`,
                   border: `1px solid ${senderColor}`,
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: "10px", fontWeight: 800, color: "white",
+                  fontSize: "14px", fontWeight: 800, color: "white",
                   boxShadow: `0 2px 8px ${senderColor}40`,
                 }}>{(senderName || "A").slice(0, 1).toUpperCase()}</div>
                 <div style={{
@@ -1020,7 +1020,7 @@ function ConversationDrawer({ ticket, onClose, onUpdate }: {
           )}
         </div>
 
-        {/* ── REPLY COMPOSER ── */}
+        {/*  REPLY COMPOSER  */}
         <div style={{
           padding: "10px 22px 18px",
           borderTop: "1px solid #e2e8f0",
@@ -1055,7 +1055,7 @@ function ConversationDrawer({ ticket, onClose, onUpdate }: {
                 width: "6px", height: "6px", borderRadius: "50%",
                 background: senderColor, boxShadow: `0 0 6px ${senderColor}80`,
               }} />
-              <span style={{ fontSize: "10px", fontWeight: 700, color: "#64748b", letterSpacing: "0.06em" }}>
+              <span style={{ fontSize: "14px", fontWeight: 700, color: "#64748b", letterSpacing: "0.06em" }}>
                 REPLYING AS <span style={{ color: senderColor }}>{senderName.toUpperCase()}</span> · <span style={{ fontWeight: 600, opacity: 0.7 }}>{senderBadge}</span>
               </span>
             </div>
@@ -1065,7 +1065,7 @@ function ConversationDrawer({ ticket, onClose, onUpdate }: {
               onChange={e => setReplyText(e.target.value)}
               placeholder={`Type your reply here…`}
               style={{
-                width: "100%", resize: "none", fontSize: "13px",
+                width: "100%", resize: "none", fontSize: "14px",
                 border: "none", background: "transparent", outline: "none",
                 padding: "8px 14px 10px", minHeight: "72px",
                 color: "#0f172a", fontFamily: "inherit", lineHeight: 1.6,
@@ -1081,13 +1081,13 @@ function ConversationDrawer({ ticket, onClose, onUpdate }: {
               borderTop: "1px solid #f1f5f9",
               background: "#f8fafc",
             }}>
-              <p style={{ fontSize: "10px", color: "#94a3b8", fontWeight: 600 }}>
+              <p style={{ fontSize: "14px", color: "#94a3b8", fontWeight: 600 }}>
                 ⌘ + ↵ to send
               </p>
               <div style={{ display: "flex", alignItems: "center", gap: "7px" }}>
                 <Select value={submitAs} onValueChange={setSubmitAs}>
                   <SelectTrigger style={{
-                    height: "30px", fontSize: "11px", width: "138px",
+                    height: "30px", fontSize: "14px", width: "138px",
                     background: "white",
                     border: "1px solid #cbd5e1",
                     borderRadius: "8px", color: "#475569",
@@ -1095,9 +1095,9 @@ function ConversationDrawer({ ticket, onClose, onUpdate }: {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Open"     className="text-xs">Submit as Open</SelectItem>
-                    <SelectItem value="Pending"  className="text-xs">Submit as Pending</SelectItem>
-                    <SelectItem value="Resolved" className="text-xs">Submit as Resolved</SelectItem>
+                    <SelectItem value="Open"     className="text-sm">Submit as Open</SelectItem>
+                    <SelectItem value="Pending"  className="text-sm">Submit as Pending</SelectItem>
+                    <SelectItem value="Resolved" className="text-sm">Submit as Resolved</SelectItem>
                   </SelectContent>
                 </Select>
 
@@ -1109,7 +1109,7 @@ function ConversationDrawer({ ticket, onClose, onUpdate }: {
                     background: sending || !replyText.trim()
                       ? "#cbd5e1"
                       : "linear-gradient(135deg, #8b5cf6, #6366f1)",
-                    color: "white", fontSize: "12px", fontWeight: 700,
+                    color: "white", fontSize: "14px", fontWeight: 700,
                     cursor: sending || !replyText.trim() ? "not-allowed" : "pointer",
                     display: "flex", alignItems: "center", gap: "5px",
                     boxShadow: !sending && replyText.trim() ? "0 4px 16px rgba(139,92,246,0.45)" : "none",
@@ -1132,7 +1132,7 @@ function ConversationDrawer({ ticket, onClose, onUpdate }: {
   );
 }
 
-// ── Stat Card ──────────────────────────────────────────────────────────────────
+//  Stat Card 
 function StatCard({ label, count, icon: Icon, color, bg, border, onClick, active }: {
   label: string; count: number; icon: React.ElementType;
   color: string; bg: string; border: string; onClick: () => void; active: boolean;
@@ -1155,15 +1155,15 @@ function StatCard({ label, count, icon: Icon, color, bg, border, onClick, active
         <Icon style={{ width: 16, height: 16, color: active ? color : "rgba(139,92,246,0.5)" }} />
       </div>
       <div>
-        <p style={{ fontSize: "20px", fontWeight: 800, color: active ? color : "var(--color-foreground)", lineHeight: 1 }}>{count}</p>
-        <p style={{ fontSize: "10px", color: "var(--color-muted-foreground)", fontWeight: 600, marginTop: "2px" }}>{label}</p>
+        <p style={{ fontSize: "14px", fontWeight: 800, color: active ? color : "var(--color-foreground)", lineHeight: 1 }}>{count}</p>
+        <p style={{ fontSize: "14px", color: "var(--color-muted-foreground)", fontWeight: 600, marginTop: "2px" }}>{label}</p>
       </div>
     </button>
   );
 }
 
-// ── AI Bot Panel ─────────────────────────────────────────────────────────────
-// Continuous voice conversation: VAD-based auto-detect → STT → AI → TTS → loop
+//  AI Bot Panel 
+// Continuous voice conversation: VAD-based auto-detect  STT  AI  TTS  loop
 function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void }) {
   const { user } = useAuth();
   const [langIdx, setLangIdx] = useState(0);
@@ -1179,14 +1179,14 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
   const [ticketPrefill, setTicketPrefill] = useState("");
   const [showLangMenu, setShowLangMenu] = useState(false);
 
-  // ── Voice state ────────────────────────────────────────────────────────────
+  //  Voice state 
   const [voiceMode, setVoiceMode] = useState(false);      // continuous voice loop on/off
   const [isRecording, setIsRecording] = useState(false);  // mic active right now
   const [sttEngine, setSttEngine] = useState("");          // shows which engine is used
   const [detectedLang, setDetectedLang] = useState("");    // detected language badge
-  const [audioLevel, setAudioLevel] = useState(0);        // 0–100 for waveform bars
+  const [audioLevel, setAudioLevel] = useState(0);        // 0100 for waveform bars
 
-  // ── Auto-escalation ────────────────────────────────────────────────────────
+  //  Auto-escalation 
   const [unresolvedTurns, setUnresolvedTurns] = useState(0);   // consecutive unresolved
   const [escalationOffered, setEscalationOffered] = useState(false);
   const [autoEscalated, setAutoEscalated] = useState(false);
@@ -1224,7 +1224,7 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
     setEscalationOffered(false);
   };
 
-  // ── TTS: play bot reply via edge-tts backend ───────────────────────────────
+  //  TTS: play bot reply via edge-tts backend 
   const speakText = useCallback(async (text: string, langCode: string): Promise<void> => {
     // Cancel any currently playing audio
     if (currentAudioRef.current) {
@@ -1276,7 +1276,7 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
     setOrbState("idle");
   }, []);
 
-  // ── STT: send recorded blob to backend ─────────────────────────────────────
+  //  STT: send recorded blob to backend 
   const transcribeAudio = useCallback(
     async (blob: Blob, langCode: string): Promise<{ transcript: string; detectedLang: string }> => {
       const form = new FormData();
@@ -1301,7 +1301,7 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
     []
   );
 
-  // ── Core: send message and handle AI response ──────────────────────────────
+  //  Core: send message and handle AI response 
   // activeLang: the language to use for AI + TTS (auto-detected from speech, else dropdown)
   const sendMessage = useCallback(async (text: string, isVoice = false, activeLang?: string) => {
     const trimmed = text.trim();
@@ -1340,7 +1340,7 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
       const suggested: string[] = Array.isArray(data.suggested_replies) ? data.suggested_replies : [];
       setMessages(prev => [...prev, { role: "assistant", content: reply, ts: Date.now(), resolved, suggestedReplies: suggested }]);
 
-      // ── Escalation tracking ────────────────────────────────────────────────
+      //  Escalation tracking 
       if (!resolved) {
         setUnresolvedTurns(prev => {
           const next = prev + 1;
@@ -1357,7 +1357,7 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
         setEscalationOffered(false);
       }
 
-      // ── TTS playback ───────────────────────────────────────────────────────
+      //  TTS playback 
       if (voiceModeRef.current) {
         await speakText(reply, effectiveLang);   // speak in same language user spoke
         // Echo-guard: 700ms gap after TTS ends so mic doesn't pick up speakers
@@ -1382,7 +1382,7 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages, lang, orbState, speakText, escalationOffered, autoEscalated]);
 
-  // ── Auto-create ticket from conversation ───────────────────────────────────
+  //  Auto-create ticket from conversation 
   const autoCreateTicket = useCallback(async (lastQuery: string, lastReply: string) => {
     if (autoEscalated) return;
     setAutoEscalated(true);
@@ -1420,7 +1420,7 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
     }
   }, [autoEscalated, messages, user, unresolvedTurns, onTicketCreated]);
 
-  // ── VAD: Voice Activity Detection using Web Audio ──────────────────────────
+  //  VAD: Voice Activity Detection using Web Audio 
   const stopLevelMeter = () => {
     if (levelRafRef.current) { cancelAnimationFrame(levelRafRef.current); levelRafRef.current = null; }
     setAudioLevel(0);
@@ -1446,7 +1446,7 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
     } catch { /* ignore */ }
   };
 
-  // ── Start a single recording session (VAD-triggered auto-stop) ─────────────
+  //  Start a single recording session (VAD-triggered auto-stop) 
   const startListeningLoop = useCallback(async () => {
     if (loopActiveRef.current) return;
     loopActiveRef.current = true;
@@ -1490,7 +1490,7 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
       audioChunksRef.current = [];
 
       if (blob.size < 1000) {
-        // Too short — restart listening
+        // Too short  restart listening
         loopActiveRef.current = false;
         if (voiceModeRef.current) setTimeout(() => startListeningLoop(), 300);
         return;
@@ -1504,7 +1504,7 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
         // Pass the spoken language so AI replies in same language
         await sendMessage(transcript, true, spoken);
       } else {
-        // Nothing transcribed — loop again
+        // Nothing transcribed  loop again
         if (voiceModeRef.current) setTimeout(() => startListeningLoop(), 500);
         else setOrbState("idle");
       }
@@ -1512,9 +1512,9 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
 
     recorder.start();
 
-    // VAD — monitor audio levels; stop after sustained silence
+    // VAD  monitor audio levels; stop after sustained silence
     // Raised noise floor (15) to ignore mic hiss / ambient noise
-    const VAD_SILENCE_MS   = 1800;  // stop after this long of silence (was 1200 — increased to avoid mid-sentence cutoff)
+    const VAD_SILENCE_MS   = 1800;  // stop after this long of silence (was 1200  increased to avoid mid-sentence cutoff)
     const VAD_START_DELAY  = 1500;  // wait this long before VAD kicks in (let user start speaking)
     const NOISE_FLOOR      = 15;    // avg frequency energy below this = silence
 
@@ -1526,11 +1526,11 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
       analyserRef.current?.getByteFrequencyData(data);
       const avg = data.reduce((a, b) => a + b, 0) / (data.length || 1);
       if (avg >= NOISE_FLOOR) {
-        // Sound detected — mark speech started and cancel any pending stop
+        // Sound detected  mark speech started and cancel any pending stop
         hasSpeechStarted = true;
         if (vadTimerRef.current) { clearTimeout(vadTimerRef.current); vadTimerRef.current = null; }
       } else if (hasSpeechStarted) {
-        // Below noise floor AND user has already spoken — start silence countdown
+        // Below noise floor AND user has already spoken  start silence countdown
         if (vadTimerRef.current === null) {
           vadTimerRef.current = setTimeout(() => {
             vadTimerRef.current = null;
@@ -1538,14 +1538,14 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
           }, VAD_SILENCE_MS);
         }
       }
-      // If hasSpeechStarted is still false, do nothing — don't start any countdown yet
+      // If hasSpeechStarted is still false, do nothing  don't start any countdown yet
       if (recorder.state === "recording") setTimeout(checkSilence, 80);
     };
     setTimeout(checkSilence, VAD_START_DELAY);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lang.code, transcribeAudio, sendMessage]);
 
-  // ── Toggle voice mode ──────────────────────────────────────────────────────
+  //  Toggle voice mode 
   const toggleVoiceMode = () => {
     if (voiceMode) {
       // Turn off
@@ -1605,7 +1605,7 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
     speaking:  "Speaking…",
   };
 
-  // ── Waveform bars (react to live audio level) ──────────────────────────────
+  //  Waveform bars (react to live audio level) 
   const WaveformBars = () => (
     <div style={{ display: "flex", alignItems: "center", gap: "3px", height: "24px" }}>
       {[0.5, 0.8, 1.0, 0.7, 0.4, 0.9, 0.6].map((base, i) => {
@@ -1680,7 +1680,7 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
 
             <div>
               <p style={{ fontSize: "14px", fontWeight: 800, color: "white", margin: 0, letterSpacing: "-0.01em" }}>CivicSaathi</p>
-              <p style={{ fontSize: "10px", color: "rgba(34,197,94,0.85)", fontWeight: 600, margin: 0, display: "flex", alignItems: "center", gap: "3px" }}>
+              <p style={{ fontSize: "14px", color: "rgba(34,197,94,0.85)", fontWeight: 600, margin: 0, display: "flex", alignItems: "center", gap: "3px" }}>
                 <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#22c55e", display: "inline-block" }} />
                 We're online · {sttEngine ? `STT: ${sttEngine}` : lang.label}
               </p>
@@ -1695,7 +1695,7 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
                 style={{
                   height: "30px", padding: "0 10px", borderRadius: "8px",
                   background: "rgba(56,189,248,0.1)", border: "1px solid rgba(56,189,248,0.25)",
-                  color: "#38bdf8", fontSize: "11px", fontWeight: 700, cursor: "pointer",
+                  color: "#38bdf8", fontSize: "14px", fontWeight: 700, cursor: "pointer",
                   display: "flex", alignItems: "center", gap: "4px",
                 }}>
                 {lang.native} <ChevronDown style={{ width: 10, height: 10 }} />
@@ -1715,9 +1715,9 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
                         border: "none", cursor: "pointer", textAlign: "left",
                         borderBottom: i < LANGUAGES.length - 1 ? "1px solid rgba(56,189,248,0.06)" : "none",
                       }}>
-                      <span style={{ fontSize: "13px", fontWeight: 700, color: "#38bdf8", width: "24px" }}>{l.native}</span>
-                      <span style={{ fontSize: "12px", color: i === langIdx ? "#38bdf8" : "rgba(255,255,255,0.6)", fontWeight: i === langIdx ? 700 : 400 }}>{l.label}</span>
-                      {i === langIdx && <span style={{ marginLeft: "auto", color: "#38bdf8", fontSize: "11px" }}>✓</span>}
+                      <span style={{ fontSize: "14px", fontWeight: 700, color: "#38bdf8", width: "24px" }}>{l.native}</span>
+                      <span style={{ fontSize: "14px", color: i === langIdx ? "#38bdf8" : "rgba(255,255,255,0.6)", fontWeight: i === langIdx ? 700 : 400 }}>{l.label}</span>
+                      {i === langIdx && <span style={{ marginLeft: "auto", color: "#38bdf8", fontSize: "14px" }}>✓</span>}
                     </button>
                   ))}
                 </div>
@@ -1736,7 +1736,7 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
           </div>
         </div>
 
-        {/* ── Voice Mode Banner ── */}
+        {/*  Voice Mode Banner  */}
         {voiceMode && (
           <div style={{
             padding: "8px 18px", background: "rgba(34,211,238,0.06)",
@@ -1750,20 +1750,20 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
                 boxShadow: isRecording ? "0 0 10px #22d3ee" : "none",
                 animation: isRecording ? "dotPulse 0.6s ease-in-out infinite alternate" : "none",
               }} />
-              <span style={{ fontSize: "11px", color: "#22d3ee", fontWeight: 700 }}>
+              <span style={{ fontSize: "14px", color: "#22d3ee", fontWeight: 700 }}>
                 {isRecording ? "Listening — speak now" : orbState === "thinking" ? "Processing…" : orbState === "speaking" ? "Speaking…" : "Voice mode active"}
               </span>
-              {isRecording && <span style={{ fontSize: "10px", color: "rgba(34,211,238,0.6)", fontWeight: 600 }}>● REC</span>}
+              {isRecording && <span style={{ fontSize: "14px", color: "rgba(34,211,238,0.6)", fontWeight: 600 }}>● REC</span>}
 
               {detectedLang && detectedLang !== lang.code && (
-                <span style={{ fontSize: "9px", padding: "2px 7px", borderRadius: "10px", background: "rgba(168,85,247,0.15)", border: "1px solid rgba(168,85,247,0.3)", color: "#c4b5fd", fontWeight: 700 }}>
+                <span style={{ fontSize: "14px", padding: "2px 7px", borderRadius: "10px", background: "rgba(168,85,247,0.15)", border: "1px solid rgba(168,85,247,0.3)", color: "#c4b5fd", fontWeight: 700 }}>
                   Detected: {detectedLang.toUpperCase()}
                 </span>
               )}
             </div>
             <button onClick={toggleVoiceMode}
               style={{
-                fontSize: "10px", fontWeight: 700, padding: "3px 10px", borderRadius: "6px",
+                fontSize: "14px", fontWeight: 700, padding: "3px 10px", borderRadius: "6px",
                 background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.3)",
                 color: "#f87171", cursor: "pointer",
               }}>
@@ -1777,7 +1777,7 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
           display: "flex", flexDirection: "column", alignItems: "center", paddingTop: "16px", paddingBottom: "8px",
           flexShrink: 0, position: "relative", zIndex: 2,
         }}>
-          {/* Clickable orb — tap to start recording in voice mode */}
+          {/* Clickable orb  tap to start recording in voice mode */}
           <div
             onClick={() => {
               if (voiceMode && !isRecording && orbState === "idle") startListeningLoop();
@@ -1807,7 +1807,7 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
               background: orbState === "idle" ? "#64748b" : orbState === "listening" ? "#22d3ee" : orbState === "thinking" ? "#a78bfa" : "#34d399",
               animation: orbState !== "idle" ? "dotPulse 0.8s ease-in-out infinite alternate" : "none",
             }} />
-            <span style={{ fontSize: "11px", color: "rgba(56,189,248,0.8)", fontWeight: 600 }}>
+            <span style={{ fontSize: "14px", color: "rgba(56,189,248,0.8)", fontWeight: 600 }}>
               {stateLabel[orbState]}
             </span>
           </div>
@@ -1818,7 +1818,7 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
                 marginTop: "8px", padding: "6px 16px", borderRadius: "20px",
                 background: "linear-gradient(135deg, rgba(34,211,238,0.15), rgba(56,189,248,0.1))",
                 border: "1px solid rgba(34,211,238,0.3)", color: "#22d3ee",
-                fontSize: "11px", fontWeight: 700, cursor: "pointer",
+                fontSize: "14px", fontWeight: 700, cursor: "pointer",
                 display: "flex", alignItems: "center", gap: "5px",
                 boxShadow: "0 0 16px rgba(34,211,238,0.1)", transition: "all 0.2s",
               }}
@@ -1840,7 +1840,7 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
             {lang.quickPrompts.map((p, i) => (
               <button key={i} onClick={() => sendMessage(p)}
                 style={{
-                  fontSize: "11px", fontWeight: 600, padding: "5px 12px", borderRadius: "20px",
+                  fontSize: "14px", fontWeight: 600, padding: "5px 12px", borderRadius: "20px",
                   background: "rgba(56,189,248,0.07)", border: "1px solid rgba(56,189,248,0.18)",
                   color: "#38bdf8", cursor: "pointer", transition: "all 0.15s",
                   animation: `bubbleIn 0.4s ease ${i * 0.08}s both`,
@@ -1854,7 +1854,7 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
           </div>
         )}
 
-        {/* ── Auto-escalation card ── */}
+        {/*  Auto-escalation card  */}
         {escalationOffered && !autoEscalated && (
           <div style={{
             margin: "0 14px 8px", padding: "12px 14px", borderRadius: "12px",
@@ -1863,11 +1863,11 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
             flexShrink: 0, position: "relative", zIndex: 2,
             animation: "bubbleIn 0.35s ease",
           }}>
-            <p style={{ fontSize: "11px", fontWeight: 700, color: "#fbbf24", marginBottom: "6px", display: "flex", alignItems: "center", gap: "5px" }}>
+            <p style={{ fontSize: "14px", fontWeight: 700, color: "#fbbf24", marginBottom: "6px", display: "flex", alignItems: "center", gap: "5px" }}>
               <AlertCircle style={{ width: 12, height: 12 }} />
               Issue not resolved after {unresolvedTurns} turns
             </p>
-            <p style={{ fontSize: "11px", color: "rgba(251,191,36,0.8)", marginBottom: "10px", lineHeight: 1.5 }}>
+            <p style={{ fontSize: "14px", color: "rgba(251,191,36,0.8)", marginBottom: "10px", lineHeight: 1.5 }}>
               Would you like to log this as a support ticket so an agent can follow up?
             </p>
             <div style={{ display: "flex", gap: "6px" }}>
@@ -1875,7 +1875,7 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
                 style={{
                   flex: 1, height: "30px", borderRadius: "8px", border: "none",
                   background: "linear-gradient(135deg,#f59e0b,#d97706)", color: "white",
-                  fontSize: "11px", fontWeight: 700, cursor: "pointer",
+                  fontSize: "14px", fontWeight: 700, cursor: "pointer",
                   display: "flex", alignItems: "center", justifyContent: "center", gap: "4px",
                 }}>
                 <TicketIcon style={{ width: 11, height: 11 }} /> Yes, Create Ticket
@@ -1884,7 +1884,7 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
                 style={{
                   padding: "0 12px", height: "30px", borderRadius: "8px",
                   background: "transparent", border: "1px solid rgba(251,191,36,0.2)",
-                  color: "rgba(251,191,36,0.6)", fontSize: "11px", cursor: "pointer",
+                  color: "rgba(251,191,36,0.6)", fontSize: "14px", cursor: "pointer",
                 }}>
                 Continue
               </button>
@@ -1902,8 +1902,8 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
           }}>
             <CheckCircle2 style={{ width: 14, height: 14, color: "#34d399" }} />
             <div>
-              <p style={{ fontSize: "11px", fontWeight: 700, color: "#34d399", margin: 0 }}>Ticket auto-created: {escalatedTicketId}</p>
-              <p style={{ fontSize: "10px", color: "rgba(52,211,153,0.7)", margin: 0 }}>An agent will follow up on your issue</p>
+              <p style={{ fontSize: "14px", fontWeight: 700, color: "#34d399", margin: 0 }}>Ticket auto-created: {escalatedTicketId}</p>
+              <p style={{ fontSize: "14px", color: "rgba(52,211,153,0.7)", margin: 0 }}>An agent will follow up on your issue</p>
             </div>
           </div>
         )}
@@ -1934,7 +1934,7 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
             <button onClick={handleLogTicket}
               style={{
                 width: "100%", height: "30px", borderRadius: "8px", border: "1px solid rgba(56,189,248,0.2)",
-                background: "rgba(56,189,248,0.06)", color: "#38bdf8", fontSize: "11px", fontWeight: 700,
+                background: "rgba(56,189,248,0.06)", color: "#38bdf8", fontSize: "14px", fontWeight: 700,
                 cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px",
                 transition: "all 0.15s",
               }}
@@ -1969,7 +1969,7 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
               disabled={orbState === "thinking"}
               style={{
                 flex: 1, background: "transparent", border: "none", outline: "none", resize: "none",
-                fontSize: "13px", color: "white", fontFamily: "inherit", lineHeight: 1.5,
+                fontSize: "14px", color: "white", fontFamily: "inherit", lineHeight: 1.5,
                 maxHeight: "80px", overflowY: "auto",
               }}
             />
@@ -2017,7 +2017,7 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
               }
             </button>
           </div>
-          <p style={{ fontSize: "9px", color: "rgba(56,189,248,0.3)", textAlign: "center", marginTop: "5px", fontWeight: 500 }}>
+          <p style={{ fontSize: "14px", color: "rgba(56,189,248,0.3)", textAlign: "center", marginTop: "5px", fontWeight: 500 }}>
             ↵ send · Shift+↵ new line · tap 🎤 for voice conversation
           </p>
         </div>
@@ -2047,8 +2047,8 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
   );
 }
 
-// ── Main Helpline Page ────────────────────────────────────────────────────────
-export function Helpline() {
+//  Main Helpline Page 
+function Helpline() {
   const { user } = useAuth();
   const isStaff = user?.role === "admin" || user?.role === "officer";
 
@@ -2089,9 +2089,9 @@ export function Helpline() {
   const filtered = activeQueue === "All" ? tickets : tickets.filter(t => t.status === activeQueue);
 
   return (
-    <div style={{ display: "flex", height: "calc(100vh - 6rem)", overflow: "hidden", background: "#f1f5f9", position: "relative" }} className="-mx-6 -mb-6">
+    <div style={{ display: "flex", height: "calc(100vh - 6rem)", overflow: "hidden", background: "transparent", position: "relative" }} className="bg-transparent">
 
-      {/* ── Ambient background ── */}
+      {/*  Ambient background  */}
       <div style={{
         position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none", opacity: 0.55,
         backgroundImage: `
@@ -2106,84 +2106,61 @@ export function Helpline() {
         backgroundSize: "24px 24px",
       }} />
 
-      {/* ── LEFT: Ticket Dashboard ─────────────────────────────── */}
+      {/*  LEFT: Ticket Dashboard  */}
       <div style={{ flex: "0 0 58%", display: "flex", flexDirection: "column", overflow: "hidden", position: "relative", zIndex: 1 }}>
 
-        {/* Header — glassmorphism matching other pages */}
-        <div style={{
-          padding: "16px 24px",
-          display: "flex", alignItems: "center", justifyContent: "space-between",
-          background: "rgba(255,255,255,0.7)", backdropFilter: "blur(20px)",
-          borderBottom: "1px solid rgba(255,255,255,0.5)",
-          flexShrink: 0,
-        }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <div style={{
-              width: "44px", height: "44px", borderRadius: "14px",
-              background: "linear-gradient(135deg,#ede9fe,#ddd6fe)",
-              border: "1px solid rgba(255,255,255,0.8)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              boxShadow: "0 8px 24px rgba(139,92,246,0.15)", flexShrink: 0,
-            }}>
-              <Headphones className="w-5 h-5" style={{ color: "#7c3aed" }} />
+        {/* Premium Command-Center Hero Header */}
+        <div className="relative overflow-hidden shrink-0">
+          <div className="absolute inset-0 bg-gradient-to-r from-teal-500/10 via-cyan-500/5 to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-soft-light pointer-events-none"></div>
+          
+          <div className="relative p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-white/60 bg-white/40 backdrop-blur-3xl shadow-sm">
+            <div className="flex items-center gap-5">
+              <div className="relative">
+                <div className="absolute inset-0 bg-teal-400 blur-xl opacity-40 rounded-full animate-pulse" />
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-teal-50 to-cyan-100/50 border border-teal-200/50 flex items-center justify-center shadow-lg shadow-teal-500/20 relative z-10 backdrop-blur-xl">
+                  <Headphones className="w-7 h-7 text-teal-600" />
+                </div>
+              </div>
+              <div>
+                <h1 className="text-3xl font-black tracking-tight text-slate-800 mb-1">
+                  Public Helpline
+                </h1>
+                <p className="text-sm text-slate-500 font-medium flex items-center gap-2">
+                  Citizen Support Dashboard
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-100/80 text-emerald-700 text-sm font-bold border border-emerald-200/50 shadow-sm">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    Live System
+                  </span>
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 style={{ fontSize: "18px", fontWeight: 800, color: "#0f172a", margin: 0, letterSpacing: "-0.02em" }}>Public Helpline</h1>
-              <p style={{ fontSize: "11px", color: "#7c3aed", fontWeight: 600, margin: 0, display: "flex", alignItems: "center", gap: "6px" }}>
-                Citizen Support Dashboard
-                <span style={{
-                  display: "inline-flex", alignItems: "center", gap: "4px",
-                  background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.2)",
-                  padding: "1px 8px", borderRadius: "20px", color: "#16a34a", fontWeight: 700, fontSize: "10px",
-                }}>
-                  <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#22c55e", animation: "pulse 2s infinite", display: "block" }} />
-                  Live
-                </span>
-              </p>
-            </div>
-          </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <div style={{ position: "relative" }}>
-              <Search style={{ position: "absolute", left: "11px", top: "50%", transform: "translateY(-50%)", width: 14, height: 14, color: "#94a3b8", pointerEvents: "none" }} />
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
               <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search tickets…"
-                style={{
-                  width: "200px", height: "38px", paddingLeft: "32px", paddingRight: search ? "28px" : "12px",
-                  background: "rgba(255,255,255,0.8)", border: "1px solid rgba(255,255,255,0.6)",
-                  borderRadius: "12px", fontSize: "13px", color: "#1e293b", outline: "none",
-                  boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
-                }}
-                onFocus={e => { e.target.style.borderColor = "rgba(139,92,246,0.4)"; e.target.style.boxShadow = "0 0 0 3px rgba(139,92,246,0.08)"; }}
-                onBlur={e => { e.target.style.borderColor = "rgba(255,255,255,0.6)"; e.target.style.boxShadow = "0 1px 4px rgba(0,0,0,0.05)"; }} />
+                className="w-[200px] h-10 pl-9 pr-8 bg-white/70 backdrop-blur-md border border-white/60 rounded-xl text-sm text-slate-800 outline-none focus:ring-4 focus:ring-teal-500/20 focus:border-teal-300 transition-all placeholder:text-slate-400 shadow-sm" />
               {search && (
-                <button onClick={() => setSearch("")}
-                  style={{ position: "absolute", right: "9px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", padding: 0 }}>
-                  <X style={{ width: 12, height: 12, color: "#94a3b8" }} />
+                <button onClick={() => setSearch("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 hover:bg-slate-200/50 rounded-full transition-colors cursor-pointer border-none bg-transparent">
+                  <X className="w-4 h-4 text-slate-400" />
                 </button>
               )}
             </div>
             <button onClick={() => fetchTickets()}
-              style={{
-                width: "38px", height: "38px", borderRadius: "12px",
-                border: "1px solid rgba(255,255,255,0.6)", background: "rgba(255,255,255,0.8)",
-                cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-                boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
-              }}>
-              <RefreshCw style={{ width: 14, height: 14, color: "#7c3aed" }} className={loading ? "animate-spin" : ""} />
+              className="w-10 h-10 rounded-xl border border-white/60 bg-white/70 backdrop-blur-md flex items-center justify-center shadow-sm hover:bg-white/90 transition-all cursor-pointer">
+              <RefreshCw className={`w-4 h-4 text-teal-600 ${loading ? "animate-spin" : ""}`} />
             </button>
             <button onClick={() => setNewOpen(true)}
-              style={{
-                height: "38px", padding: "0 18px", borderRadius: "12px", border: "none", cursor: "pointer",
-                background: "linear-gradient(135deg,#8b5cf6,#6366f1)", color: "white", fontSize: "13px", fontWeight: 700,
-                display: "flex", alignItems: "center", gap: "5px",
-                boxShadow: "0 4px 14px rgba(139,92,246,0.35)",
-              }}>
-              <Plus className="w-3.5 h-3.5" /> New
+              className="h-10 px-5 rounded-xl border border-teal-500/30 bg-gradient-to-r from-teal-500 to-cyan-600 text-white font-bold flex items-center gap-2 shadow-lg shadow-teal-500/25 hover:shadow-teal-500/40 hover:-translate-y-0.5 transition-all cursor-pointer"
+            >
+              <Plus className="w-4 h-4" /> New
             </button>
+          </div>
           </div>
         </div>
 
-        {/* KPI Stat cards — matching grievances page style */}
+        {/* KPI Stat cards  matching grievances page style */}
         <div style={{ display: "flex", gap: "10px", padding: "14px 24px 0", flexShrink: 0 }}>
           {[
             { label: "All",      count: counts.All,      icon: Inbox,        color: "#7c3aed", from: "#ede9fe", to: "#ddd6fe", border: "#c4b5fd", q: "All" },
@@ -2217,8 +2194,8 @@ export function Helpline() {
                   <Icon style={{ width: 16, height: 16, color }} />
                 </div>
                 <div>
-                  <p style={{ fontSize: "22px", fontWeight: 800, color: active ? color : "#1e293b", margin: 0, lineHeight: 1 }}>{count}</p>
-                  <p style={{ fontSize: "11px", fontWeight: 600, color: active ? color : "#64748b", margin: 0 }}>{label}</p>
+                  <p style={{ fontSize: "24px", fontWeight: 800, color: active ? color : "#1e293b", margin: 0, lineHeight: 1 }}>{count}</p>
+                  <p style={{ fontSize: "14px", fontWeight: 600, color: active ? color : "#64748b", margin: 0 }}>{label}</p>
                 </div>
               </button>
             );
@@ -2236,9 +2213,9 @@ export function Helpline() {
               <div style={{ width: "52px", height: "52px", borderRadius: "14px", background: "rgba(139,92,246,0.08)", border: "1px solid rgba(139,92,246,0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <Inbox style={{ width: 22, height: 22, color: "rgba(139,92,246,0.4)" }} />
               </div>
-              <p style={{ fontSize: "13px", color: "var(--color-muted-foreground)", fontWeight: 500 }}>No tickets found</p>
+              <p style={{ fontSize: "14px", color: "var(--color-muted-foreground)", fontWeight: 500 }}>No tickets found</p>
               <button onClick={() => setNewOpen(true)}
-                style={{ padding: "7px 18px", borderRadius: "9px", background: "linear-gradient(135deg,rgba(139,92,246,0.2),rgba(99,102,241,0.1))", border: "1px solid rgba(139,92,246,0.25)", color: "#a78bfa", fontSize: "12px", fontWeight: 700, cursor: "pointer" }}>
+                style={{ padding: "7px 18px", borderRadius: "9px", background: "linear-gradient(135deg,rgba(139,92,246,0.2),rgba(99,102,241,0.1))", border: "1px solid rgba(139,92,246,0.25)", color: "#a78bfa", fontSize: "14px", fontWeight: 700, cursor: "pointer" }}>
                 <Plus className="w-3.5 h-3.5 inline mr-1" />Create Ticket
               </button>
             </div>
@@ -2252,7 +2229,7 @@ export function Helpline() {
         </div>
       </div>
 
-      {/* ── RIGHT: AI Bot Panel ────────────────────────────────── */}
+      {/*  RIGHT: AI Bot Panel  */}
       <div style={{ flex: "0 0 42%", display: "flex", flexDirection: "column", overflow: "hidden" }}>
         <AIBotPanel onTicketCreated={t => { setTickets(p => [t, ...p]); fetchTickets(true); }} />
       </div>

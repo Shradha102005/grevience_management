@@ -56,7 +56,7 @@ function Admin() {
         </CardContent>
       </Card>
 
-      <h2 className="mb-4 font-display text-lg font-bold">Management Tools</h2>
+      <h2 className="mb-4 font-display text-base font-bold">Management Tools</h2>
       <FeatureGrid features={FEATURES} />
     </div>
   );

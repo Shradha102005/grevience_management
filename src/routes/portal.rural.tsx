@@ -47,7 +47,7 @@ interface Program {
   benefit: string; how_to_apply: string; contact: string; helpline: string;
 }
 
-// ── category styling ─────────────────────────────────────────────────────────
+//  category styling 
 const CAT_CFG: Record<string, { icon: React.ElementType; color: string; bg: string }> = {
   employment:     { icon: Briefcase,     color: "#34d399", bg: "rgba(52,211,153,0.12)"  },
   housing:        { icon: Home,          color: "#60a5fa", bg: "rgba(96,165,250,0.12)"  },
@@ -58,15 +58,14 @@ const CAT_CFG: Record<string, { icon: React.ElementType; color: string; bg: stri
 };
 const getCatCfg = (cat: string) => CAT_CFG[cat.toLowerCase()] ?? { icon: Sprout, color: "#4ade80", bg: "rgba(74,222,128,0.12)" };
 
-// ── Program card (drawer item) ────────────────────────────────────────────────
+//  Program card (drawer item) 
 function ProgramCard({ p, onAsk }: { p: Program; onAsk: (q: string) => void }) {
   const [expanded, setExpanded] = useState(false);
   const cfg = getCatCfg(p.category);
   const Icon = cfg.icon;
   return (
     <div style={{
-      background: "var(--color-card)", borderRadius: "14px",
-      border: "1px solid rgba(139,92,246,0.1)",
+      background: "rgba(255,255,255,0.6)", backdropFilter: "blur(24px)", borderRadius: "16px", boxShadow: "0 20px 25px -5px rgba(226, 232, 240, 0.4)", border: "1px solid rgba(255,255,255,0.6)",
       overflow: "hidden", transition: "all 0.2s",
     }}
       onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = `${cfg.color}44`; (e.currentTarget as HTMLElement).style.boxShadow = `0 4px 20px ${cfg.color}18`; }}
@@ -81,8 +80,8 @@ function ProgramCard({ p, onAsk }: { p: Program; onAsk: (q: string) => void }) {
             <Icon style={{ width: 16, height: 16, color: cfg.color }} />
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <p style={{ fontSize: "13px", fontWeight: 700, color: "var(--color-foreground)", marginBottom: "3px", lineHeight: 1.3 }}>{p.name}</p>
-            <span style={{ fontSize: "10px", fontWeight: 700, padding: "2px 8px", borderRadius: "20px", background: cfg.bg, color: cfg.color, border: `1px solid ${cfg.color}30` }}>{p.category}</span>
+            <p style={{ fontSize: "14px", fontWeight: 700, color: "var(--color-foreground)", marginBottom: "3px", lineHeight: 1.3 }}>{p.name}</p>
+            <span style={{ fontSize: "14px", fontWeight: 700, padding: "2px 8px", borderRadius: "20px", background: cfg.bg, color: cfg.color, border: `1px solid ${cfg.color}30` }}>{p.category}</span>
           </div>
           <button onClick={() => setExpanded(x => !x)}
             style={{ background: "none", border: "none", cursor: "pointer", padding: "4px", color: "var(--color-muted-foreground)", flexShrink: 0 }}>
@@ -90,28 +89,28 @@ function ProgramCard({ p, onAsk }: { p: Program; onAsk: (q: string) => void }) {
           </button>
         </div>
 
-        <p style={{ fontSize: "11px", color: "var(--color-muted-foreground)", lineHeight: 1.5, marginBottom: expanded ? "12px" : 0, display: "-webkit-box", WebkitLineClamp: expanded ? 999 : 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+        <p style={{ fontSize: "14px", color: "var(--color-muted-foreground)", lineHeight: 1.5, marginBottom: expanded ? "12px" : 0, display: "-webkit-box", WebkitLineClamp: expanded ? 999 : 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
           {p.description}
         </p>
 
         {expanded && (
           <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
             <div style={{ padding: "10px 12px", background: "rgba(139,92,246,0.05)", borderRadius: "9px", border: "1px solid rgba(139,92,246,0.1)" }}>
-              <p style={{ fontSize: "10px", fontWeight: 700, color: "#a78bfa", marginBottom: "3px", textTransform: "uppercase", letterSpacing: "0.06em" }}>Benefit</p>
-              <p style={{ fontSize: "11px", color: "var(--color-foreground)", lineHeight: 1.5 }}>{p.benefit}</p>
+              <p style={{ fontSize: "14px", fontWeight: 700, color: "#a78bfa", marginBottom: "3px", textTransform: "uppercase", letterSpacing: "0.06em" }}>Benefit</p>
+              <p style={{ fontSize: "14px", color: "var(--color-foreground)", lineHeight: 1.5 }}>{p.benefit}</p>
             </div>
             <div style={{ padding: "10px 12px", background: `${cfg.color}09`, borderRadius: "9px", border: `1px solid ${cfg.color}20` }}>
-              <p style={{ fontSize: "10px", fontWeight: 700, color: cfg.color, marginBottom: "3px", textTransform: "uppercase", letterSpacing: "0.06em" }}>How to Apply</p>
-              <p style={{ fontSize: "11px", color: "var(--color-foreground)", lineHeight: 1.5 }}>{p.how_to_apply}</p>
+              <p style={{ fontSize: "14px", fontWeight: 700, color: cfg.color, marginBottom: "3px", textTransform: "uppercase", letterSpacing: "0.06em" }}>How to Apply</p>
+              <p style={{ fontSize: "14px", color: "var(--color-foreground)", lineHeight: 1.5 }}>{p.how_to_apply}</p>
             </div>
             {p.helpline && (
               <div style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 10px", background: "rgba(52,211,153,0.06)", borderRadius: "8px", border: "1px solid rgba(52,211,153,0.15)" }}>
                 <Phone style={{ width: 12, height: 12, color: "#34d399" }} />
-                <span style={{ fontSize: "11px", color: "var(--color-foreground)", fontWeight: 600 }}>Helpline: {p.helpline}</span>
+                <span style={{ fontSize: "14px", color: "var(--color-foreground)", fontWeight: 600 }}>Helpline: {p.helpline}</span>
               </div>
             )}
             <button onClick={() => onAsk(`Tell me more about ${p.name}`)}
-              style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", padding: "8px 14px", borderRadius: "9px", background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.2)", color: "#a78bfa", fontSize: "12px", fontWeight: 700, cursor: "pointer" }}>
+              style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", padding: "8px 14px", borderRadius: "9px", background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.2)", color: "#a78bfa", fontSize: "14px", fontWeight: 700, cursor: "pointer" }}>
               <Sparkles style={{ width: 12, height: 12 }} />Ask AI about this
             </button>
           </div>
@@ -121,7 +120,7 @@ function ProgramCard({ p, onAsk }: { p: Program; onAsk: (q: string) => void }) {
   );
 }
 
-// ── Programs Drawer ───────────────────────────────────────────────────────────
+//  Programs Drawer 
 function ProgramsDrawer({ programs, loading, onRefresh, onAsk, onClose }: {
   programs: Program[]; loading: boolean; onRefresh: () => void;
   onAsk: (q: string) => void; onClose: () => void;
@@ -147,8 +146,8 @@ function ProgramsDrawer({ programs, loading, onRefresh, onAsk, onClose }: {
                 <Sprout style={{ width: 18, height: 18, color: "white" }} />
               </div>
               <div>
-                <h2 style={{ fontSize: "15px", fontWeight: 800, color: "var(--color-foreground)", margin: 0 }}>Rural Programs</h2>
-                <p style={{ fontSize: "11px", color: "var(--color-muted-foreground)", margin: 0 }}>{programs.length} active schemes</p>
+                <h2 style={{ fontSize: "14px", fontWeight: 800, color: "var(--color-foreground)", margin: 0 }}>Rural Programs</h2>
+                <p style={{ fontSize: "14px", color: "var(--color-muted-foreground)", margin: 0 }}>{programs.length} active schemes</p>
               </div>
             </div>
             <div style={{ display: "flex", gap: "8px" }}>
@@ -168,7 +167,7 @@ function ProgramsDrawer({ programs, loading, onRefresh, onAsk, onClose }: {
               const cfg = getCatCfg(c);
               return (
                 <button key={c} onClick={() => setFilter(c)}
-                  style={{ padding: "4px 10px", borderRadius: "20px", fontSize: "10px", fontWeight: 700, cursor: "pointer", textTransform: "capitalize", border: `1px solid ${filter === c ? (c === "all" ? "#a78bfa44" : cfg.color + "44") : "rgba(139,92,246,0.12)"}`, background: filter === c ? (c === "all" ? "rgba(139,92,246,0.12)" : cfg.bg) : "transparent", color: filter === c ? (c === "all" ? "#a78bfa" : cfg.color) : "var(--color-muted-foreground)" }}>
+                  style={{ padding: "4px 10px", borderRadius: "20px", fontSize: "14px", fontWeight: 700, cursor: "pointer", textTransform: "capitalize", border: `1px solid ${filter === c ? (c === "all" ? "#a78bfa44" : cfg.color + "44") : "rgba(139,92,246,0.12)"}`, background: filter === c ? (c === "all" ? "rgba(139,92,246,0.12)" : cfg.bg) : "transparent", color: filter === c ? (c === "all" ? "#a78bfa" : cfg.color) : "var(--color-muted-foreground)" }}>
                   {c}
                 </button>
               );
@@ -195,7 +194,7 @@ function ProgramsDrawer({ programs, loading, onRefresh, onAsk, onClose }: {
   );
 }
 
-// ── Subsidy calculator popover ────────────────────────────────────────────────
+//  Subsidy calculator popover 
 function SubsidyCalc({ onClose }: { onClose: () => void }) {
   const [acres, setAcres] = useState("");
   const [result, setResult] = useState<string | null>(null);
@@ -208,30 +207,29 @@ function SubsidyCalc({ onClose }: { onClose: () => void }) {
   return (
     <div style={{
       position: "absolute", bottom: "60px", left: "50%", transform: "translateX(-50%)",
-      width: "320px", background: "var(--color-card)", borderRadius: "16px",
-      border: "1px solid rgba(139,92,246,0.2)", boxShadow: "0 20px 60px rgba(0,0,0,0.2)",
+      width: "320px", background: "rgba(255,255,255,0.6)", backdropFilter: "blur(24px)", borderRadius: "16px", border: "1px solid rgba(255,255,255,0.6)", boxShadow: "0 20px 60px rgba(0,0,0,0.2)",
       padding: "18px 20px", zIndex: 30, animation: "fadeIn 0.2s ease",
     }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "12px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "7px" }}>
           <Calculator style={{ width: 15, height: 15, color: "#a78bfa" }} />
-          <span style={{ fontSize: "13px", fontWeight: 700, color: "var(--color-foreground)" }}>Subsidy Estimator</span>
+          <span style={{ fontSize: "14px", fontWeight: 700, color: "var(--color-foreground)" }}>Subsidy Estimator</span>
         </div>
         <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-muted-foreground)" }}>
           <X style={{ width: 14, height: 14 }} />
         </button>
       </div>
-      <p style={{ fontSize: "11px", color: "var(--color-muted-foreground)", marginBottom: "10px" }}>Enter your land size to estimate annual subsidies</p>
+      <p style={{ fontSize: "14px", color: "var(--color-muted-foreground)", marginBottom: "10px" }}>Enter your land size to estimate annual subsidies</p>
       <div style={{ display: "flex", gap: "8px", marginBottom: "10px" }}>
         <input type="number" placeholder="Land in acres…" value={acres} onChange={e => setAcres(e.target.value)}
-          style={{ flex: 1, height: "36px", padding: "0 10px", borderRadius: "9px", border: "1px solid rgba(139,92,246,0.2)", background: "rgba(139,92,246,0.04)", color: "var(--color-foreground)", fontSize: "13px", outline: "none" }} />
+          style={{ flex: 1, height: "36px", padding: "0 10px", borderRadius: "9px", border: "1px solid rgba(139,92,246,0.2)", background: "rgba(139,92,246,0.04)", color: "var(--color-foreground)", fontSize: "14px", outline: "none" }} />
         <button onClick={calc}
-          style={{ padding: "0 16px", height: "36px", borderRadius: "9px", background: "linear-gradient(135deg,#8b5cf6,#7c3aed)", color: "white", border: "none", cursor: "pointer", fontSize: "12px", fontWeight: 700 }}>
+          style={{ padding: "0 16px", height: "36px", borderRadius: "9px", background: "linear-gradient(135deg,#8b5cf6,#7c3aed)", color: "white", border: "none", cursor: "pointer", fontSize: "14px", fontWeight: 700 }}>
           Estimate
         </button>
       </div>
       {result && (
-        <div style={{ padding: "10px 12px", background: "rgba(52,211,153,0.1)", borderRadius: "9px", border: "1px solid rgba(52,211,153,0.25)", fontSize: "12px", color: "var(--color-foreground)", lineHeight: 1.5, fontWeight: 600 }}>
+        <div style={{ padding: "10px 12px", background: "rgba(52,211,153,0.1)", borderRadius: "9px", border: "1px solid rgba(52,211,153,0.25)", fontSize: "14px", color: "var(--color-foreground)", lineHeight: 1.5, fontWeight: 600 }}>
           <CheckCircle2 style={{ width: 12, height: 12, color: "#34d399", display: "inline", marginRight: "5px" }} />{result}
         </div>
       )}
@@ -239,7 +237,7 @@ function SubsidyCalc({ onClose }: { onClose: () => void }) {
   );
 }
 
-// ── Main Rural component ──────────────────────────────────────────────────────
+//  Main Rural component 
 function Rural() {
   const [language, setLanguage]         = useState("en");
   const [messages, setMessages]         = useState<Msg[]>([{ role: "bot", text: "नमस्ते! I'm your Rural Development Assistant. Ask me about MGNREGA, PM Awas, SHG loans, subsidies, or any village welfare scheme." }]);
@@ -258,7 +256,7 @@ function Rural() {
   const recognRef    = useRef<InstanceType<typeof SpeechRecognition> | null>(null);
   const historyRef   = useRef<{ role: string; content: string }[]>([]);
 
-  // ── fetch programs ──
+  //  fetch programs 
   const fetchPrograms = useCallback(async () => {
     setProgLoading(true);
     try {
@@ -269,15 +267,15 @@ function Rural() {
 
   useEffect(() => { fetchPrograms(); }, [fetchPrograms]);
 
-  // ── auto-scroll ──
+  //  auto-scroll 
   useEffect(() => { scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" }); }, [messages, loading]);
 
-  // ── history sync ──
+  //  history sync 
   useEffect(() => {
     historyRef.current = messages.map(m => ({ role: m.role === "bot" ? "assistant" : "user", content: m.text }));
   }, [messages]);
 
-  // ── speak ──
+  //  speak 
   const speakText = useCallback((text: string) => {
     if (!voiceEnabled || !window.speechSynthesis) return;
     window.speechSynthesis.cancel();
@@ -287,7 +285,7 @@ function Rural() {
     window.speechSynthesis.speak(u);
   }, [voiceEnabled, language]);
 
-  // ── send message ──
+  //  send message 
   const sendMessage = useCallback(async (text: string) => {
     const q = text.trim(); if (!q || loading) return;
     setMessages(m => [...m, { role: "user", text: q }]);
@@ -307,7 +305,7 @@ function Rural() {
     } finally { setLoading(false); }
   }, [loading, language, speakText]);
 
-  // ── voice input ──
+  //  voice input 
   const startListening = useCallback(() => {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SR) { toast.error("Voice requires Chrome or Edge browser."); return; }
@@ -323,41 +321,51 @@ function Rural() {
   const okCount    = programs.filter(p => p.category).length;
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "calc(100vh - 6rem)", overflow: "hidden" }}
-      className="-mx-6 -mb-6">
+    <div className="flex flex-col h-[calc(100vh-4rem)] relative overflow-hidden font-sans bg-transparent animate-in fade-in duration-500">
+      
+      {/* Premium Ambient Background */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        <div className="absolute top-[-10%] right-[-5%] w-[40%] h-[40%] rounded-full bg-orange-500/20 dark:bg-orange-900/30 blur-[120px] animate-pulse" style={{ animationDuration: '8s' }} />
+        <div className="absolute bottom-[-10%] left-[-5%] w-[40%] h-[40%] rounded-full bg-amber-500/20 dark:bg-amber-900/30 blur-[120px] animate-pulse" style={{ animationDuration: '10s' }} />
+        <div className="absolute inset-0" style={{ backgroundImage: "radial-gradient(rgba(148,163,184,0.1) 1px, transparent 1px)", backgroundSize: "32px 32px" }} />
+      </div>
 
-      {/* ── TOP HEADER ─────────────────────────────────────────── */}
-      <div style={{ padding: "14px 28px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid rgba(139,92,246,0.1)", background: "linear-gradient(180deg,rgba(74,222,128,0.04) 0%,transparent 100%)", flexShrink: 0 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <div style={{ width: "40px", height: "40px", borderRadius: "12px", background: "linear-gradient(135deg,#4ade80,#22c55e)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 0 20px rgba(74,222,128,0.35)", flexShrink: 0 }}>
-            <Sprout className="w-5 h-5 text-white" />
+      {/*  TOP HEADER  */}
+      <div className="shrink-0 z-20 px-6 lg:px-10 pt-8 pb-4 border-b border-orange-500/10">
+        <div className="max-w-[1400px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="flex items-center gap-6">
+            <div className="hidden md:flex h-16 w-16 rounded-[1.5rem] items-center justify-center text-white shadow-2xl shadow-orange-500/30 bg-gradient-to-br from-orange-400 to-amber-600 shrink-0">
+              <Sprout className="h-8 w-8" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-extrabold tracking-tight flex items-center gap-3 flex-wrap">
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-orange-600 via-amber-500 to-yellow-500 animate-gradient-x">
+                  Rural Development Bot
+                </span>
+                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 ml-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">Online</span>
+                </div>
+              </h1>
+              <p className="text-slate-500/80 dark:text-slate-400 mt-2 font-medium text-sm md:text-base">ग्रामीण सहायक · Multilingual AI Assistant</p>
+            </div>
           </div>
-          <div>
-            <h1 style={{ fontSize: "16px", fontWeight: 800, color: "var(--color-foreground)", margin: 0 }}>Rural Development Bot</h1>
-            <p style={{ fontSize: "11px", margin: 0, fontWeight: 600, color: "rgba(74,222,128,0.7)" }}>ग्रामीण सहायक · Multilingual AI Assistant</p>
-          </div>
-          {/* Online indicator */}
-          <div style={{ display: "flex", alignItems: "center", gap: "5px", padding: "4px 10px", borderRadius: "20px", background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.25)", marginLeft: "6px" }}>
-            <span style={{ width: "7px", height: "7px", borderRadius: "50%", background: "#22c55e", display: "block", boxShadow: "0 0 8px rgba(34,197,94,0.7)", animation: "pulse 2s infinite" }} />
-            <span style={{ fontSize: "11px", color: "#22c55e", fontWeight: 700 }}>Online</span>
-          </div>
-        </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          {/* Language selector */}
-          <div style={{ display: "flex", alignItems: "center", gap: "7px" }}>
-            <span style={{ fontSize: "11px", color: "var(--color-muted-foreground)", fontWeight: 600 }}>भाषा:</span>
-            <LanguageDropdown value={language} onChange={setLanguage} className="h-8 text-xs" />
-          </div>
+          <div className="flex items-center gap-4 flex-wrap md:flex-nowrap">
+            <div className="flex items-center gap-2 bg-white/60 backdrop-blur-2xl px-4 py-2 rounded-[1.25rem] shadow-xl shadow-slate-200/40 border border-white/60 shrink-0">
+              <span className="text-sm text-slate-500 font-bold uppercase tracking-wider">भाषा:</span>
+              <LanguageDropdown value={language} onChange={setLanguage} className="h-10 text-sm" />
+            </div>
           {/* Programs button */}
-          <button onClick={() => setShowPrograms(true)}
-            style={{ display: "flex", alignItems: "center", gap: "6px", padding: "6px 14px", height: "36px", borderRadius: "10px", border: "1px solid rgba(74,222,128,0.25)", background: "rgba(74,222,128,0.08)", color: "#4ade80", fontSize: "12px", fontWeight: 700, cursor: "pointer" }}>
-            <BookOpen style={{ width: 14, height: 14 }} />Programs <span style={{ background: "rgba(74,222,128,0.2)", borderRadius: "10px", padding: "1px 6px", fontSize: "11px" }}>{programs.length}</span>
-          </button>
+            <button onClick={() => setShowPrograms(true)}
+              style={{ display: "flex", alignItems: "center", gap: "6px", padding: "6px 14px", height: "36px", borderRadius: "10px", border: "1px solid rgba(74,222,128,0.25)", background: "rgba(74,222,128,0.08)", color: "#4ade80", fontSize: "14px", fontWeight: 700, cursor: "pointer" }}>
+              <BookOpen style={{ width: 14, height: 14 }} />Programs <span style={{ background: "rgba(74,222,128,0.2)", borderRadius: "10px", padding: "1px 6px", fontSize: "14px" }}>{programs.length}</span>
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* ── STAT CHIPS ─────────────────────────────────────────── */}
+      {/*  STAT CHIPS  */}
       <div style={{ display: "flex", gap: "10px", padding: "14px 28px", flexShrink: 0, borderBottom: "1px solid rgba(139,92,246,0.06)" }}>
         {[
           { icon: Wheat,         label: "Active Programs",   value: programs.length,  color: "#4ade80" },
@@ -366,19 +374,19 @@ function Rural() {
           { icon: Users,         label: "Finance / SHG",     value: programs.filter(p => p.category.toLowerCase() === "finance").length,    color: "#f472b6" },
           { icon: Sparkles,      label: "Queries Answered",  value: msgCount,          color: "#a78bfa" },
         ].map(({ icon: Icon, label, value, color }) => (
-          <div key={label} style={{ flex: 1, padding: "12px 16px", borderRadius: "12px", background: "var(--color-card)", border: "1px solid rgba(139,92,246,0.08)", display: "flex", alignItems: "center", gap: "10px" }}>
+          <div key={label} style={{ flex: 1, padding: "12px 16px", background: "rgba(255,255,255,0.6)", backdropFilter: "blur(24px)", borderRadius: "16px", boxShadow: "0 20px 25px -5px rgba(226, 232, 240, 0.4)", border: "1px solid rgba(255,255,255,0.6)", display: "flex", alignItems: "center", gap: "10px" }}>
             <div style={{ width: "34px", height: "34px", borderRadius: "9px", background: `${color}12`, border: `1px solid ${color}25`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
               <Icon style={{ width: 15, height: 15, color }} />
             </div>
             <div>
-              <p style={{ fontSize: "18px", fontWeight: 800, color, lineHeight: 1, margin: 0 }}>{value}</p>
-              <p style={{ fontSize: "10px", color: "var(--color-muted-foreground)", margin: 0, fontWeight: 600, marginTop: "2px" }}>{label}</p>
+              <p style={{ fontSize: "14px", fontWeight: 800, color, lineHeight: 1, margin: 0 }}>{value}</p>
+              <p style={{ fontSize: "14px", color: "var(--color-muted-foreground)", margin: 0, fontWeight: 600, marginTop: "2px" }}>{label}</p>
             </div>
           </div>
         ))}
       </div>
 
-      {/* ── CHAT AREA ──────────────────────────────────────────── */}
+      {/*  CHAT AREA  */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
 
         {/* Messages */}
@@ -387,11 +395,11 @@ function Rural() {
           {/* Quick suggestions (shown at start) */}
           {messages.length <= 1 && (
             <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "8px" }}>
-              <p style={{ fontSize: "11px", fontWeight: 700, color: "var(--color-muted-foreground)", textTransform: "uppercase", letterSpacing: "0.08em" }}>Suggested questions</p>
+              <p style={{ fontSize: "14px", fontWeight: 700, color: "var(--color-muted-foreground)", textTransform: "uppercase", letterSpacing: "0.08em" }}>Suggested questions</p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
                 {SUGGESTIONS.map(s => (
                   <button key={s} onClick={() => sendMessage(s)} disabled={loading}
-                    style={{ padding: "6px 14px", borderRadius: "20px", border: "1px solid rgba(139,92,246,0.18)", background: "rgba(139,92,246,0.06)", color: "var(--color-muted-foreground)", fontSize: "11px", cursor: "pointer", transition: "all 0.15s" }}
+                    style={{ padding: "6px 14px", borderRadius: "20px", border: "1px solid rgba(139,92,246,0.18)", background: "rgba(139,92,246,0.06)", color: "var(--color-muted-foreground)", fontSize: "14px", cursor: "pointer", transition: "all 0.15s" }}
                     onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "rgba(139,92,246,0.12)"; (e.currentTarget as HTMLElement).style.color = "#a78bfa"; }}
                     onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "rgba(139,92,246,0.06)"; (e.currentTarget as HTMLElement).style.color = "var(--color-muted-foreground)"; }}>
                     {s}
@@ -416,7 +424,7 @@ function Rural() {
                   : "var(--color-card)",
                 border: m.role === "user" ? "none" : "1px solid rgba(139,92,246,0.1)",
                 color: m.role === "user" ? "white" : "var(--color-foreground)",
-                fontSize: "13px", lineHeight: 1.6, fontWeight: m.role === "user" ? 500 : 400,
+                fontSize: "14px", lineHeight: 1.6, fontWeight: m.role === "user" ? 500 : 400,
                 boxShadow: m.role === "user" ? "0 4px 16px rgba(139,92,246,0.25)" : "none",
                 animation: "fadeInMsg 0.25s ease",
               }}>{m.text}</div>
@@ -429,7 +437,7 @@ function Rural() {
               <div style={{ width: "30px", height: "30px", borderRadius: "9px", background: "linear-gradient(135deg,#4ade80,#22c55e)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                 <Sprout style={{ width: 14, height: 14, color: "white" }} />
               </div>
-              <div style={{ padding: "12px 16px", borderRadius: "18px 18px 18px 4px", background: "var(--color-card)", border: "1px solid rgba(139,92,246,0.1)", display: "flex", gap: "4px", alignItems: "center" }}>
+              <div style={{ padding: "12px 16px", background: "rgba(255,255,255,0.6)", backdropFilter: "blur(24px)", borderRadius: "16px", boxShadow: "0 20px 25px -5px rgba(226, 232, 240, 0.4)", border: "1px solid rgba(255,255,255,0.6)", display: "flex", gap: "4px", alignItems: "center" }}>
                 {[0,150,300].map((d,i) => (
                   <span key={i} style={{ width: "7px", height: "7px", borderRadius: "50%", background: "#a78bfa", animation: "bounce 1.2s ease infinite", animationDelay: `${d}ms` }} />
                 ))}
@@ -438,7 +446,7 @@ function Rural() {
           )}
         </div>
 
-        {/* ── INPUT BAR ────────────────────────────────────────── */}
+        {/*  INPUT BAR  */}
         <div style={{ padding: "14px 28px 20px", borderTop: "1px solid rgba(139,92,246,0.08)", background: "linear-gradient(0deg,rgba(139,92,246,0.02) 0%,transparent 100%)", position: "relative", flexShrink: 0 }}>
           {showCalc && <SubsidyCalc onClose={() => setShowCalc(false)} />}
 
@@ -458,7 +466,7 @@ function Rural() {
                 value={input} onChange={e => setInput(e.target.value)}
                 placeholder={isListening ? "Listening…" : LANG_PLACEHOLDER[language] ?? "Type your question…"}
                 disabled={loading || isListening}
-                style={{ width: "100%", height: "44px", padding: "0 14px", borderRadius: "13px", border: "1px solid rgba(139,92,246,0.2)", background: "var(--color-card)", color: "var(--color-foreground)", fontSize: "13px", outline: "none", boxSizing: "border-box", transition: "border-color 0.2s" }}
+                style={{ width: "100%", height: "44px", padding: "0 14px", background: "rgba(255,255,255,0.6)", backdropFilter: "blur(24px)", borderRadius: "16px", boxShadow: "0 20px 25px -5px rgba(226, 232, 240, 0.4)", border: "1px solid rgba(255,255,255,0.6)", color: "var(--color-foreground)", fontSize: "14px", outline: "none", boxSizing: "border-box", transition: "border-color 0.2s" }}
                 onFocus={e => (e.target as HTMLInputElement).style.borderColor = "rgba(139,92,246,0.5)"}
                 onBlur={e  => (e.target as HTMLInputElement).style.borderColor = "rgba(139,92,246,0.2)"}
               />
@@ -489,7 +497,7 @@ function Rural() {
         </div>
       </div>
 
-      {/* ── PROGRAMS DRAWER ──────────────────────────────────────── */}
+      {/*  PROGRAMS DRAWER  */}
       {showPrograms && (
         <ProgramsDrawer programs={programs} loading={progLoading} onRefresh={fetchPrograms}
           onAsk={q => { sendMessage(q); }} onClose={() => setShowPrograms(false)} />

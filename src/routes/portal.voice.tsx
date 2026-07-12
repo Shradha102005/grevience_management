@@ -245,42 +245,45 @@ function VoiceAssistant() {
   };
 
   return (
-    <div style={{ position: "relative", display: "flex", flexDirection: "column", height: "calc(100vh - 4rem)", overflow: "hidden", background: "#f8fafc", color: "#0f172a", alignItems: "center", justifyItems: "center", justifyContent: "center" }} className="-m-6">
+    <div className="relative flex flex-col h-[calc(100vh-4rem)] overflow-hidden font-sans bg-transparent items-center justify-center animate-in fade-in duration-500">
       
-      {/* ── Ambient Background Gradients ── */}
-      <div style={{ position: "absolute", inset: 0, opacity: 0.6, pointerEvents: "none", filter: "blur(80px)" }}>
-        <div style={{ position: "absolute", top: "50%", left: "50%", width: "40vw", height: "40vw", transform: "translate(-50%, -50%)", borderRadius: "50%",
-          background: orbState === "listening" ? "radial-gradient(circle, rgba(239,68,68,0.25) 0%, rgba(255,255,255,0) 70%)" :
-                      orbState === "processing" ? "radial-gradient(circle, rgba(168,85,247,0.25) 0%, rgba(255,255,255,0) 70%)" :
-                      orbState === "speaking" ? "radial-gradient(circle, rgba(59,130,246,0.25) 0%, rgba(255,255,255,0) 70%)" :
-                      "radial-gradient(circle, rgba(139,92,246,0.15) 0%, rgba(255,255,255,0) 70%)",
-          transition: "all 1s ease-in-out",
-          animation: orbState !== "idle" ? "pulseGlow 3s infinite alternate" : "none"
-        }} />
+      {/*  Ambient Background Gradients  */}
+      <div className="absolute inset-0 pointer-events-none transition-all duration-1000 z-0" style={{
+        background: orbState === "listening" ? "radial-gradient(circle at 50% 50%, rgba(239,68,68,0.2) 0%, transparent 60%)" :
+                    orbState === "processing" ? "radial-gradient(circle at 50% 50%, rgba(168,85,247,0.2) 0%, transparent 60%)" :
+                    orbState === "speaking" ? "radial-gradient(circle at 50% 50%, rgba(59,130,246,0.2) 0%, transparent 60%)" :
+                    "radial-gradient(circle at 50% 50%, rgba(139,92,246,0.1) 0%, transparent 60%)",
+      }}>
+        <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full bg-indigo-500/10 dark:bg-indigo-900/20 blur-[120px] animate-pulse" style={{ animationDuration: '8s' }} />
+        <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] rounded-full bg-violet-500/10 dark:bg-violet-900/20 blur-[120px] animate-pulse" style={{ animationDuration: '10s' }} />
+        <div className="absolute inset-0" style={{ backgroundImage: "radial-gradient(rgba(148,163,184,0.1) 1px, transparent 1px)", backgroundSize: "32px 32px" }} />
       </div>
 
-      {/* ── Top Header ── */}
-      <div style={{ position: "absolute", top: 0, left: 0, right: 0, padding: "24px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", zIndex: 10 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "white", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
-            <Sparkles style={{ width: 16, height: 16, color: "#8b5cf6" }} />
+      {/*  Top Header  */}
+      <div className="absolute top-0 left-0 right-0 px-6 lg:px-10 py-6 flex justify-between items-center z-20">
+        <div className="flex items-center gap-4">
+          <div className="h-12 w-12 rounded-[1.25rem] bg-white/60 backdrop-blur-2xl shadow-xl shadow-slate-200/40 border border-white/60 flex items-center justify-center">
+            <Sparkles className="h-6 w-6 text-violet-600 animate-pulse" />
           </div>
-          <span style={{ fontSize: "14px", fontWeight: 700, letterSpacing: "0.05em", color: "#0f172a" }}>AI Command Center</span>
+          <span className="text-base font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-violet-600 to-indigo-600">AI Command Center</span>
         </div>
         {orbState !== "idle" && (
-          <Badge variant="outline" className="bg-white text-slate-800 border-slate-200 shadow-sm animate-in fade-in" style={{ padding: "4px 10px", fontSize: "10px", letterSpacing: "0.1em" }}>
-            <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: orbState === 'listening' ? '#ef4444' : orbState === 'speaking' ? '#3b82f6' : '#a855f7', display: "inline-block", marginRight: "6px", animation: "ping 1.5s infinite" }} />
-            {orbState.toUpperCase()}
-          </Badge>
+          <div className="bg-white/60 backdrop-blur-2xl border border-white/60 shadow-xl px-4 py-2 rounded-full flex items-center gap-2 animate-in fade-in">
+            <span className={`w-2.5 h-2.5 rounded-full animate-ping ${orbState === 'listening' ? 'bg-red-500' : orbState === 'speaking' ? 'bg-blue-500' : 'bg-purple-500'}`} />
+            <span className="text-sm font-bold text-slate-700 tracking-widest uppercase">{orbState}</span>
+          </div>
         )}
       </div>
 
-      {/* ── Center Stage (Orb + Transcript + Result) ── */}
-      <div style={{ zIndex: 10, display: "flex", flexDirection: "column", alignItems: "center", width: "100%", maxWidth: "800px", padding: "0 24px" }}>
+      {/*  Center Stage (Orb + Transcript + Result)  */}
+      <div className="z-10 flex flex-col items-center w-full max-w-4xl px-6 relative mt-12">
         
         {/* The Voice Orb */}
-        <div style={{ marginBottom: results ? "40px" : "60px", transition: "all 0.5s cubic-bezier(0.16,1,0.3,1)", transform: results ? "scale(0.8) translateY(-20px)" : "scale(1) translateY(0)" }}>
-          <VoiceOrb state={orbState} onClick={toggleVoice} size="lg" className="shadow-[0_10px_40px_rgba(139,92,246,0.2)] rounded-full cursor-pointer" />
+        <div className="transition-all duration-700 ease-out" style={{ 
+          transform: results ? "scale(0.7) translateY(-30px)" : "scale(1.2) translateY(0)",
+          marginBottom: results ? "2rem" : "4rem"
+        }}>
+          <VoiceOrb state={orbState} onClick={toggleVoice} size="lg" className="shadow-[0_20px_60px_-15px_rgba(139,92,246,0.3)] rounded-full cursor-pointer hover:scale-105 transition-transform" />
         </div>
 
         {/* Live Transcript / Response */}
@@ -299,70 +302,80 @@ function VoiceAssistant() {
 
         {/* Result Card (Slides in when AI responds) */}
         {results && (
-          <div style={{ width: "100%", marginTop: "32px", animation: "slideUpFade 0.6s cubic-bezier(0.16,1,0.3,1)" }}>
-            <Card style={{ background: "white", border: "1px solid #e2e8f0", borderRadius: "24px", overflow: "hidden", boxShadow: "0 10px 40px rgba(0,0,0,0.04)" }}>
-              <div style={{ padding: "16px 24px", borderBottom: "1px solid #f1f5f9", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                  <Terminal style={{ width: 14, height: 14, color: "#3b82f6" }} />
-                  <span style={{ fontSize: "12px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "#64748b" }}>{results.intent}</span>
-                </div>
-                <button onClick={() => { setResults(null); setTranscript("Hi. How can I help you today?"); }} style={{ width: "24px", height: "24px", borderRadius: "12px", background: "#f1f5f9", border: "none", color: "#64748b", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}><X style={{ width: 12, height: 12 }} /></button>
+          <div className="animate-in slide-in-from-bottom-10 fade-in duration-500 w-full mt-10">
+            <Card className="bg-white/60 backdrop-blur-3xl rounded-[2rem] p-8 md:p-10 border border-white/60 shadow-2xl shadow-slate-200/50">
+              <div className="flex items-center gap-3 mb-2">
+                <Command className="w-6 h-6 text-violet-600" />
+                <h3 className="text-sm font-black tracking-widest text-slate-500 uppercase">{results.intent}</h3>
               </div>
-              <div style={{ padding: "24px" }}>
-                <p style={{ fontSize: "16px", lineHeight: 1.6, color: "#1e293b", marginBottom: "24px" }}>{results.summary}</p>
-                
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
-                  {results.actions.map((a: any, i: number) => (
-                    <button 
-                      key={i} 
-                      onClick={() => navigate({ to: a.route })}
-                      style={{ padding: "14px", borderRadius: "16px", background: "#f8fafc", border: "1px solid #e2e8f0", color: "#0f172a", display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", transition: "all 0.2s" }} 
-                      onMouseEnter={e => e.currentTarget.style.background = "#f1f5f9"} 
-                      onMouseLeave={e => e.currentTarget.style.background = "#f8fafc"}
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {results.actions?.map((action: any, i: number) => {
+                  const Icon = action.icon;
+                  return (
+                    <button
+                      key={i}
+                      onClick={() => navigate({ to: action.route })}
+                      className="group flex items-center gap-5 p-6 bg-white rounded-2xl border border-slate-100/50 transition-all text-left w-full cursor-pointer shadow-xl shadow-slate-200/20 hover:shadow-2xl hover:shadow-violet-500/10 hover:-translate-y-1 hover:border-violet-100"
                     >
-                      <div style={{ width: "28px", height: "28px", borderRadius: "8px", background: `${a.color}15`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                        <a.icon style={{ width: 14, height: 14, color: a.color }} />
+                      <div className="w-14 h-14 rounded-[1.25rem] flex items-center justify-center shrink-0" style={{ background: `${action.color}15`, color: action.color }}>
+                        <Icon className="w-7 h-7" />
                       </div>
-                      <span style={{ fontSize: "13px", fontWeight: 600 }}>{a.label}</span>
-                      <ChevronRight style={{ width: 14, height: 14, color: "#cbd5e1", marginLeft: "auto" }} />
+                      <div className="flex-1 min-w-0">
+                        <span className="block text-base font-extrabold text-slate-800 truncate group-hover:text-violet-600 transition-colors">{action.label}</span>
+                        <span className="text-sm font-bold text-slate-400">Tap to open module</span>
+                      </div>
+                      <ChevronRight className="w-6 h-6 text-slate-300 group-hover:text-violet-500 group-hover:translate-x-1 transition-all" />
                     </button>
-                  ))}
-                </div>
+                  );
+                })}
               </div>
             </Card>
           </div>
         )}
       </div>
 
-      {/* ── Bottom Section (Suggestions & Input) ── */}
-      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "32px", display: "flex", flexDirection: "column", alignItems: "center", gap: "24px", zIndex: 10, background: "linear-gradient(0deg, rgba(248,250,252,1) 30%, rgba(248,250,252,0) 100%)" }}>
+      {/*  Bottom Input & Help  */}
+      <div className="absolute bottom-8 left-0 right-0 flex flex-col items-center gap-6 z-20 w-full px-6">
         
-        {/* Quick Actions (only show if no results) */}
+        {/* Quick Actions Carousel */}
         {!results && orbState === "idle" && (
-          <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", justifyContent: "center", maxWidth: "800px" }}>
-            {QUICK_ACTIONS.map((a, i) => (
-              <button key={i} onClick={() => { setTranscript(a.label); handleProcessQuery(a.label); }} style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 16px", borderRadius: "20px", background: "white", border: "1px solid #e2e8f0", color: "#334155", fontSize: "13px", fontWeight: 600, cursor: "pointer", boxShadow: "0 2px 8px rgba(0,0,0,0.02)", transition: "all 0.2s" }} onMouseEnter={e => e.currentTarget.style.background = "#f8fafc"} onMouseLeave={e => e.currentTarget.style.background = "white"}>
-                <a.icon style={{ width: 14, height: 14, color: a.color }} />
-                {a.label}
+          <div className="flex gap-4 flex-wrap justify-center animate-in fade-in slide-in-from-bottom-4 max-w-4xl mx-auto">
+            {QUICK_ACTIONS.map((action, i) => (
+              <button 
+                key={i}
+                onClick={() => setQueryInput(action.label)}
+                className="flex items-center gap-2.5 px-5 py-3 bg-white/60 backdrop-blur-2xl rounded-full border border-white/60 text-sm font-bold text-slate-600 cursor-pointer shadow-xl shadow-slate-200/40 hover:bg-white hover:scale-105 transition-all"
+              >
+                <action.icon className="w-4 h-4" style={{ color: action.color }} />
+                {action.label}
               </button>
             ))}
           </div>
         )}
 
-        {/* Text Input Fallback */}
-        <form onSubmit={handleTextSubmit} style={{ width: "100%", maxWidth: "600px", position: "relative" }}>
-          <div style={{ position: "absolute", left: "16px", top: "50%", transform: "translateY(-50%)", display: "flex", alignItems: "center" }}>
-            <Search style={{ width: 18, height: 18, color: "#94a3b8" }} />
+        <form onSubmit={handleTextSubmit} className="relative w-full max-w-2xl mx-auto">
+          <div className="relative shadow-2xl shadow-slate-300/30 rounded-[2rem]">
+            <Terminal className="absolute left-6 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-400" />
+            <input 
+              type="text" 
+              placeholder="Or type your command here..."
+              value={queryInput}
+              onChange={e => setQueryInput(e.target.value)}
+              className="w-full h-16 pl-16 pr-20 bg-white/70 backdrop-blur-3xl border border-white/60 rounded-[2rem] text-base font-bold text-slate-800 outline-none focus:ring-4 focus:ring-violet-500/20 focus:border-violet-300 transition-all placeholder:text-slate-400 placeholder:font-semibold shadow-inner"
+            />
+            <button 
+              type="submit"
+              disabled={!queryInput.trim()}
+              className={`absolute right-3 top-2.5 w-11 h-11 rounded-[1.25rem] flex items-center justify-center transition-all ${
+                queryInput.trim() 
+                  ? "bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-lg shadow-violet-500/30 hover:scale-105 cursor-pointer" 
+                  : "bg-slate-100 text-slate-300 cursor-default"
+              }`}
+            >
+              <Command className="w-4 h-4" />
+            </button>
           </div>
-          <input 
-            value={queryInput} onChange={e => setQueryInput(e.target.value)} 
-            placeholder="Type your command..." 
-            style={{ width: "100%", height: "56px", padding: "0 56px", borderRadius: "28px", background: "white", border: "1px solid #e2e8f0", color: "#0f172a", fontSize: "15px", outline: "none", boxShadow: "0 4px 12px rgba(0,0,0,0.03)", transition: "all 0.2s" }} 
-            onFocus={e => e.target.style.borderColor = "#a855f7"} onBlur={e => e.target.style.borderColor = "#e2e8f0"}
-          />
-          <button type="button" onClick={toggleVoice} style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", width: "36px", height: "36px", borderRadius: "18px", background: orbState === "listening" ? "#ef4444" : "#f1f5f9", border: "none", color: "white", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "all 0.2s" }}>
-            <Mic style={{ width: 16, height: 16, color: orbState === "listening" ? "white" : "#64748b" }} className={orbState === "listening" ? "animate-pulse" : ""} />
-          </button>
         </form>
       </div>
 

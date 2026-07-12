@@ -43,7 +43,7 @@ function Settings() {
   return (
     <div className="flex flex-col h-[calc(100vh-6rem)] bg-background">
       <div className="px-8 py-5 border-b border-border/50 shrink-0 bg-card">
-        <h1 className="text-xl font-bold">Settings</h1>
+        <h1 className="text-base font-bold">Settings</h1>
         <p className="text-sm text-muted-foreground mt-1">Manage your account settings and preferences.</p>
       </div>
 
@@ -63,34 +63,34 @@ function Settings() {
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-auto p-8 max-w-3xl">
+        <div className="flex-1 overflow-auto px-8 pt-4 pb-8 max-w-3xl">
           {activeSection === "profile" && (
             <div className="space-y-8 animate-in fade-in">
               <div>
-                <h2 className="text-lg font-bold mb-1">Profile Information</h2>
+                <h2 className="text-base font-bold mb-1">Profile Information</h2>
                 <p className="text-sm text-muted-foreground">Update your personal details and public profile.</p>
               </div>
 
               <div className="space-y-4">
                 <div className="flex gap-4">
                   <div className="flex-1 space-y-2">
-                    <Label className="text-xs uppercase font-bold text-muted-foreground">First Name</Label>
+                    <Label className="text-sm uppercase font-bold text-muted-foreground">First Name</Label>
                     <Input className="h-9 shadow-none rounded-sm border-border bg-card" defaultValue="Anita" />
                   </div>
                   <div className="flex-1 space-y-2">
-                    <Label className="text-xs uppercase font-bold text-muted-foreground">Last Name</Label>
+                    <Label className="text-sm uppercase font-bold text-muted-foreground">Last Name</Label>
                     <Input className="h-9 shadow-none rounded-sm border-border bg-card" defaultValue="Kumar" />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-xs uppercase font-bold text-muted-foreground">Email Address</Label>
+                  <Label className="text-sm uppercase font-bold text-muted-foreground">Email Address</Label>
                   <Input className="h-9 shadow-none rounded-sm border-border bg-card" defaultValue={user?.email || "anita.kumar@gov.in"} disabled />
-                  <p className="text-[10px] text-muted-foreground">To change your email address, please contact IT support.</p>
+                  <p className="text-sm text-muted-foreground">To change your email address, please contact IT support.</p>
                 </div>
                 
                 <div className="space-y-2">
-                  <Label className="text-xs uppercase font-bold text-muted-foreground">Department</Label>
+                  <Label className="text-sm uppercase font-bold text-muted-foreground">Department</Label>
                   <Select defaultValue="municipal">
                     <SelectTrigger className="h-9 shadow-none rounded-sm border-border bg-card"><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -103,7 +103,7 @@ function Settings() {
               </div>
 
               <div className="pt-4 border-t border-border/50">
-                 <Button onClick={handleSave} disabled={saving} className="h-8 rounded-sm text-xs shadow-none">
+                 <Button onClick={handleSave} disabled={saving} className="h-8 rounded-sm text-sm shadow-none">
                    {saving ? "Saving..." : <><Save className="h-3.5 w-3.5 mr-2" /> Save Changes</>}
                  </Button>
               </div>
@@ -113,12 +113,12 @@ function Settings() {
           {activeSection === "appearance" && (
             <div className="space-y-8 animate-in fade-in">
               <div>
-                <h2 className="text-lg font-bold mb-1">Appearance</h2>
+                <h2 className="text-base font-bold mb-1">Appearance</h2>
                 <p className="text-sm text-muted-foreground">Customize how the application looks on your device.</p>
               </div>
 
               <div className="space-y-4">
-                <Label className="text-xs uppercase font-bold text-muted-foreground">Theme Preference</Label>
+                <Label className="text-sm uppercase font-bold text-muted-foreground">Theme Preference</Label>
                 <div className="grid grid-cols-3 gap-4">
                   <button onClick={() => setTheme("light")} className={`flex flex-col items-center gap-3 p-4 border rounded-sm transition-colors ${theme === 'light' ? 'border-primary bg-primary/5' : 'border-border bg-card hover:bg-muted/50'}`}>
                      <Sun className={`h-6 w-6 ${theme === 'light' ? 'text-primary' : 'text-muted-foreground'}`} />
@@ -136,11 +136,11 @@ function Settings() {
               </div>
 
               <div className="space-y-4 pt-4 border-t border-border/50">
-                <Label className="text-xs uppercase font-bold text-muted-foreground">Density</Label>
+                <Label className="text-sm uppercase font-bold text-muted-foreground">Density</Label>
                 <div className="flex items-center justify-between p-3 border border-border/50 rounded-sm bg-card">
                   <div>
                     <p className="text-sm font-medium">Compact Mode</p>
-                    <p className="text-xs text-muted-foreground">Reduce padding and margin to show more data.</p>
+                    <p className="text-sm text-muted-foreground">Reduce padding and margin to show more data.</p>
                   </div>
                   <Switch defaultChecked />
                 </div>
@@ -151,7 +151,7 @@ function Settings() {
           {activeSection === "notifications" && (
             <div className="space-y-8 animate-in fade-in">
               <div>
-                <h2 className="text-lg font-bold mb-1">Notification Preferences</h2>
+                <h2 className="text-base font-bold mb-1">Notification Preferences</h2>
                 <p className="text-sm text-muted-foreground">Control what alerts you receive and where.</p>
               </div>
 
@@ -159,21 +159,21 @@ function Settings() {
                 <div className="flex items-center justify-between p-3 border border-border/50 rounded-sm bg-card">
                   <div>
                     <p className="text-sm font-medium">High Priority Grievances</p>
-                    <p className="text-xs text-muted-foreground">Receive immediate push notifications.</p>
+                    <p className="text-sm text-muted-foreground">Receive immediate push notifications.</p>
                   </div>
                   <Switch defaultChecked />
                 </div>
                 <div className="flex items-center justify-between p-3 border border-border/50 rounded-sm bg-card">
                   <div>
                     <p className="text-sm font-medium">Daily Summary Email</p>
-                    <p className="text-xs text-muted-foreground">A roll-up of activity sent at 8:00 AM.</p>
+                    <p className="text-sm text-muted-foreground">A roll-up of activity sent at 8:00 AM.</p>
                   </div>
                   <Switch defaultChecked />
                 </div>
                 <div className="flex items-center justify-between p-3 border border-border/50 rounded-sm bg-card">
                   <div>
                     <p className="text-sm font-medium">New System Broadcasts</p>
-                    <p className="text-xs text-muted-foreground">Announcements from the admin team.</p>
+                    <p className="text-sm text-muted-foreground">Announcements from the admin team.</p>
                   </div>
                   <Switch defaultChecked />
                 </div>

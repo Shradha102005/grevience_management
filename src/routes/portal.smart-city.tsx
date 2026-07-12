@@ -22,7 +22,7 @@ export const Route = createFileRoute("/portal/smart-city")({
 
 const API_BASE = "http://localhost:8000";
 
-// ── Types ──────────────────────────────────────────────────────────────────────
+//  Types 
 interface WeatherDay { date: string; day: string; weather: string; description: string; high: number; low: number; humidity: number; wind_speed: number; rain_chance: number; icon: string; }
 interface AQI { aqi: number; category: string; pm25: number; }
 interface WeatherData { city: string; current: { temp: number; feels_like: number; humidity: number; wind_speed: number; weather: string; description: string; icon: string; }; forecast: WeatherDay[]; aqi: AQI; advisory: string; }
@@ -34,7 +34,7 @@ interface CityEvent { id: string; city: string; title: string; description: stri
 interface ChatMessage { role: "user" | "assistant"; content: string; }
 interface UserInfo { role: string; city?: string; name?: string; }
 
-// ── Helpers ────────────────────────────────────────────────────────────────────
+//  Helpers 
 const trafficColor = (v: number) => v > 75 ? "#f43f5e" : v > 50 ? "#fbbf24" : "#34d399";
 const aqiColor = (aqi: number) => aqi <= 50 ? "#34d399" : aqi <= 100 ? "#a3e635" : aqi <= 200 ? "#fbbf24" : aqi <= 300 ? "#fb923c" : "#f43f5e";
 const parkingColor = (pct: number) => pct > 80 ? "#f43f5e" : pct > 60 ? "#fbbf24" : "#34d399";
@@ -65,7 +65,7 @@ const LANGUAGES = [
 
 const TABS = ["Overview", "Traffic", "Transport", "Nearby", "Parking", "Weather", "Events"];
 
-// ── City Selector Modal ────────────────────────────────────────────────────────
+//  City Selector Modal 
 function CitySelectorModal({ onSelect, lockedCity }: { onSelect: (city: string) => void; lockedCity?: string }) {
   const [search, setSearch] = useState("");
   const filtered = POPULAR_CITIES.filter(c => c.toLowerCase().includes(search.toLowerCase()));
@@ -74,12 +74,12 @@ function CitySelectorModal({ onSelect, lockedCity }: { onSelect: (city: string) 
     // Officers: show locked city notice
     return (
       <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(8px)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <div style={{ background: "var(--color-card)", borderRadius: "20px", border: "1px solid rgba(139,92,246,0.2)", padding: "40px", maxWidth: "420px", width: "90%", textAlign: "center" }}>
+        <div style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(24px)", borderRadius: "16px", boxShadow: "0 20px 25px -5px rgba(226, 232, 240, 0.4)", border: "1px solid rgba(255,255,255,0.6)", padding: "40px", maxWidth: "420px", width: "90%", textAlign: "center" }}>
           <div style={{ width: "56px", height: "56px", borderRadius: "16px", background: "linear-gradient(135deg,#8b5cf6,#06b6d4)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
             <Shield style={{ width: 26, height: 26, color: "white" }} />
           </div>
-          <h2 style={{ fontSize: "20px", fontWeight: 800, color: "var(--color-foreground)", marginBottom: "10px" }}>City Assigned</h2>
-          <p style={{ fontSize: "13px", color: "var(--color-muted-foreground)", marginBottom: "24px" }}>
+          <h2 style={{ fontSize: "14px", fontWeight: 800, color: "var(--color-foreground)", marginBottom: "10px" }}>City Assigned</h2>
+          <p style={{ fontSize: "14px", color: "var(--color-muted-foreground)", marginBottom: "24px" }}>
             As a government officer, your portal is locked to <strong style={{ color: "#a78bfa" }}>{lockedCity}</strong>.
           </p>
           <button onClick={() => onSelect(lockedCity)}
@@ -93,15 +93,15 @@ function CitySelectorModal({ onSelect, lockedCity }: { onSelect: (city: string) 
 
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)", backdropFilter: "blur(10px)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
-      <div style={{ background: "var(--color-card)", borderRadius: "24px", border: "1px solid rgba(139,92,246,0.2)", padding: "36px", maxWidth: "520px", width: "100%", boxShadow: "0 40px 100px rgba(0,0,0,0.4)" }}>
+      <div style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(24px)", borderRadius: "16px", boxShadow: "0 20px 25px -5px rgba(226, 232, 240, 0.4)", border: "1px solid rgba(255,255,255,0.6)", padding: "36px", maxWidth: "520px", width: "100%", boxShadow: "0 40px 100px rgba(0,0,0,0.4)" }}>
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", gap: "14px", marginBottom: "28px" }}>
           <div style={{ width: "48px", height: "48px", borderRadius: "14px", background: "linear-gradient(135deg,#8b5cf6,#06b6d4)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
             <Globe style={{ width: 22, height: 22, color: "white" }} />
           </div>
           <div>
-            <h2 style={{ fontSize: "20px", fontWeight: 800, color: "var(--color-foreground)", margin: 0 }}>Choose Your City</h2>
-            <p style={{ fontSize: "12px", color: "var(--color-muted-foreground)", margin: 0 }}>Nation-wide smart city portal — pick any Indian city</p>
+            <h2 style={{ fontSize: "14px", fontWeight: 800, color: "var(--color-foreground)", margin: 0 }}>Choose Your City</h2>
+            <p style={{ fontSize: "14px", color: "var(--color-muted-foreground)", margin: 0 }}>Nation-wide smart city portal — pick any Indian city</p>
           </div>
         </div>
 
@@ -121,17 +121,17 @@ function CitySelectorModal({ onSelect, lockedCity }: { onSelect: (city: string) 
         {/* Custom city hint */}
         {search.trim() && !POPULAR_CITIES.find(c => c.toLowerCase() === search.toLowerCase()) && (
           <button onClick={() => onSelect(search.trim())}
-            style={{ width: "100%", padding: "10px 14px", marginBottom: "12px", borderRadius: "10px", border: "1px dashed rgba(139,92,246,0.4)", background: "rgba(139,92,246,0.05)", color: "#a78bfa", fontSize: "13px", fontWeight: 600, cursor: "pointer", textAlign: "left" }}>
+            style={{ width: "100%", padding: "10px 14px", marginBottom: "12px", borderRadius: "10px", border: "1px dashed rgba(139,92,246,0.4)", background: "rgba(139,92,246,0.05)", color: "#a78bfa", fontSize: "14px", fontWeight: 600, cursor: "pointer", textAlign: "left" }}>
             Use "{search.trim()}" →
           </button>
         )}
 
         {/* Popular cities grid */}
-        <p style={{ fontSize: "11px", fontWeight: 700, color: "var(--color-muted-foreground)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "12px" }}>Popular Cities</p>
+        <p style={{ fontSize: "14px", fontWeight: 700, color: "var(--color-muted-foreground)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "12px" }}>Popular Cities</p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "8px", maxHeight: "260px", overflowY: "auto" }}>
           {filtered.map(city => (
             <button key={city} onClick={() => onSelect(city)}
-              style={{ padding: "10px 12px", borderRadius: "10px", border: "1px solid rgba(139,92,246,0.12)", background: "var(--color-background)", color: "var(--color-foreground)", fontSize: "13px", fontWeight: 600, cursor: "pointer", textAlign: "left", transition: "all 0.15s", display: "flex", alignItems: "center", gap: "8px" }}>
+              style={{ padding: "10px 12px", borderRadius: "10px", border: "1px solid rgba(139,92,246,0.12)", background: "var(--color-background)", color: "var(--color-foreground)", fontSize: "14px", fontWeight: 600, cursor: "pointer", textAlign: "left", transition: "all 0.15s", display: "flex", alignItems: "center", gap: "8px" }}>
               <MapPin style={{ width: 12, height: 12, color: "#a78bfa", flexShrink: 0 }} />
               {city}
             </button>
@@ -142,7 +142,7 @@ function CitySelectorModal({ onSelect, lockedCity }: { onSelect: (city: string) 
   );
 }
 
-// ── AI Chat Panel ──────────────────────────────────────────────────────────────
+//  AI Chat Panel 
 function AIChatPanel({ city, userRole, onClose }: { city: string; userRole: string; onClose: () => void }) {
   const [messages, setMessages] = useState<ChatMessage[]>([
     { role: "assistant", content: `Hi! I'm your Smart City assistant for **${city}**. Ask me about traffic, transport, weather, nearby services, or any city-related query! 🏙️` }
@@ -186,14 +186,14 @@ function AIChatPanel({ city, userRole, onClose }: { city: string; userRole: stri
               <Bot style={{ width: 16, height: 16, color: "white" }} />
             </div>
             <div>
-              <p style={{ fontSize: "13px", fontWeight: 800, color: "var(--color-foreground)", margin: 0 }}>City AI Assistant</p>
-              <p style={{ fontSize: "10px", color: "#a78bfa", margin: 0 }}>{city} · {LANGUAGES.find(l => l.code === language)?.label}</p>
+              <p style={{ fontSize: "14px", fontWeight: 800, color: "var(--color-foreground)", margin: 0 }}>City AI Assistant</p>
+              <p style={{ fontSize: "14px", color: "#a78bfa", margin: 0 }}>{city} · {LANGUAGES.find(l => l.code === language)?.label}</p>
             </div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             {/* Language selector */}
             <select value={language} onChange={e => setLanguage(e.target.value)}
-              style={{ fontSize: "11px", borderRadius: "8px", border: "1px solid rgba(139,92,246,0.2)", background: "rgba(139,92,246,0.08)", color: "var(--color-foreground)", padding: "4px 8px", cursor: "pointer", outline: "none" }}>
+              style={{ fontSize: "14px", borderRadius: "8px", border: "1px solid rgba(139,92,246,0.2)", background: "rgba(139,92,246,0.08)", color: "var(--color-foreground)", padding: "4px 8px", cursor: "pointer", outline: "none" }}>
               {LANGUAGES.map(l => <option key={l.code} value={l.code}>{l.flag} {l.label}</option>)}
             </select>
             <button onClick={onClose} style={{ width: "28px", height: "28px", borderRadius: "8px", border: "1px solid rgba(139,92,246,0.15)", background: "rgba(139,92,246,0.06)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -211,14 +211,14 @@ function AIChatPanel({ city, userRole, onClose }: { city: string; userRole: stri
                 background: m.role === "user" ? "linear-gradient(135deg,#8b5cf6,#7c3aed)" : "var(--color-card)",
                 border: m.role === "user" ? "none" : "1px solid rgba(139,92,246,0.1)",
                 color: m.role === "user" ? "white" : "var(--color-foreground)",
-                fontSize: "13px", lineHeight: 1.5, whiteSpace: "pre-wrap",
+                fontSize: "14px", lineHeight: 1.5, whiteSpace: "pre-wrap",
               }}>
                 {m.content.replace(/\*\*(.*?)\*\*/g, "$1")}
               </div>
             </div>
           ))}
           {loading && (
-            <div style={{ display: "flex", gap: "4px", padding: "10px 13px", background: "var(--color-card)", borderRadius: "14px 14px 14px 4px", border: "1px solid rgba(139,92,246,0.1)", width: "fit-content" }}>
+            <div style={{ display: "flex", gap: "4px", padding: "10px 13px", background: "rgba(255,255,255,0.6)", backdropFilter: "blur(24px)", borderRadius: "16px", boxShadow: "0 20px 25px -5px rgba(226, 232, 240, 0.4)", border: "1px solid rgba(255,255,255,0.6)", width: "fit-content" }}>
               {[0,1,2].map(i => <div key={i} style={{ width: 6, height: 6, borderRadius: "50%", background: "#a78bfa", animation: `bounce 0.8s ${i * 0.15}s infinite` }} />)}
             </div>
           )}
@@ -229,7 +229,7 @@ function AIChatPanel({ city, userRole, onClose }: { city: string; userRole: stri
         <div style={{ padding: "8px 12px", display: "flex", gap: "6px", flexWrap: "wrap", flexShrink: 0, borderTop: "1px solid rgba(139,92,246,0.06)" }}>
           {quickReplies.map(qr => (
             <button key={qr} onClick={() => sendMessage(qr)}
-              style={{ fontSize: "11px", padding: "5px 10px", borderRadius: "20px", border: "1px solid rgba(139,92,246,0.2)", background: "rgba(139,92,246,0.06)", color: "#a78bfa", cursor: "pointer", fontWeight: 600 }}>
+              style={{ fontSize: "14px", padding: "5px 10px", borderRadius: "20px", border: "1px solid rgba(139,92,246,0.2)", background: "rgba(139,92,246,0.06)", color: "#a78bfa", cursor: "pointer", fontWeight: 600 }}>
               {qr}
             </button>
           ))}
@@ -241,7 +241,7 @@ function AIChatPanel({ city, userRole, onClose }: { city: string; userRole: stri
             value={input} onChange={e => setInput(e.target.value)}
             onKeyDown={e => e.key === "Enter" && !e.shiftKey && sendMessage()}
             placeholder="Ask about traffic, weather, services..."
-            style={{ flex: 1, padding: "10px 14px", borderRadius: "12px", border: "1px solid rgba(139,92,246,0.2)", background: "rgba(139,92,246,0.04)", color: "var(--color-foreground)", fontSize: "13px", outline: "none" }}
+            style={{ flex: 1, padding: "10px 14px", borderRadius: "12px", border: "1px solid rgba(139,92,246,0.2)", background: "rgba(139,92,246,0.04)", color: "var(--color-foreground)", fontSize: "14px", outline: "none" }}
           />
           <button onClick={() => sendMessage()} disabled={loading || !input.trim()}
             style={{ width: "40px", height: "40px", borderRadius: "12px", background: input.trim() ? "linear-gradient(135deg,#8b5cf6,#06b6d4)" : "rgba(139,92,246,0.1)", border: "none", cursor: input.trim() ? "pointer" : "default", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
@@ -253,7 +253,7 @@ function AIChatPanel({ city, userRole, onClose }: { city: string; userRole: stri
   );
 }
 
-// ── Main Component ─────────────────────────────────────────────────────────────
+//  Main Component 
 function SmartCity() {
   // City state
   const [city, setCity] = useState<string | null>(null);
@@ -361,7 +361,7 @@ function SmartCity() {
     return () => clearInterval(id);
   }, [city, activeTab, fetchData]);
 
-  // ── Render helpers ───────────────────────────────────────────────────────────
+  //  Render helpers 
 
   const isOfficer = userInfo.role === "officer";
   const isAdmin = userInfo.role === "admin";
@@ -377,7 +377,7 @@ function SmartCity() {
     );
   }
 
-  // ── Tab content renderers ────────────────────────────────────────────────────
+  //  Tab content renderers 
 
   const renderOverview = () => (
     <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
@@ -391,15 +391,15 @@ function SmartCity() {
           { label: "Wind", value: weather?.current.wind_speed ? `${weather.current.wind_speed} km/h` : "—", icon: Radio, color: "#34d399", sub: "Wind speed" },
           { label: "Transport", value: transport ? `${transport.modes.filter(m => m.status === "ok").length}/${transport.modes.length}` : "—", icon: Bus, color: "#a78bfa", sub: "Modes on time" },
         ].map(({ label, value, icon: Icon, color, sub }) => (
-          <div key={label} style={{ background: "var(--color-card)", borderRadius: "14px", border: "1px solid rgba(139,92,246,0.08)", padding: "16px", display: "flex", flexDirection: "column", gap: "8px" }}>
+          <div key={label} style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(24px)", borderRadius: "16px", boxShadow: "0 20px 25px -5px rgba(226, 232, 240, 0.4)", border: "1px solid rgba(255,255,255,0.6)", padding: "16px", display: "flex", flexDirection: "column", gap: "8px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <div style={{ width: "32px", height: "32px", borderRadius: "9px", background: `${color}18`, border: `1px solid ${color}30`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                 <Icon style={{ width: 15, height: 15, color }} />
               </div>
-              <p style={{ fontSize: "10px", fontWeight: 700, color: "var(--color-muted-foreground)", textTransform: "uppercase", letterSpacing: "0.06em", margin: 0 }}>{label}</p>
+              <p style={{ fontSize: "14px", fontWeight: 700, color: "var(--color-muted-foreground)", textTransform: "uppercase", letterSpacing: "0.06em", margin: 0 }}>{label}</p>
             </div>
-            <p style={{ fontSize: "22px", fontWeight: 800, color: "var(--color-foreground)", margin: 0 }}>{value}</p>
-            <p style={{ fontSize: "11px", color: "var(--color-muted-foreground)", margin: 0 }}>{sub}</p>
+            <p style={{ fontSize: "24px", fontWeight: 800, color: "var(--color-foreground)", margin: 0 }}>{value}</p>
+            <p style={{ fontSize: "14px", color: "var(--color-muted-foreground)", margin: 0 }}>{sub}</p>
           </div>
         ))}
       </div>
@@ -407,17 +407,17 @@ function SmartCity() {
       {/* Traffic mini chart + Weather advisory */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: "14px" }}>
         {/* Traffic chart */}
-        <div style={{ background: "var(--color-card)", borderRadius: "16px", border: "1px solid rgba(139,92,246,0.1)", padding: "18px 20px" }}>
+        <div style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(24px)", borderRadius: "16px", boxShadow: "0 20px 25px -5px rgba(226, 232, 240, 0.4)", border: "1px solid rgba(255,255,255,0.6)", padding: "18px 20px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "14px" }}>
             <TrafficCone style={{ width: 15, height: 15, color: "#a78bfa" }} />
-            <p style={{ fontSize: "13px", fontWeight: 700, color: "var(--color-foreground)", margin: 0 }}>Traffic Congestion — {city}</p>
+            <p style={{ fontSize: "14px", fontWeight: 700, color: "var(--color-foreground)", margin: 0 }}>Traffic Congestion — {city}</p>
           </div>
-          <div style={{ height: "160px" }}>
+          <div style={{ height: "260px" }}>
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={traffic?.zones ?? []} layout="vertical" margin={{ top: 0, right: 12, left: -10, bottom: 0 }}>
+              <BarChart data={traffic?.zones ?? []} layout="vertical" margin={{ top: 0, right: 12, left: 0, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(139,92,246,0.07)" horizontal={false} />
                 <XAxis type="number" domain={[0,100]} tick={{ fill: "var(--color-muted-foreground)", fontSize: 10 }} tickLine={false} axisLine={false} />
-                <YAxis dataKey="zone" type="category" tick={{ fill: "var(--color-muted-foreground)", fontSize: 10 }} tickLine={false} axisLine={false} width={110} />
+                <YAxis dataKey="zone" type="category" tick={{ fill: "var(--color-muted-foreground)", fontSize: 10 }} tickLine={false} axisLine={false} width={125} />
                 <Bar dataKey="index" radius={[0,6,6,0]} animationDuration={600}>
                   {(traffic?.zones ?? []).map((e, i) => <Cell key={i} fill={trafficColor(e.index)} />)}
                 </Bar>
@@ -430,7 +430,7 @@ function SmartCity() {
         <div style={{ background: "linear-gradient(135deg, rgba(139,92,246,0.12), rgba(6,182,212,0.08))", borderRadius: "16px", border: "1px solid rgba(139,92,246,0.15)", padding: "18px 20px", display: "flex", flexDirection: "column", gap: "12px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <Thermometer style={{ width: 15, height: 15, color: "#fbbf24" }} />
-            <p style={{ fontSize: "13px", fontWeight: 700, color: "var(--color-foreground)", margin: 0 }}>Weather — {city}</p>
+            <p style={{ fontSize: "14px", fontWeight: 700, color: "var(--color-foreground)", margin: 0 }}>Weather — {city}</p>
           </div>
           {weather ? (
             <>
@@ -438,37 +438,37 @@ function SmartCity() {
                 <p style={{ fontSize: "48px", margin: 0 }}>{weather.current.icon}</p>
                 <div>
                   <p style={{ fontSize: "32px", fontWeight: 800, color: "var(--color-foreground)", margin: 0 }}>{weather.current.temp}°C</p>
-                  <p style={{ fontSize: "12px", color: "var(--color-muted-foreground)", margin: 0 }}>{weather.current.description}</p>
+                  <p style={{ fontSize: "14px", color: "var(--color-muted-foreground)", margin: 0 }}>{weather.current.description}</p>
                 </div>
               </div>
               <div style={{ display: "flex", gap: "10px" }}>
                 {weather.forecast.slice(0,3).map(d => (
                   <div key={d.date} style={{ flex: 1, background: "rgba(139,92,246,0.06)", borderRadius: "10px", padding: "8px", textAlign: "center" }}>
-                    <p style={{ fontSize: "10px", fontWeight: 700, color: "var(--color-muted-foreground)", margin: "0 0 4px" }}>{d.day}</p>
-                    <p style={{ fontSize: "16px", margin: "0 0 4px" }}>{d.icon}</p>
-                    <p style={{ fontSize: "12px", fontWeight: 700, color: "var(--color-foreground)", margin: 0 }}>{d.high}°</p>
+                    <p style={{ fontSize: "14px", fontWeight: 700, color: "var(--color-muted-foreground)", margin: "0 0 4px" }}>{d.day}</p>
+                    <p style={{ fontSize: "14px", margin: "0 0 4px" }}>{d.icon}</p>
+                    <p style={{ fontSize: "14px", fontWeight: 700, color: "var(--color-foreground)", margin: 0 }}>{d.high}°</p>
                   </div>
                 ))}
               </div>
               {weather.advisory && (
-                <div style={{ padding: "10px 12px", borderRadius: "10px", background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.2)", fontSize: "11px", color: "#fbbf24" }}>
+                <div style={{ padding: "10px 12px", borderRadius: "10px", background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.2)", fontSize: "14px", color: "#fbbf24" }}>
                   {weather.advisory}
                 </div>
               )}
             </>
           ) : (
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "120px", color: "var(--color-muted-foreground)", fontSize: "12px" }}>Loading weather...</div>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "120px", color: "var(--color-muted-foreground)", fontSize: "14px" }}>Loading weather...</div>
           )}
         </div>
       </div>
 
       {/* Utility status from NOC */}
       {telemetry?.services && (
-        <div style={{ background: "var(--color-card)", borderRadius: "16px", border: "1px solid rgba(139,92,246,0.1)", padding: "18px 20px" }}>
+        <div style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(24px)", borderRadius: "16px", boxShadow: "0 20px 25px -5px rgba(226, 232, 240, 0.4)", border: "1px solid rgba(255,255,255,0.6)", padding: "18px 20px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "14px" }}>
             <Zap style={{ width: 15, height: 15, color: "#a78bfa" }} />
-            <p style={{ fontSize: "13px", fontWeight: 700, color: "var(--color-foreground)", margin: 0 }}>Utility Services — Live</p>
-            {isAdmin && <span style={{ fontSize: "10px", padding: "2px 8px", borderRadius: "20px", background: "rgba(139,92,246,0.1)", color: "#a78bfa", border: "1px solid rgba(139,92,246,0.2)", marginLeft: "auto" }}>Admin: Override via Settings</span>}
+            <p style={{ fontSize: "14px", fontWeight: 700, color: "var(--color-foreground)", margin: 0 }}>Utility Services — Live</p>
+            {isAdmin && <span style={{ fontSize: "14px", padding: "2px 8px", borderRadius: "20px", background: "rgba(139,92,246,0.1)", color: "#a78bfa", border: "1px solid rgba(139,92,246,0.2)", marginLeft: "auto" }}>Admin: Override via Settings</span>}
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px,1fr))", gap: "10px" }}>
             {telemetry.services.map((svc: any) => {
@@ -477,12 +477,12 @@ function SmartCity() {
               return (
                 <div key={svc.id} style={{ padding: "12px 14px", borderRadius: "12px", background: `${c}08`, border: `1px solid ${c}25` }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "6px" }}>
-                    <p style={{ fontSize: "11px", fontWeight: 700, color: "var(--color-muted-foreground)", margin: 0, textTransform: "uppercase" }}>{svc.label}</p>
-                    <span style={{ fontSize: "10px", fontWeight: 700, color: c, background: `${c}15`, padding: "2px 7px", borderRadius: "20px" }}>
+                    <p style={{ fontSize: "14px", fontWeight: 700, color: "var(--color-muted-foreground)", margin: 0, textTransform: "uppercase" }}>{svc.label}</p>
+                    <span style={{ fontSize: "14px", fontWeight: 700, color: c, background: `${c}15`, padding: "2px 7px", borderRadius: "20px" }}>
                       {svc.status === "ok" ? "OK" : svc.status === "warn" ? "WARN" : "ALERT"}
                     </span>
                   </div>
-                  <p style={{ fontSize: "12px", color: "var(--color-foreground)", margin: 0, fontWeight: 600 }}>{svc.value}</p>
+                  <p style={{ fontSize: "14px", color: "var(--color-foreground)", margin: 0, fontWeight: 600 }}>{svc.value}</p>
                 </div>
               );
             })}
@@ -495,11 +495,11 @@ function SmartCity() {
   const renderTraffic = () => (
     <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
       {/* Advisories */}
-      <div style={{ background: "var(--color-card)", borderRadius: "16px", border: "1px solid rgba(139,92,246,0.1)", padding: "20px 22px" }}>
+      <div style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(24px)", borderRadius: "16px", boxShadow: "0 20px 25px -5px rgba(226, 232, 240, 0.4)", border: "1px solid rgba(255,255,255,0.6)", padding: "20px 22px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <AlertTriangle style={{ width: 15, height: 15, color: "#fbbf24" }} />
-            <p style={{ fontSize: "13px", fontWeight: 700, color: "var(--color-foreground)", margin: 0 }}>Traffic Advisories — {city}</p>
+            <p style={{ fontSize: "14px", fontWeight: 700, color: "var(--color-foreground)", margin: 0 }}>Traffic Advisories — {city}</p>
           </div>
           {canManage && (
             <button onClick={async () => {
@@ -512,7 +512,7 @@ function SmartCity() {
                 body: JSON.stringify({ city, message: msg, severity: "warn" }),
               });
               fetchData("Traffic");
-            }} style={{ padding: "7px 14px", borderRadius: "10px", border: "1px solid rgba(251,191,36,0.3)", background: "rgba(251,191,36,0.08)", color: "#fbbf24", fontSize: "12px", fontWeight: 700, cursor: "pointer" }}>
+            }} style={{ padding: "7px 14px", borderRadius: "10px", border: "1px solid rgba(251,191,36,0.3)", background: "rgba(251,191,36,0.08)", color: "#fbbf24", fontSize: "14px", fontWeight: 700, cursor: "pointer" }}>
               + Post Advisory
             </button>
           )}
@@ -523,8 +523,8 @@ function SmartCity() {
               <div key={a.id} style={{ padding: "12px 14px", borderRadius: "10px", background: "rgba(251,191,36,0.06)", border: "1px solid rgba(251,191,36,0.15)", display: "flex", gap: "12px", alignItems: "flex-start" }}>
                 <AlertTriangle style={{ width: 14, height: 14, color: "#fbbf24", flexShrink: 0, marginTop: 2 }} />
                 <div style={{ flex: 1 }}>
-                  <p style={{ fontSize: "13px", color: "var(--color-foreground)", margin: "0 0 4px" }}>{a.message}</p>
-                  <p style={{ fontSize: "10px", color: "var(--color-muted-foreground)", margin: 0 }}>Posted by {a.posted_by} · {new Date(a.posted_at).toLocaleTimeString("en-IN")}</p>
+                  <p style={{ fontSize: "14px", color: "var(--color-foreground)", margin: "0 0 4px" }}>{a.message}</p>
+                  <p style={{ fontSize: "14px", color: "var(--color-muted-foreground)", margin: 0 }}>Posted by {a.posted_by} · {new Date(a.posted_at).toLocaleTimeString("en-IN")}</p>
                 </div>
               </div>
             ))}
@@ -532,27 +532,27 @@ function SmartCity() {
         ) : (
           <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "14px", background: "rgba(52,211,153,0.06)", borderRadius: "10px", border: "1px solid rgba(52,211,153,0.15)" }}>
             <CheckCircle2 style={{ width: 14, height: 14, color: "#34d399" }} />
-            <p style={{ fontSize: "12px", color: "#34d399", margin: 0, fontWeight: 600 }}>No active advisories — traffic is flowing normally in {city}</p>
+            <p style={{ fontSize: "14px", color: "#34d399", margin: 0, fontWeight: 600 }}>No active advisories — traffic is flowing normally in {city}</p>
           </div>
         )}
       </div>
 
       {/* Zone congestion full chart */}
-      <div style={{ background: "var(--color-card)", borderRadius: "16px", border: "1px solid rgba(139,92,246,0.1)", padding: "20px 22px" }}>
+      <div style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(24px)", borderRadius: "16px", boxShadow: "0 20px 25px -5px rgba(226, 232, 240, 0.4)", border: "1px solid rgba(255,255,255,0.6)", padding: "20px 22px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
-          <p style={{ fontSize: "13px", fontWeight: 700, color: "var(--color-foreground)", margin: 0 }}>Zone-wise Congestion Index</p>
+          <p style={{ fontSize: "14px", fontWeight: 700, color: "var(--color-foreground)", margin: 0 }}>Zone-wise Congestion Index</p>
           {traffic?.source === "tomtom" ? (
-            <span style={{ fontSize: "10px", padding: "2px 8px", borderRadius: "20px", background: "rgba(52,211,153,0.1)", color: "#34d399", border: "1px solid rgba(52,211,153,0.2)" }}>Real-time (TomTom)</span>
+            <span style={{ fontSize: "14px", padding: "2px 8px", borderRadius: "20px", background: "rgba(52,211,153,0.1)", color: "#34d399", border: "1px solid rgba(52,211,153,0.2)" }}>Real-time (TomTom)</span>
           ) : (
-            <span style={{ fontSize: "10px", padding: "2px 8px", borderRadius: "20px", background: "rgba(139,92,246,0.1)", color: "#a78bfa", border: "1px solid rgba(139,92,246,0.2)" }}>Smart Simulation</span>
+            <span style={{ fontSize: "14px", padding: "2px 8px", borderRadius: "20px", background: "rgba(139,92,246,0.1)", color: "#a78bfa", border: "1px solid rgba(139,92,246,0.2)" }}>Smart Simulation</span>
           )}
         </div>
-        <div style={{ height: "220px" }}>
+        <div style={{ height: "260px" }}>
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={traffic?.zones ?? []} layout="vertical" margin={{ top: 0, right: 12, left: -10, bottom: 0 }}>
+            <BarChart data={traffic?.zones ?? []} layout="vertical" margin={{ top: 0, right: 12, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(139,92,246,0.07)" horizontal={false} />
               <XAxis type="number" domain={[0,100]} tick={{ fill: "var(--color-muted-foreground)", fontSize: 10 }} tickLine={false} axisLine={false} />
-              <YAxis dataKey="zone" type="category" tick={{ fill: "var(--color-muted-foreground)", fontSize: 10 }} tickLine={false} axisLine={false} width={130} />
+              <YAxis dataKey="zone" type="category" tick={{ fill: "var(--color-muted-foreground)", fontSize: 10 }} tickLine={false} axisLine={false} width={125} />
               <Bar dataKey="index" radius={[0,6,6,0]} animationDuration={600}>
                 {(traffic?.zones ?? []).map((e, i) => <Cell key={i} fill={trafficColor(e.index)} />)}
               </Bar>
@@ -561,7 +561,7 @@ function SmartCity() {
         </div>
         <div style={{ display: "flex", gap: "14px", justifyContent: "center", marginTop: "10px" }}>
           {[["#34d399","Low (< 50)"],["#fbbf24","Moderate (50–75)"],["#f43f5e","High (> 75)"]].map(([c,l]) => (
-            <span key={l} style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "10px", color: "var(--color-muted-foreground)" }}>
+            <span key={l} style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "14px", color: "var(--color-muted-foreground)" }}>
               <span style={{ width: 8, height: 8, borderRadius: 2, background: c, display: "block" }} />{l}
             </span>
           ))}
@@ -574,7 +574,7 @@ function SmartCity() {
     <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
       {canManage && (
         <div style={{ padding: "12px 16px", borderRadius: "12px", background: "rgba(139,92,246,0.06)", border: "1px solid rgba(139,92,246,0.15)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <p style={{ fontSize: "12px", color: "#a78bfa", margin: 0, fontWeight: 600 }}>
+          <p style={{ fontSize: "14px", color: "#a78bfa", margin: 0, fontWeight: 600 }}>
             {isAdmin ? "Admin" : "Officer"}: You can post transport delay alerts
           </p>
           <button onClick={async () => {
@@ -588,7 +588,7 @@ function SmartCity() {
               body: JSON.stringify({ city, mode, message: msg, severity: "warn" }),
             });
             fetchData("Transport");
-          }} style={{ padding: "7px 14px", borderRadius: "10px", border: "1px solid rgba(139,92,246,0.3)", background: "rgba(139,92,246,0.1)", color: "#a78bfa", fontSize: "12px", fontWeight: 700, cursor: "pointer" }}>
+          }} style={{ padding: "7px 14px", borderRadius: "10px", border: "1px solid rgba(139,92,246,0.3)", background: "rgba(139,92,246,0.1)", color: "#a78bfa", fontSize: "14px", fontWeight: 700, cursor: "pointer" }}>
             + Post Alert
           </button>
         </div>
@@ -596,9 +596,9 @@ function SmartCity() {
 
       {transport?.alerts && transport.alerts.length > 0 && (
         <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-          <p style={{ fontSize: "11px", fontWeight: 700, color: "#f43f5e", textTransform: "uppercase", letterSpacing: "0.06em", margin: 0 }}>Active Alerts</p>
+          <p style={{ fontSize: "14px", fontWeight: 700, color: "#f43f5e", textTransform: "uppercase", letterSpacing: "0.06em", margin: 0 }}>Active Alerts</p>
           {transport.alerts.map((a: any) => (
-            <div key={a.id} style={{ padding: "10px 14px", borderRadius: "10px", background: "rgba(244,63,94,0.06)", border: "1px solid rgba(244,63,94,0.2)", fontSize: "13px", color: "var(--color-foreground)" }}>
+            <div key={a.id} style={{ padding: "10px 14px", borderRadius: "10px", background: "rgba(244,63,94,0.06)", border: "1px solid rgba(244,63,94,0.2)", fontSize: "14px", color: "var(--color-foreground)" }}>
               <strong style={{ color: "#f43f5e" }}>{a.mode}:</strong> {a.message}
             </div>
           ))}
@@ -610,7 +610,7 @@ function SmartCity() {
           const statusColors: Record<string, string> = { ok: "#34d399", warn: "#fbbf24", alert: "#f43f5e" };
           const c = statusColors[m.status] || "#34d399";
           return (
-            <div key={i} style={{ background: "var(--color-card)", borderRadius: "16px", border: `1px solid ${c}25`, padding: "20px", position: "relative", overflow: "hidden" }}>
+            <div key={i} style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(24px)", borderRadius: "16px", boxShadow: "0 20px 25px -5px rgba(226, 232, 240, 0.4)", border: "1px solid rgba(255,255,255,0.6)", border: `1px solid ${c}25`, padding: "20px", position: "relative", overflow: "hidden" }}>
               <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "3px", background: c, borderRadius: "16px 16px 0 0" }} />
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "12px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
@@ -618,25 +618,25 @@ function SmartCity() {
                     <Bus style={{ width: 16, height: 16, color: c }} />
                   </div>
                   <div>
-                    <p style={{ fontSize: "13px", fontWeight: 700, color: "var(--color-foreground)", margin: 0 }}>{m.mode}</p>
-                    {m.routes && <p style={{ fontSize: "10px", color: "var(--color-muted-foreground)", margin: 0 }}>{m.routes} routes</p>}
+                    <p style={{ fontSize: "14px", fontWeight: 700, color: "var(--color-foreground)", margin: 0 }}>{m.mode}</p>
+                    {m.routes && <p style={{ fontSize: "14px", color: "var(--color-muted-foreground)", margin: 0 }}>{m.routes} routes</p>}
                   </div>
                 </div>
-                <span style={{ fontSize: "10px", fontWeight: 700, padding: "3px 8px", borderRadius: "20px", background: `${c}15`, color: c }}>
+                <span style={{ fontSize: "14px", fontWeight: 700, padding: "3px 8px", borderRadius: "20px", background: `${c}15`, color: c }}>
                   {m.status === "ok" ? "On Schedule" : m.status === "warn" ? "Delayed" : "Alert"}
                 </span>
               </div>
-              <p style={{ fontSize: "11px", color: "var(--color-muted-foreground)", margin: "0 0 8px", lineHeight: 1.5 }}>{m.detail}</p>
-              <p style={{ fontSize: "10px", color: "#a78bfa", fontWeight: 600, margin: 0 }}>Frequency: {m.frequency}</p>
+              <p style={{ fontSize: "14px", color: "var(--color-muted-foreground)", margin: "0 0 8px", lineHeight: 1.5 }}>{m.detail}</p>
+              <p style={{ fontSize: "14px", color: "#a78bfa", fontWeight: 600, margin: 0 }}>Frequency: {m.frequency}</p>
             </div>
           );
         })}
-        {!transport && <div style={{ gridColumn: "1/-1", display: "flex", alignItems: "center", justifyContent: "center", height: "160px", color: "var(--color-muted-foreground)", fontSize: "13px" }}>Loading transport data...</div>}
+        {!transport && <div style={{ gridColumn: "1/-1", display: "flex", alignItems: "center", justifyContent: "center", height: "160px", color: "var(--color-muted-foreground)", fontSize: "14px" }}>Loading transport data...</div>}
       </div>
       {transport?.helpline && (
         <div style={{ padding: "12px 16px", borderRadius: "12px", background: "rgba(96,165,250,0.06)", border: "1px solid rgba(96,165,250,0.15)", display: "flex", alignItems: "center", gap: "10px" }}>
           <Phone style={{ width: 14, height: 14, color: "#60a5fa" }} />
-          <p style={{ fontSize: "12px", color: "var(--color-foreground)", margin: 0 }}>
+          <p style={{ fontSize: "14px", color: "var(--color-foreground)", margin: 0 }}>
             <strong>Transport Helpline:</strong> <span style={{ color: "#60a5fa" }}>{transport.helpline}</span>
           </p>
         </div>
@@ -653,7 +653,7 @@ function SmartCity() {
           const active = nearbyType === t.key;
           return (
             <button key={t.key} onClick={() => setNearbyType(t.key)}
-              style={{ padding: "8px 14px", borderRadius: "20px", border: `1px solid ${active ? t.color : "rgba(139,92,246,0.15)"}`, background: active ? `${t.color}15` : "transparent", color: active ? t.color : "var(--color-muted-foreground)", fontSize: "12px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: "6px", transition: "all 0.15s" }}>
+              style={{ padding: "8px 14px", borderRadius: "20px", border: `1px solid ${active ? t.color : "rgba(139,92,246,0.15)"}`, background: active ? `${t.color}15` : "transparent", color: active ? t.color : "var(--color-muted-foreground)", fontSize: "14px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: "6px", transition: "all 0.15s" }}>
               <Icon style={{ width: 13, height: 13 }} />{t.label}
             </button>
           );
@@ -663,7 +663,7 @@ function SmartCity() {
       {/* Admin add button */}
       {isAdmin && (
         <div style={{ display: "flex", justifyContent: "flex-end" }}>
-          <button style={{ padding: "8px 16px", borderRadius: "10px", border: "1px solid rgba(139,92,246,0.3)", background: "rgba(139,92,246,0.08)", color: "#a78bfa", fontSize: "12px", fontWeight: 700, cursor: "pointer" }}>
+          <button style={{ padding: "8px 16px", borderRadius: "10px", border: "1px solid rgba(139,92,246,0.3)", background: "rgba(139,92,246,0.08)", color: "#a78bfa", fontSize: "14px", fontWeight: 700, cursor: "pointer" }}>
             + Add Location
           </button>
         </div>
@@ -671,11 +671,11 @@ function SmartCity() {
 
       {/* Results */}
       {loading.nearby ? (
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "200px", color: "var(--color-muted-foreground)", fontSize: "13px" }}>Fetching from OpenStreetMap...</div>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "200px", color: "var(--color-muted-foreground)", fontSize: "14px" }}>Fetching from OpenStreetMap...</div>
       ) : nearby.length === 0 ? (
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "200px", gap: "10px", color: "var(--color-muted-foreground)" }}>
           <MapPin style={{ width: 28, height: 28, opacity: 0.3 }} />
-          <p style={{ fontSize: "13px", margin: 0 }}>No {nearbyType} locations found for {city}</p>
+          <p style={{ fontSize: "14px", margin: 0 }}>No {nearbyType} locations found for {city}</p>
         </div>
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px,1fr))", gap: "12px" }}>
@@ -683,27 +683,27 @@ function SmartCity() {
             const typeConfig = NEARBY_TYPES.find(t => t.key === svc.type) || NEARBY_TYPES[0];
             const Icon = typeConfig.icon;
             return (
-              <div key={svc.id} style={{ background: "var(--color-card)", borderRadius: "14px", border: "1px solid rgba(139,92,246,0.08)", padding: "16px", display: "flex", gap: "12px" }}>
+              <div key={svc.id} style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(24px)", borderRadius: "16px", boxShadow: "0 20px 25px -5px rgba(226, 232, 240, 0.4)", border: "1px solid rgba(255,255,255,0.6)", padding: "16px", display: "flex", gap: "12px" }}>
                 <div style={{ width: "38px", height: "38px", borderRadius: "11px", background: `${typeConfig.color}18`, border: `1px solid ${typeConfig.color}30`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                   <Icon style={{ width: 17, height: 17, color: typeConfig.color }} />
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontSize: "13px", fontWeight: 700, color: "var(--color-foreground)", margin: "0 0 4px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{svc.name}</p>
-                  {svc.address && <p style={{ fontSize: "11px", color: "var(--color-muted-foreground)", margin: "0 0 6px" }}>{svc.address}</p>}
+                  <p style={{ fontSize: "14px", fontWeight: 700, color: "var(--color-foreground)", margin: "0 0 4px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{svc.name}</p>
+                  {svc.address && <p style={{ fontSize: "14px", color: "var(--color-muted-foreground)", margin: "0 0 6px" }}>{svc.address}</p>}
                   {svc.phone && (
                     <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
                       <Phone style={{ width: 11, height: 11, color: "#60a5fa" }} />
-                      <p style={{ fontSize: "11px", color: "#60a5fa", margin: 0 }}>{svc.phone}</p>
+                      <p style={{ fontSize: "14px", color: "#60a5fa", margin: 0 }}>{svc.phone}</p>
                     </div>
                   )}
-                  {svc.opening_hours && <p style={{ fontSize: "10px", color: "var(--color-muted-foreground)", margin: "4px 0 0" }}>⏰ {svc.opening_hours}</p>}
+                  {svc.opening_hours && <p style={{ fontSize: "14px", color: "var(--color-muted-foreground)", margin: "4px 0 0" }}>⏰ {svc.opening_hours}</p>}
                 </div>
               </div>
             );
           })}
         </div>
       )}
-      <p style={{ fontSize: "10px", color: "rgba(139,92,246,0.4)", textAlign: "center", margin: 0 }}>Data from OpenStreetMap contributors · Free & open source</p>
+      <p style={{ fontSize: "14px", color: "rgba(139,92,246,0.4)", textAlign: "center", margin: 0 }}>Data from OpenStreetMap contributors · Free & open source</p>
     </div>
   );
 
@@ -712,7 +712,7 @@ function SmartCity() {
       {parkingAsOf && (
         <div style={{ padding: "10px 14px", borderRadius: "10px", background: "rgba(139,92,246,0.06)", border: "1px solid rgba(139,92,246,0.15)", display: "flex", alignItems: "center", gap: "8px" }}>
           <Clock style={{ width: 14, height: 14, color: "#a78bfa" }} />
-          <p style={{ fontSize: "12px", color: "var(--color-foreground)", margin: 0 }}>
+          <p style={{ fontSize: "14px", color: "var(--color-foreground)", margin: 0 }}>
             Live Occupancy Status — Auto-refreshing simulation model (As of <strong>{parkingAsOf}</strong>)
           </p>
         </div>
@@ -721,7 +721,7 @@ function SmartCity() {
         {parking.map(spot => {
           const c = parkingColor(spot.occupancy_pct);
           return (
-            <div key={spot.id} style={{ background: "var(--color-card)", borderRadius: "16px", border: `1px solid ${c}25`, padding: "20px", position: "relative", overflow: "hidden" }}>
+            <div key={spot.id} style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(24px)", borderRadius: "16px", boxShadow: "0 20px 25px -5px rgba(226, 232, 240, 0.4)", border: "1px solid rgba(255,255,255,0.6)", border: `1px solid ${c}25`, padding: "20px", position: "relative", overflow: "hidden" }}>
               <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "3px", background: c, borderRadius: "16px 16px 0 0" }} />
               <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "14px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
@@ -729,30 +729,30 @@ function SmartCity() {
                     <Car style={{ width: 16, height: 16, color: c }} />
                   </div>
                   <div>
-                    <p style={{ fontSize: "13px", fontWeight: 700, color: "var(--color-foreground)", margin: 0 }}>{spot.name}</p>
-                    <p style={{ fontSize: "10px", color: "var(--color-muted-foreground)", margin: 0, textTransform: "capitalize" }}>{spot.parking_type}</p>
+                    <p style={{ fontSize: "14px", fontWeight: 700, color: "var(--color-foreground)", margin: 0 }}>{spot.name}</p>
+                    <p style={{ fontSize: "14px", color: "var(--color-muted-foreground)", margin: 0, textTransform: "capitalize" }}>{spot.parking_type}</p>
                   </div>
                 </div>
-                <span style={{ fontSize: "10px", fontWeight: 700, padding: "3px 8px", borderRadius: "20px", background: `${c}15`, color: c }}>
+                <span style={{ fontSize: "14px", fontWeight: 700, padding: "3px 8px", borderRadius: "20px", background: `${c}15`, color: c }}>
                   {spot.status === "available" ? "Available" : spot.status === "limited" ? "Limited" : "Full"}
                 </span>
               </div>
               {/* Occupancy bar */}
               <div style={{ marginBottom: "10px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
-                  <p style={{ fontSize: "11px", color: "var(--color-muted-foreground)", margin: 0 }}>{spot.available_slots} of {spot.total_slots} available</p>
-                  <p style={{ fontSize: "11px", fontWeight: 700, color: c, margin: 0 }}>{spot.occupancy_pct}% full</p>
+                  <p style={{ fontSize: "14px", color: "var(--color-muted-foreground)", margin: 0 }}>{spot.available_slots} of {spot.total_slots} available</p>
+                  <p style={{ fontSize: "14px", fontWeight: 700, color: c, margin: 0 }}>{spot.occupancy_pct}% full</p>
                 </div>
                 <div style={{ height: "6px", borderRadius: "3px", background: "rgba(139,92,246,0.1)", overflow: "hidden" }}>
                   <div style={{ height: "100%", width: `${spot.occupancy_pct}%`, background: c, borderRadius: "3px", transition: "width 0.8s ease" }} />
                 </div>
               </div>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <p style={{ fontSize: "11px", color: "var(--color-muted-foreground)", margin: 0 }}>{spot.address}</p>
+                <p style={{ fontSize: "14px", color: "var(--color-muted-foreground)", margin: 0 }}>{spot.address}</p>
                 {spot.is_paid && spot.rate_per_hour && (
-                  <p style={{ fontSize: "11px", fontWeight: 700, color: "#a78bfa", margin: 0 }}>₹{spot.rate_per_hour}/hr</p>
+                  <p style={{ fontSize: "14px", fontWeight: 700, color: "#a78bfa", margin: 0 }}>₹{spot.rate_per_hour}/hr</p>
                 )}
-                {!spot.is_paid && <p style={{ fontSize: "11px", fontWeight: 700, color: "#34d399", margin: 0 }}>Free</p>}
+                {!spot.is_paid && <p style={{ fontSize: "14px", fontWeight: 700, color: "#34d399", margin: 0 }}>Free</p>}
               </div>
               {canManage && (
                 <button onClick={async () => {
@@ -765,7 +765,7 @@ function SmartCity() {
                     body: JSON.stringify({ available_slots: Number(val) }),
                   });
                   fetchData("Parking");
-                }} style={{ marginTop: "10px", width: "100%", padding: "7px", borderRadius: "8px", border: "1px solid rgba(139,92,246,0.2)", background: "rgba(139,92,246,0.06)", color: "#a78bfa", fontSize: "11px", fontWeight: 700, cursor: "pointer" }}>
+                }} style={{ marginTop: "10px", width: "100%", padding: "7px", borderRadius: "8px", border: "1px solid rgba(139,92,246,0.2)", background: "rgba(139,92,246,0.06)", color: "#a78bfa", fontSize: "14px", fontWeight: 700, cursor: "pointer" }}>
                   Update Occupancy
                 </button>
               )}
@@ -775,7 +775,7 @@ function SmartCity() {
         {parking.length === 0 && !loading.parking && (
           <div style={{ gridColumn: "1/-1", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "160px", gap: "10px", color: "var(--color-muted-foreground)" }}>
             <Car style={{ width: 28, height: 28, opacity: 0.3 }} />
-            <p style={{ fontSize: "13px", margin: 0 }}>No parking data for {city}</p>
+            <p style={{ fontSize: "14px", margin: 0 }}>No parking data for {city}</p>
           </div>
         )}
       </div>
@@ -790,7 +790,7 @@ function SmartCity() {
           <div style={{ background: "linear-gradient(135deg, rgba(139,92,246,0.15), rgba(6,182,212,0.1))", borderRadius: "20px", border: "1px solid rgba(139,92,246,0.2)", padding: "28px 32px" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "20px" }}>
               <div>
-                <p style={{ fontSize: "11px", fontWeight: 700, color: "#a78bfa", textTransform: "uppercase", letterSpacing: "0.08em", margin: "0 0 8px" }}>{city} — Right Now</p>
+                <p style={{ fontSize: "14px", fontWeight: 700, color: "#a78bfa", textTransform: "uppercase", letterSpacing: "0.08em", margin: "0 0 8px" }}>{city} — Right Now</p>
                 <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
                   <p style={{ fontSize: "72px", margin: 0 }}>{weather.current.icon}</p>
                   <div>
@@ -807,8 +807,8 @@ function SmartCity() {
                 ].map(({ label, value, icon: Icon, color }) => (
                   <div key={label} style={{ textAlign: "center", padding: "14px 18px", borderRadius: "14px", background: "rgba(0,0,0,0.1)", border: "1px solid rgba(255,255,255,0.05)" }}>
                     <Icon style={{ width: 18, height: 18, color, margin: "0 auto 8px" }} />
-                    <p style={{ fontSize: "18px", fontWeight: 800, color: "var(--color-foreground)", margin: "0 0 4px" }}>{value}</p>
-                    <p style={{ fontSize: "10px", color: "var(--color-muted-foreground)", margin: 0 }}>{label}</p>
+                    <p style={{ fontSize: "14px", fontWeight: 800, color: "var(--color-foreground)", margin: "0 0 4px" }}>{value}</p>
+                    <p style={{ fontSize: "14px", color: "var(--color-muted-foreground)", margin: 0 }}>{label}</p>
                   </div>
                 ))}
               </div>
@@ -819,22 +819,22 @@ function SmartCity() {
           {weather.advisory && (
             <div style={{ padding: "14px 18px", borderRadius: "12px", background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.25)", display: "flex", gap: "10px", alignItems: "flex-start" }}>
               <AlertTriangle style={{ width: 15, height: 15, color: "#fbbf24", flexShrink: 0, marginTop: 1 }} />
-              <p style={{ fontSize: "13px", color: "#fbbf24", margin: 0 }}>{weather.advisory}</p>
+              <p style={{ fontSize: "14px", color: "#fbbf24", margin: 0 }}>{weather.advisory}</p>
             </div>
           )}
 
           {/* AQI gauge */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
-            <div style={{ background: "var(--color-card)", borderRadius: "16px", border: "1px solid rgba(139,92,246,0.1)", padding: "20px" }}>
-              <p style={{ fontSize: "12px", fontWeight: 700, color: "var(--color-muted-foreground)", textTransform: "uppercase", letterSpacing: "0.06em", margin: "0 0 16px" }}>Air Quality Index</p>
+            <div style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(24px)", borderRadius: "16px", boxShadow: "0 20px 25px -5px rgba(226, 232, 240, 0.4)", border: "1px solid rgba(255,255,255,0.6)", padding: "20px" }}>
+              <p style={{ fontSize: "14px", fontWeight: 700, color: "var(--color-muted-foreground)", textTransform: "uppercase", letterSpacing: "0.06em", margin: "0 0 16px" }}>Air Quality Index</p>
               <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
                 <div style={{ width: "70px", height: "70px", borderRadius: "50%", border: `4px solid ${aqiColor(weather.aqi.aqi)}`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: `${aqiColor(weather.aqi.aqi)}12` }}>
-                  <p style={{ fontSize: "20px", fontWeight: 800, color: aqiColor(weather.aqi.aqi), margin: 0 }}>{weather.aqi.aqi}</p>
+                  <p style={{ fontSize: "14px", fontWeight: 800, color: aqiColor(weather.aqi.aqi), margin: 0 }}>{weather.aqi.aqi}</p>
                 </div>
                 <div>
-                  <p style={{ fontSize: "16px", fontWeight: 700, color: aqiColor(weather.aqi.aqi), margin: "0 0 4px" }}>{weather.aqi.category}</p>
-                  <p style={{ fontSize: "12px", color: "var(--color-muted-foreground)", margin: 0 }}>PM2.5: {weather.aqi.pm25} µg/m³</p>
-                  <p style={{ fontSize: "10px", color: "var(--color-muted-foreground)", margin: "4px 0 0" }}>
+                  <p style={{ fontSize: "14px", fontWeight: 700, color: aqiColor(weather.aqi.aqi), margin: "0 0 4px" }}>{weather.aqi.category}</p>
+                  <p style={{ fontSize: "14px", color: "var(--color-muted-foreground)", margin: 0 }}>PM2.5: {weather.aqi.pm25} µg/m³</p>
+                  <p style={{ fontSize: "14px", color: "var(--color-muted-foreground)", margin: "4px 0 0" }}>
                     {weather.aqi.aqi <= 100 ? "Air quality is acceptable." : weather.aqi.aqi <= 200 ? "Sensitive groups may be affected." : "Wear a mask outdoors."}
                   </p>
                 </div>
@@ -842,18 +842,18 @@ function SmartCity() {
             </div>
 
             {/* 5-day forecast */}
-            <div style={{ background: "var(--color-card)", borderRadius: "16px", border: "1px solid rgba(139,92,246,0.1)", padding: "20px" }}>
-              <p style={{ fontSize: "12px", fontWeight: 700, color: "var(--color-muted-foreground)", textTransform: "uppercase", letterSpacing: "0.06em", margin: "0 0 14px" }}>5-Day Forecast</p>
+            <div style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(24px)", borderRadius: "16px", boxShadow: "0 20px 25px -5px rgba(226, 232, 240, 0.4)", border: "1px solid rgba(255,255,255,0.6)", padding: "20px" }}>
+              <p style={{ fontSize: "14px", fontWeight: 700, color: "var(--color-muted-foreground)", textTransform: "uppercase", letterSpacing: "0.06em", margin: "0 0 14px" }}>5-Day Forecast</p>
               <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                 {weather.forecast.slice(0,5).map(d => (
                   <div key={d.date} style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                    <p style={{ fontSize: "12px", fontWeight: 600, color: "var(--color-muted-foreground)", margin: 0, width: "36px" }}>{d.day}</p>
-                    <p style={{ fontSize: "18px", margin: 0 }}>{d.icon}</p>
+                    <p style={{ fontSize: "14px", fontWeight: 600, color: "var(--color-muted-foreground)", margin: 0, width: "36px" }}>{d.day}</p>
+                    <p style={{ fontSize: "14px", margin: 0 }}>{d.icon}</p>
                     <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                      <p style={{ fontSize: "12px", color: "#f43f5e", fontWeight: 700, margin: 0 }}>{d.high}°</p>
-                      <p style={{ fontSize: "12px", color: "#60a5fa", fontWeight: 600, margin: 0 }}>{d.low}°</p>
+                      <p style={{ fontSize: "14px", color: "#f43f5e", fontWeight: 700, margin: 0 }}>{d.high}°</p>
+                      <p style={{ fontSize: "14px", color: "#60a5fa", fontWeight: 600, margin: 0 }}>{d.low}°</p>
                     </div>
-                    <p style={{ fontSize: "10px", color: "#60a5fa", margin: 0 }}>{d.rain_chance}% 🌧️</p>
+                    <p style={{ fontSize: "14px", color: "#60a5fa", margin: 0 }}>{d.rain_chance}% 🌧️</p>
                   </div>
                 ))}
               </div>
@@ -861,7 +861,7 @@ function SmartCity() {
           </div>
         </>
       ) : (
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "200px", color: "var(--color-muted-foreground)", fontSize: "13px" }}>Loading weather data for {city}...</div>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "200px", color: "var(--color-muted-foreground)", fontSize: "14px" }}>Loading weather data for {city}...</div>
       )}
     </div>
   );
@@ -892,7 +892,7 @@ function SmartCity() {
               body: JSON.stringify({ city, title, description: desc, category: cat, location: loc, event_date: date ? `${date}T00:00:00` : null }),
             });
             fetchData("Events");
-          }} style={{ padding: "9px 18px", borderRadius: "12px", border: "1px solid rgba(139,92,246,0.3)", background: "rgba(139,92,246,0.1)", color: "#a78bfa", fontSize: "13px", fontWeight: 700, cursor: "pointer" }}>
+          }} style={{ padding: "9px 18px", borderRadius: "12px", border: "1px solid rgba(139,92,246,0.3)", background: "rgba(139,92,246,0.1)", color: "#a78bfa", fontSize: "14px", fontWeight: 700, cursor: "pointer" }}>
             {isAdmin ? "+ Create & Publish Event" : "+ Create Event Draft"}
           </button>
         </div>
@@ -901,39 +901,39 @@ function SmartCity() {
       {events.length === 0 ? (
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "200px", gap: "12px", color: "var(--color-muted-foreground)" }}>
           <Calendar style={{ width: 32, height: 32, opacity: 0.3 }} />
-          <p style={{ fontSize: "13px", margin: 0 }}>No upcoming events in {city}</p>
+          <p style={{ fontSize: "14px", margin: 0 }}>No upcoming events in {city}</p>
         </div>
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px,1fr))", gap: "14px" }}>
           {events.map(ev => {
             const cat = EVENT_CATEGORIES.find(c => c.key === ev.category) || EVENT_CATEGORIES[4];
             return (
-              <div key={ev.id} style={{ background: "var(--color-card)", borderRadius: "16px", border: "1px solid rgba(139,92,246,0.08)", padding: "20px", display: "flex", flexDirection: "column", gap: "12px" }}>
+              <div key={ev.id} style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(24px)", borderRadius: "16px", boxShadow: "0 20px 25px -5px rgba(226, 232, 240, 0.4)", border: "1px solid rgba(255,255,255,0.6)", padding: "20px", display: "flex", flexDirection: "column", gap: "12px" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                  <span style={{ fontSize: "20px" }}>{cat.icon}</span>
+                  <span style={{ fontSize: "14px" }}>{cat.icon}</span>
                   <div style={{ display: "flex", gap: "6px" }}>
-                    <span style={{ fontSize: "10px", fontWeight: 700, padding: "3px 8px", borderRadius: "20px", background: `${cat.color}15`, color: cat.color }}>{cat.label}</span>
+                    <span style={{ fontSize: "14px", fontWeight: 700, padding: "3px 8px", borderRadius: "20px", background: `${cat.color}15`, color: cat.color }}>{cat.label}</span>
                     {ev.status === "draft" && (
-                      <span style={{ fontSize: "10px", fontWeight: 700, padding: "3px 8px", borderRadius: "20px", background: "rgba(251,191,36,0.1)", color: "#fbbf24" }}>Draft</span>
+                      <span style={{ fontSize: "14px", fontWeight: 700, padding: "3px 8px", borderRadius: "20px", background: "rgba(251,191,36,0.1)", color: "#fbbf24" }}>Draft</span>
                     )}
                   </div>
                 </div>
                 <div>
-                  <p style={{ fontSize: "15px", fontWeight: 700, color: "var(--color-foreground)", margin: "0 0 6px", lineHeight: 1.3 }}>{ev.title}</p>
-                  <p style={{ fontSize: "12px", color: "var(--color-muted-foreground)", margin: 0, lineHeight: 1.5 }}>{ev.description}</p>
+                  <p style={{ fontSize: "14px", fontWeight: 700, color: "var(--color-foreground)", margin: "0 0 6px", lineHeight: 1.3 }}>{ev.title}</p>
+                  <p style={{ fontSize: "14px", color: "var(--color-muted-foreground)", margin: 0, lineHeight: 1.5 }}>{ev.description}</p>
                 </div>
                 {(ev.location || ev.event_date) && (
                   <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
                     {ev.location && (
                       <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                         <MapPin style={{ width: 12, height: 12, color: "#a78bfa" }} />
-                        <p style={{ fontSize: "11px", color: "var(--color-muted-foreground)", margin: 0 }}>{ev.location}</p>
+                        <p style={{ fontSize: "14px", color: "var(--color-muted-foreground)", margin: 0 }}>{ev.location}</p>
                       </div>
                     )}
                     {ev.event_date && (
                       <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                         <Calendar style={{ width: 12, height: 12, color: "#60a5fa" }} />
-                        <p style={{ fontSize: "11px", color: "var(--color-muted-foreground)", margin: 0 }}>{new Date(ev.event_date).toLocaleDateString("en-IN", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</p>
+                        <p style={{ fontSize: "14px", color: "var(--color-muted-foreground)", margin: 0 }}>{new Date(ev.event_date).toLocaleDateString("en-IN", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</p>
                       </div>
                     )}
                   </div>
@@ -947,7 +947,7 @@ function SmartCity() {
                       body: JSON.stringify({ status: "published" }),
                     });
                     fetchData("Events");
-                  }} style={{ padding: "8px", borderRadius: "8px", border: "1px solid rgba(52,211,153,0.3)", background: "rgba(52,211,153,0.08)", color: "#34d399", fontSize: "11px", fontWeight: 700, cursor: "pointer" }}>
+                  }} style={{ padding: "8px", borderRadius: "8px", border: "1px solid rgba(52,211,153,0.3)", background: "rgba(52,211,153,0.08)", color: "#34d399", fontSize: "14px", fontWeight: 700, cursor: "pointer" }}>
                     Publish Event
                   </button>
                 )}
@@ -970,60 +970,65 @@ function SmartCity() {
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "calc(100vh - 6rem)", overflow: "hidden" }} className="-mx-6 -mb-6">
+    <div className="flex flex-col h-[calc(100vh-4rem)] relative overflow-hidden font-sans bg-transparent animate-in fade-in duration-500">
+      {/* Premium Ambient Background */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        <div className="absolute top-[-10%] right-[-5%] w-[40%] h-[40%] rounded-full bg-blue-500/20 dark:bg-blue-900/30 blur-[120px] animate-pulse" style={{ animationDuration: '8s' }} />
+        <div className="absolute bottom-[-10%] left-[-5%] w-[40%] h-[40%] rounded-full bg-purple-500/20 dark:bg-purple-900/30 blur-[120px] animate-pulse" style={{ animationDuration: '10s' }} />
+        <div className="absolute inset-0" style={{ backgroundImage: "radial-gradient(rgba(148,163,184,0.1) 1px, transparent 1px)", backgroundSize: "32px 32px" }} />
+      </div>
 
-      {/* ── TOP HEADER ──────────────────────────────────────────── */}
-      <div style={{ padding: "14px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid rgba(139,92,246,0.1)", background: "linear-gradient(180deg,rgba(139,92,246,0.04) 0%,transparent 100%)", flexShrink: 0 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <div style={{ width: "38px", height: "38px", borderRadius: "11px", background: "linear-gradient(135deg,#8b5cf6,#06b6d4)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 0 16px rgba(139,92,246,0.35)", flexShrink: 0 }}>
-            <Globe style={{ width: 18, height: 18, color: "white" }} />
-          </div>
+      {/* Header */}
+      <div className="shrink-0 z-20 px-6 lg:px-10 pt-8 pb-0">
+        <div className="max-w-[1400px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6 mb-2">
           <div>
-            <h1 style={{ fontSize: "15px", fontWeight: 800, color: "var(--color-foreground)", margin: 0 }}>Smart City Portal</h1>
-            <p style={{ fontSize: "10px", margin: 0, fontWeight: 600, color: "rgba(139,92,246,0.7)" }}>Nation-wide · AI-powered · Live data</p>
+            <h1 className="text-2xl font-extrabold tracking-tight flex items-center gap-3">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-indigo-500 to-purple-500 animate-gradient-x">
+                Smart City Pulse
+              </span>
+              <Globe className="text-blue-500 h-10 w-10 animate-bounce" style={{ animationDuration: '4s' }} />
+              <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 ml-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+                <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">Live</span>
+              </div>
+            </h1>
+            <p className="text-slate-500/80 dark:text-slate-400 mt-2 font-medium text-sm md:text-base">Nation-wide · AI-powered · Real-time Intelligence</p>
           </div>
-          {/* Live pill */}
-          <div style={{ display: "flex", alignItems: "center", gap: "5px", padding: "3px 10px", borderRadius: "20px", background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.25)", marginLeft: "4px" }}>
-            <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#22c55e", display: "block", animation: "ping 2s ease-out infinite" }} />
-            <span style={{ fontSize: "10px", color: "#22c55e", fontWeight: 700 }}>Live</span>
+          
+          <div className="flex items-center gap-4">
+             <button onClick={() => { if (!isOfficer) setShowCitySelector(true); }}
+               className="h-10 px-4 rounded-xl bg-white/60 backdrop-blur-2xl dark:bg-[#1A1F2E]/60 border border-white/60 dark:border-slate-700 shadow-xl shadow-slate-200/40 hover:shadow-2xl hover:scale-105 transition-all flex items-center gap-3 text-blue-700 dark:text-blue-400 font-extrabold text-sm cursor-pointer">
+               <MapPin className="w-4 h-4" />
+               {city}
+               {!isOfficer && <ChevronDown className="w-4 h-4 ml-2 opacity-50" />}
+             </button>
+             
+             <button onClick={() => fetchData()} className="h-14 w-14 rounded-[1.25rem] bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 shadow-xl shadow-blue-500/30 text-white flex items-center justify-center hover:scale-105 transition-all">
+               <RefreshCw className="w-4 h-4" />
+             </button>
           </div>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          {lastSync && <span style={{ fontSize: "10px", color: "var(--color-muted-foreground)", fontFamily: "monospace" }}>Synced {lastSync.toLocaleTimeString("en-IN")}</span>}
-          {/* City chip — click to change */}
-          <button onClick={() => { if (!isOfficer) setShowCitySelector(true); }}
-            style={{ display: "flex", alignItems: "center", gap: "7px", padding: "7px 14px", borderRadius: "10px", border: "1px solid rgba(139,92,246,0.25)", background: "rgba(139,92,246,0.08)", color: "var(--color-foreground)", fontSize: "13px", fontWeight: 700, cursor: isOfficer ? "default" : "pointer" }}>
-            <MapPin style={{ width: 13, height: 13, color: "#a78bfa" }} />
-            {city}
-            {!isOfficer && <ChevronDown style={{ width: 12, height: 12, color: "var(--color-muted-foreground)" }} />}
-          </button>
-          {/* Role badge */}
-          <span style={{ fontSize: "10px", fontWeight: 700, padding: "4px 10px", borderRadius: "20px", background: isAdmin ? "rgba(244,63,94,0.1)" : isOfficer ? "rgba(96,165,250,0.1)" : "rgba(52,211,153,0.1)", color: isAdmin ? "#f43f5e" : isOfficer ? "#60a5fa" : "#34d399", border: `1px solid ${isAdmin ? "rgba(244,63,94,0.2)" : isOfficer ? "rgba(96,165,250,0.2)" : "rgba(52,211,153,0.2)"}` }}>
-            {isAdmin ? "Admin" : isOfficer ? "Officer" : "Citizen"}
-          </span>
-          <button onClick={() => fetchData()} style={{ width: "34px", height: "34px", borderRadius: "9px", border: "1px solid rgba(139,92,246,0.15)", background: "rgba(139,92,246,0.06)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <RefreshCw style={{ width: 13, height: 13, color: "#a78bfa" }} />
-          </button>
+        {/* Tab Bar */}
+        <div className="max-w-[1400px] mx-auto pb-2">
+          <div className="flex gap-2 bg-white/40 dark:bg-slate-800/40 backdrop-blur-2xl rounded-xl p-1 border border-white/60 dark:border-slate-700 shadow-lg w-fit overflow-x-auto">
+            {TABS.map(tab => (
+              <button key={tab} onClick={() => setActiveTab(tab)} className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all duration-300 ${activeTab === tab ? "bg-white dark:bg-slate-700 shadow-md text-blue-700 dark:text-blue-400" : "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-white/50 dark:hover:bg-slate-700/50"}`}>
+                {tab}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* ── TABS ──────────────────────────────────────────────── */}
-      <div style={{ display: "flex", gap: "2px", padding: "10px 24px 0", borderBottom: "1px solid rgba(139,92,246,0.08)", flexShrink: 0, overflowX: "auto" }}>
-        {TABS.map(tab => (
-          <button key={tab} onClick={() => setActiveTab(tab)}
-            style={{ padding: "8px 16px", borderRadius: "10px 10px 0 0", border: "none", background: activeTab === tab ? "rgba(139,92,246,0.1)" : "transparent", color: activeTab === tab ? "#a78bfa" : "var(--color-muted-foreground)", fontSize: "12px", fontWeight: activeTab === tab ? 700 : 600, cursor: "pointer", borderBottom: activeTab === tab ? "2px solid #8b5cf6" : "2px solid transparent", transition: "all 0.15s", whiteSpace: "nowrap" }}>
-            {tab}
-          </button>
-        ))}
+      {/* Tab Content */}
+      <div className="flex-1 overflow-y-auto px-6 lg:px-10 pt-4 pb-8 z-10 relative" style={{ scrollbarWidth: "none" }}>
+        <div className="max-w-[1400px] mx-auto">
+          {tabContent[activeTab]?.()}
+        </div>
       </div>
 
-      {/* ── CONTENT ───────────────────────────────────────────── */}
-      <div style={{ flex: 1, overflowY: "auto", padding: "20px 24px 28px" }}>
-        {tabContent[activeTab]?.()}
-      </div>
-
-      {/* ── AI CHAT FAB ───────────────────────────────────────── */}
+      {/*  AI CHAT FAB  */}
       <button onClick={() => setShowChat(s => !s)}
         style={{ position: "fixed", bottom: "24px", right: "24px", width: "56px", height: "56px", borderRadius: "18px", background: "linear-gradient(135deg,#8b5cf6,#06b6d4)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 8px 32px rgba(139,92,246,0.45)", zIndex: 48, transition: "transform 0.2s" }}
         onMouseEnter={e => (e.currentTarget as HTMLElement).style.transform = "scale(1.1)"}

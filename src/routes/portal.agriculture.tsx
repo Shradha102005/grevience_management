@@ -17,7 +17,7 @@ export const Route = createFileRoute("/portal/agriculture")({
 
 const API_BASE = "http://localhost:8000";
 
-// ── Types ─────────────────────────────────────────────────────────────────────
+//  Types 
 interface WeatherDay { day: string; icon: string; high: number; low: number; humidity: number; wind_speed: number; rain_chance: number; description: string; }
 interface WeatherResponse { city: string; forecast: WeatherDay[]; advisory: string[]; source: string; }
 interface MarketItem { crop: string; price: string; modal_price: number; min_price: number; max_price: number; unit: string; market: string; state: string; arrival_date: string; records_found: number; }
@@ -61,37 +61,37 @@ const PEST_MAP_STATES: Record<string, string> = {
 };
 const RISK_COLOR: Record<string, string> = { critical: "rose", high: "amber", moderate: "yellow", low: "emerald" };
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+//  Helpers 
 const glassCard = "bg-white/70 backdrop-blur-2xl border border-white shadow-xl shadow-slate-200/50 rounded-[2rem] p-6";
 const glassCardLg = "bg-white/70 backdrop-blur-2xl border border-white shadow-2xl shadow-slate-300/60 rounded-[2.5rem] p-8";
 
-// ── Weather Drawer ────────────────────────────────────────────────────────────
+//  Weather Drawer 
 function WeatherDrawer({ weather, loading, onClose }: { weather: WeatherResponse | null; loading: boolean; onClose: () => void; }) {
   return (
     <>
       <div onClick={onClose} className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 animate-in fade-in" />
       <div className="fixed top-0 right-0 bottom-0 w-full md:w-[480px] bg-white shadow-2xl z-50 flex flex-col animate-in slide-in-from-right-12">
         <div className="px-8 py-6 border-b border-slate-100 flex items-center justify-between">
-          <div><h2 className="text-xl font-bold text-slate-900">7-Day Forecast</h2><p className="text-sm text-slate-500 mt-0.5">{weather?.city ?? "India"}</p></div>
+          <div><h2 className="text-base font-bold text-slate-900">7-Day Forecast</h2><p className="text-sm text-slate-500 mt-0.5">{weather?.city ?? "India"}</p></div>
           <button onClick={onClose} className="h-10 w-10 rounded-full hover:bg-slate-100 flex items-center justify-center"><X className="h-5 w-5 text-slate-500" /></button>
         </div>
-        <div className="flex-1 overflow-y-auto p-8 flex flex-col gap-4">
+        <div className="flex-1 overflow-y-auto px-8 pt-4 pb-8 flex flex-col gap-4">
           {loading ? <div className="flex justify-center p-12"><Loader2 className="h-8 w-8 text-indigo-500 animate-spin" /></div>
             : (weather?.forecast ?? []).map((w, i) => (
               <div key={i} className="bg-white border border-slate-100 rounded-2xl p-4 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow">
                 <span className="text-3xl">{w.icon}</span>
                 <div className="flex-1">
                   <div className="flex justify-between items-center"><span className="font-bold text-slate-800">{w.day}</span><div className="flex gap-2"><span className="font-black text-slate-900">{w.high}°</span><span className="text-slate-400 font-semibold">{w.low}°</span></div></div>
-                  <p className="text-xs text-slate-500 mt-1">{w.description}</p>
+                  <p className="text-sm text-slate-500 mt-1">{w.description}</p>
                   <div className="flex gap-3 mt-1.5">
-                    <span className="flex items-center gap-1 text-xs text-slate-400 font-bold"><Droplets className="w-3 h-3" />{w.humidity}%</span>
-                    <span className="flex items-center gap-1 text-xs text-slate-400 font-bold"><Wind className="w-3 h-3" />{w.wind_speed}km/h</span>
+                    <span className="flex items-center gap-1 text-sm text-slate-400 font-bold"><Droplets className="w-3 h-3" />{w.humidity}%</span>
+                    <span className="flex items-center gap-1 text-sm text-slate-400 font-bold"><Wind className="w-3 h-3" />{w.wind_speed}km/h</span>
                   </div>
                 </div>
               </div>
             ))}
           {weather?.advisory && <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-5 mt-2">
-            <p className="text-xs font-black text-emerald-600 mb-2 uppercase tracking-widest">Farm Advisories</p>
+            <p className="text-sm font-black text-emerald-600 mb-2 uppercase tracking-widest">Farm Advisories</p>
             {weather.advisory.map((a, i) => <p key={i} className="text-sm text-emerald-800 font-medium leading-relaxed">{a}</p>)}
           </div>}
         </div>
@@ -100,7 +100,7 @@ function WeatherDrawer({ weather, loading, onClose }: { weather: WeatherResponse
   );
 }
 
-// ── Agri Chat Modal ────────────────────────────────────────────────────────────
+//  Agri Chat Modal 
 function AgriChatModal({ onClose }: { onClose: () => void; }) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
@@ -117,12 +117,12 @@ function AgriChatModal({ onClose }: { onClose: () => void; }) {
     return (
       <div className="flex flex-col gap-3 w-full max-w-sm">
         <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
-          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Diagnosed</p>
-          <div className="flex items-center justify-between"><h3 className="text-base font-bold text-slate-800">{d.diagnosis}</h3><Badge className={`bg-${c}-100 text-${c}-700 border-none text-[10px] font-black`}>{d.confidence}%</Badge></div>
+          <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-2">Diagnosed</p>
+          <div className="flex items-center justify-between"><h3 className="text-base font-bold text-slate-800">{d.diagnosis}</h3><Badge className={`bg-${c}-100 text-${c}-700 border-none text-sm font-black`}>{d.confidence}%</Badge></div>
         </div>
         <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
-          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Treatment</p>
-          {d.treatment.map((t, i) => <div key={i} className="flex gap-2 items-start mb-2"><span className={`w-5 h-5 rounded-full bg-${c}-100 text-${c}-600 flex items-center justify-center text-[10px] font-black shrink-0`}>{i+1}</span><p className="text-xs text-slate-600">{t}</p></div>)}
+          <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-2">Treatment</p>
+          {d.treatment.map((t, i) => <div key={i} className="flex gap-2 items-start mb-2"><span className={`w-4 h-4 rounded-full bg-${c}-100 text-${c}-600 flex items-center justify-center text-sm font-black shrink-0`}>{i+1}</span><p className="text-sm text-slate-600">{t}</p></div>)}
         </div>
       </div>
     );
@@ -160,13 +160,13 @@ function AgriChatModal({ onClose }: { onClose: () => void; }) {
         <div className="absolute top-0 inset-x-0 h-32 bg-gradient-to-b from-indigo-50/80 to-transparent pointer-events-none" />
         <div className="px-8 py-5 flex items-center justify-between border-b border-slate-100 bg-white/80 backdrop-blur-md z-10 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center"><Sparkles className="w-5 h-5" /></div>
-            <div><h3 className="text-lg font-bold text-slate-900">AI Agri-Expert</h3><p className="text-xs text-slate-400 font-bold">Upload a crop photo for instant diagnosis</p></div>
+            <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center"><Sparkles className="w-4 h-4" /></div>
+            <div><h3 className="text-base font-bold text-slate-900">AI Agri-Expert</h3><p className="text-sm text-slate-400 font-bold">Upload a crop photo for instant diagnosis</p></div>
           </div>
           <button onClick={onClose} className="h-10 w-10 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400"><X className="h-5 w-5" /></button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-8 flex flex-col gap-6">
+        <div className="flex-1 overflow-y-auto px-8 pt-4 pb-8 flex flex-col gap-6">
           <div className="flex gap-4">
             <div className="w-8 h-8 rounded-full bg-indigo-100 flex-shrink-0 flex items-center justify-center text-indigo-600"><Sparkles className="w-4 h-4" /></div>
             <div className="bg-slate-100 text-slate-800 rounded-2xl rounded-tl-sm px-5 py-4 text-sm font-medium shadow-sm max-w-[85%]">Hello! I'm your AI Agri-Expert. Ask me anything about crops, pest control, irrigation, or <b>upload a photo</b> using the paperclip for instant disease diagnosis!</div>
@@ -187,10 +187,10 @@ function AgriChatModal({ onClose }: { onClose: () => void; }) {
         </div>
 
         <div className="p-5 bg-white border-t border-slate-100 z-10 shrink-0">
-          {imageUrl && <div className="mb-3 relative inline-block"><img src={imageUrl} alt="Preview" className="h-14 w-14 object-cover rounded-xl border-2 border-indigo-100 shadow-sm" /><button onClick={() => { setImageFile(null); setImageUrl(null); }} className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-slate-800 text-white flex items-center justify-center hover:bg-rose-500 transition-colors"><X className="w-3 h-3" /></button></div>}
+          {imageUrl && <div className="mb-3 relative inline-block"><img src={imageUrl} alt="Preview" className="h-14 w-14 object-cover rounded-xl border-2 border-indigo-100 shadow-sm" /><button onClick={() => { setImageFile(null); setImageUrl(null); }} className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-slate-800 text-white flex items-center justify-center hover:bg-rose-500 transition-colors"><X className="w-3 h-3" /></button></div>}
           <form onSubmit={e => { e.preventDefault(); handleSend(); }} className="relative flex items-center">
             <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={e => { const f = e.target.files?.[0]; if (f) { setImageFile(f); setImageUrl(URL.createObjectURL(f)); }}} />
-            <button type="button" onClick={() => fileInputRef.current?.click()} className="absolute left-2 w-10 h-10 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-indigo-600 transition-colors"><Paperclip className="w-5 h-5" /></button>
+            <button type="button" onClick={() => fileInputRef.current?.click()} className="absolute left-2 w-10 h-10 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-indigo-600 transition-colors"><Paperclip className="w-4 h-4" /></button>
             <input type="text" value={input} onChange={e => setInput(e.target.value)} placeholder={imageUrl ? "Describe symptoms or ask..." : "Ask about crops, upload a photo..."} className="w-full bg-slate-50 border border-slate-200 rounded-full py-3.5 pl-12 pr-14 text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent shadow-inner" />
             <button type="submit" disabled={(!input.trim() && !imageFile) || loading} className="absolute right-2 w-10 h-10 rounded-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 text-white flex items-center justify-center transition-colors shadow-md"><Send className="w-4 h-4 ml-0.5" /></button>
           </form>
@@ -200,11 +200,11 @@ function AgriChatModal({ onClose }: { onClose: () => void; }) {
   );
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
+// 
 // Tab Components
-// ══════════════════════════════════════════════════════════════════════════════
+// 
 
-// ── Tab 1: Dashboard ──────────────────────────────────────────────────────────
+//  Tab 1: Dashboard 
 function DashboardTab() {
   return (
     <div className="flex flex-col gap-6">
@@ -217,20 +217,20 @@ function DashboardTab() {
         ].map((pod, i) => (
           <div key={i} className={`${glassCard} relative overflow-hidden group`}>
             <div className={`absolute -right-4 -top-4 w-20 h-20 bg-${pod.color}-500/10 rounded-full blur-xl group-hover:bg-${pod.color}-500/20 transition-all`} />
-            <div className="flex items-center gap-2 mb-3"><pod.icon className={`w-4 h-4 text-${pod.color}-500`} /><span className="text-xs font-black text-slate-400 uppercase tracking-widest">{pod.label}</span></div>
+            <div className="flex items-center gap-2 mb-3"><pod.icon className={`w-4 h-4 text-${pod.color}-500`} /><span className="text-sm font-black text-slate-400 uppercase tracking-widest">{pod.label}</span></div>
             <span className="text-3xl font-black text-slate-800 tracking-tight">{pod.value}</span>
-            <p className="text-xs font-bold text-slate-400 mt-1">{pod.status}</p>
+            <p className="text-sm font-bold text-slate-400 mt-1">{pod.status}</p>
           </div>
         ))}
       </div>
 
       <div className={`${glassCard}`}>
-        <h2 className="text-lg font-black text-slate-800 mb-5 flex items-center gap-2"><ShieldAlert className="w-5 h-5 text-rose-500" /> Regional Pest Alerts</h2>
+        <h2 className="text-base font-black text-slate-800 mb-5 flex items-center gap-2"><ShieldAlert className="w-4 h-4 text-rose-500" /> Regional Pest Alerts</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {PEST_ALERTS.map((a, i) => (
             <div key={i} className={`p-4 rounded-2xl bg-${a.color}-50/60 border border-${a.color}-100 flex gap-3 items-start`}>
               <span className="text-2xl shrink-0">{a.icon}</span>
-              <div><h4 className="text-sm font-bold text-slate-800">{a.title}</h4><p className="text-xs text-slate-500 font-medium mt-0.5">{a.area}</p><p className="text-xs text-slate-600 mt-1 leading-relaxed">{a.desc}</p></div>
+              <div><h4 className="text-sm font-bold text-slate-800">{a.title}</h4><p className="text-sm text-slate-500 font-medium mt-0.5">{a.area}</p><p className="text-sm text-slate-600 mt-1 leading-relaxed">{a.desc}</p></div>
             </div>
           ))}
         </div>
@@ -239,7 +239,7 @@ function DashboardTab() {
   );
 }
 
-// ── Tab 2: AI Planner ─────────────────────────────────────────────────────────
+//  Tab 2: AI Planner 
 function PlannerTab() {
   const [calState, setCalState] = useState("Maharashtra");
   const [calSeason, setCalSeason] = useState("kharif");
@@ -293,13 +293,13 @@ function PlannerTab() {
 
   const selectCls = "bg-slate-100/80 border-none text-sm font-bold text-slate-700 rounded-xl px-3 py-2 focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer w-full";
   const inputCls = "bg-slate-100/80 border-none text-sm font-medium text-slate-800 rounded-xl px-3 py-2 focus:ring-2 focus:ring-indigo-500 outline-none w-full";
-  const labelCls = "block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5";
+  const labelCls = "block text-sm font-black text-slate-400 uppercase tracking-widest mb-1.5";
 
   return (
     <div className="flex flex-col gap-6">
       {/* Crop Calendar */}
       <div className={glassCardLg}>
-        <div className="flex items-center gap-3 mb-6"><div className="w-10 h-10 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center"><CalendarDays className="w-5 h-5 text-emerald-500" /></div><h2 className="text-xl font-black text-slate-800">Crop Calendar Planner</h2></div>
+        <div className="flex items-center gap-3 mb-2"><div className="w-10 h-10 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center"><CalendarDays className="w-4 h-4 text-emerald-500" /></div><h2 className="text-base font-black text-slate-800">Crop Calendar Planner</h2></div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-5">
           <div><label className={labelCls}>State</label><select className={selectCls} value={calState} onChange={e => setCalState(e.target.value)}>{INDIAN_STATES.filter(Boolean).map(s => <option key={s}>{s}</option>)}</select></div>
           <div><label className={labelCls}>Season</label><select className={selectCls} value={calSeason} onChange={e => setCalSeason(e.target.value)}>{SEASONS.map(s => <option key={s}>{s}</option>)}</select></div>
@@ -308,14 +308,14 @@ function PlannerTab() {
         </div>
         {calResult && (
           <div className="flex flex-col gap-4">
-            <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-4"><p className="text-xs font-black text-emerald-600 mb-1 uppercase tracking-widest">Season Tip</p><p className="text-sm text-emerald-800 font-medium">{calResult.season_tip}</p></div>
+            <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-4"><p className="text-sm font-black text-emerald-600 mb-1 uppercase tracking-widest">Season Tip</p><p className="text-sm text-emerald-800 font-medium">{calResult.season_tip}</p></div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {calResult.recommended_crops.map((c, i) => (
                 <div key={i} className="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow">
-                  <div className="flex items-start justify-between mb-2"><h4 className="font-black text-slate-800 text-sm">{c.name}</h4><Badge className={`bg-${(waterColor as Record<string, string>)[c.water_need] || "slate"}-100 text-${(waterColor as Record<string, string>)[c.water_need] || "slate"}-700 border-none text-[10px] font-black shrink-0`}>{c.water_need} water</Badge></div>
-                  <div className="flex gap-3 text-xs font-bold text-slate-500 mb-2"><span className="flex items-center gap-1"><Sprout className="w-3 h-3 text-emerald-500" />{c.sow_month}</span><ChevronRight className="w-3 h-3" /><span>{c.harvest_month}</span></div>
-                  <p className="text-xs font-black text-indigo-600">{c.expected_yield_q_per_acre} q/acre</p>
-                  <p className="text-xs text-slate-500 mt-1 leading-relaxed">{c.notes}</p>
+                  <div className="flex items-start justify-between mb-2"><h4 className="font-black text-slate-800 text-sm">{c.name}</h4><Badge className={`bg-${(waterColor as Record<string, string>)[c.water_need] || "slate"}-100 text-${(waterColor as Record<string, string>)[c.water_need] || "slate"}-700 border-none text-sm font-black shrink-0`}>{c.water_need} water</Badge></div>
+                  <div className="flex gap-3 text-sm font-bold text-slate-500 mb-2"><span className="flex items-center gap-1"><Sprout className="w-3 h-3 text-emerald-500" />{c.sow_month}</span><ChevronRight className="w-3 h-3" /><span>{c.harvest_month}</span></div>
+                  <p className="text-sm font-black text-indigo-600">{c.expected_yield_q_per_acre} q/acre</p>
+                  <p className="text-sm text-slate-500 mt-1 leading-relaxed">{c.notes}</p>
                 </div>
               ))}
             </div>
@@ -326,7 +326,7 @@ function PlannerTab() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Yield Prediction */}
         <div className={glassCard}>
-          <div className="flex items-center gap-3 mb-5"><div className="w-9 h-9 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center"><TrendingUp className="w-4 h-4 text-amber-500" /></div><h2 className="text-lg font-black text-slate-800">Yield Prediction</h2></div>
+          <div className="flex items-center gap-3 mb-5"><div className="w-9 h-9 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center"><TrendingUp className="w-4 h-4 text-amber-500" /></div><h2 className="text-base font-black text-slate-800">Yield Prediction</h2></div>
           <div className="grid grid-cols-2 gap-3 mb-4">
             <div><label className={labelCls}>Crop</label><select className={selectCls} value={yieldCrop} onChange={e => setYieldCrop(e.target.value)}>{CROPS.map(c => <option key={c}>{c}</option>)}</select></div>
             <div><label className={labelCls}>Area (acres)</label><input className={inputCls} type="number" value={yieldArea} onChange={e => setYieldArea(e.target.value)} /></div>
@@ -340,15 +340,15 @@ function PlannerTab() {
               <div className="flex gap-3">
                 <div className={`flex-1 bg-${(gradeColor as Record<string, string>)[yieldResult.grade] || "slate"}-50 border border-${(gradeColor as Record<string, string>)[yieldResult.grade] || "slate"}-100 rounded-2xl p-4 text-center`}>
                   <p className="text-3xl font-black text-slate-800">{(yieldResult.estimated_yield_kg / 1000).toFixed(1)}T</p>
-                  <p className="text-xs text-slate-500 font-bold mt-1">Total Yield</p>
+                  <p className="text-sm text-slate-500 font-bold mt-1">Total Yield</p>
                 </div>
                 <div className="flex-1 bg-slate-50 border border-slate-100 rounded-2xl p-4 text-center">
                   <p className="text-3xl font-black text-slate-800">{yieldResult.confidence_pct}%</p>
-                  <p className="text-xs text-slate-500 font-bold mt-1">Confidence</p>
+                  <p className="text-sm text-slate-500 font-bold mt-1">Confidence</p>
                 </div>
               </div>
               <div className="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm flex flex-col gap-2">
-                {yieldResult.tips.map((t, i) => <p key={i} className="text-xs text-slate-600 flex gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />{t}</p>)}
+                {yieldResult.tips.map((t, i) => <p key={i} className="text-sm text-slate-600 flex gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />{t}</p>)}
               </div>
             </div>
           )}
@@ -356,7 +356,7 @@ function PlannerTab() {
 
         {/* Irrigation Advisor */}
         <div className={glassCard}>
-          <div className="flex items-center gap-3 mb-5"><div className="w-9 h-9 rounded-xl bg-sky-50 border border-sky-100 flex items-center justify-center"><Droplets className="w-4 h-4 text-sky-500" /></div><h2 className="text-lg font-black text-slate-800">Smart Irrigation</h2></div>
+          <div className="flex items-center gap-3 mb-5"><div className="w-9 h-9 rounded-xl bg-sky-50 border border-sky-100 flex items-center justify-center"><Droplets className="w-4 h-4 text-sky-500" /></div><h2 className="text-base font-black text-slate-800">Smart Irrigation</h2></div>
           <div className="grid grid-cols-2 gap-3 mb-4">
             <div><label className={labelCls}>Crop</label><select className={selectCls} value={irrigCrop} onChange={e => setIrrigCrop(e.target.value)}>{CROPS.map(c => <option key={c}>{c}</option>)}</select></div>
             <div><label className={labelCls}>Crop Stage</label><select className={selectCls} value={irrigStage} onChange={e => setIrrigStage(e.target.value)}>{CROP_STAGES.map(s => <option key={s}>{s}</option>)}</select></div>
@@ -368,15 +368,15 @@ function PlannerTab() {
           {irrigResult && (
             <div className="mt-5 flex flex-col gap-3">
               <div className={`p-4 rounded-2xl border ${irrigResult.should_irrigate ? "bg-sky-50 border-sky-100" : "bg-emerald-50 border-emerald-100"} flex items-center gap-4`}>
-                <div className={`text-4xl font-black ${irrigResult.should_irrigate ? "text-sky-600" : "text-emerald-600"}`}>{irrigResult.should_irrigate ? "💧" : "✅"}</div>
+                <div className={`text-3xl font-black ${irrigResult.should_irrigate ? "text-sky-600" : "text-emerald-600"}`}>{irrigResult.should_irrigate ? "💧" : "✅"}</div>
                 <div>
-                  <h4 className={`font-black text-lg ${irrigResult.should_irrigate ? "text-sky-700" : "text-emerald-700"}`}>{irrigResult.should_irrigate ? "Irrigate Now" : "No Irrigation Needed"}</h4>
-                  <Badge className={`bg-${(urgencyColor as Record<string, string>)[irrigResult.urgency] || "slate"}-100 text-${(urgencyColor as Record<string, string>)[irrigResult.urgency] || "slate"}-700 border-none text-[10px] font-black mt-1`}>{irrigResult.urgency.replace("_", " ")}</Badge>
+                  <h4 className={`font-black text-base ${irrigResult.should_irrigate ? "text-sky-700" : "text-emerald-700"}`}>{irrigResult.should_irrigate ? "Irrigate Now" : "No Irrigation Needed"}</h4>
+                  <Badge className={`bg-${(urgencyColor as Record<string, string>)[irrigResult.urgency] || "slate"}-100 text-${(urgencyColor as Record<string, string>)[irrigResult.urgency] || "slate"}-700 border-none text-sm font-black mt-1`}>{irrigResult.urgency.replace("_", " ")}</Badge>
                 </div>
               </div>
-              {irrigResult.should_irrigate && <div className="flex gap-3"><div className="flex-1 bg-white border border-slate-100 rounded-xl p-3 text-center shadow-sm"><p className="text-xl font-black text-slate-800">{irrigResult.next_irrigation_hours}h</p><p className="text-[10px] font-bold text-slate-400">Window</p></div><div className="flex-1 bg-white border border-slate-100 rounded-xl p-3 text-center shadow-sm"><p className="text-xl font-black text-slate-800">{(irrigResult.quantity_liters_per_acre / 1000).toFixed(0)}kL</p><p className="text-[10px] font-bold text-slate-400">Per Acre</p></div></div>}
-              <p className="text-xs text-slate-600 font-medium bg-white border border-slate-100 rounded-xl p-3 leading-relaxed shadow-sm">{irrigResult.reason}</p>
-              {irrigResult.warning && <div className="flex gap-2 items-start bg-amber-50 border border-amber-100 rounded-xl p-3"><AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" /><p className="text-xs text-amber-700 font-medium">{irrigResult.warning}</p></div>}
+              {irrigResult.should_irrigate && <div className="flex gap-3"><div className="flex-1 bg-white border border-slate-100 rounded-xl p-3 text-center shadow-sm"><p className="text-base font-black text-slate-800">{irrigResult.next_irrigation_hours}h</p><p className="text-sm font-bold text-slate-400">Window</p></div><div className="flex-1 bg-white border border-slate-100 rounded-xl p-3 text-center shadow-sm"><p className="text-base font-black text-slate-800">{(irrigResult.quantity_liters_per_acre / 1000).toFixed(0)}kL</p><p className="text-sm font-bold text-slate-400">Per Acre</p></div></div>}
+              <p className="text-sm text-slate-600 font-medium bg-white border border-slate-100 rounded-xl p-3 leading-relaxed shadow-sm">{irrigResult.reason}</p>
+              {irrigResult.warning && <div className="flex gap-2 items-start bg-amber-50 border border-amber-100 rounded-xl p-3"><AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" /><p className="text-sm text-amber-700 font-medium">{irrigResult.warning}</p></div>}
             </div>
           )}
         </div>
@@ -385,7 +385,7 @@ function PlannerTab() {
   );
 }
 
-// ── Tab 3: Markets ────────────────────────────────────────────────────────────
+//  Tab 3: Markets 
 function MarketsTab() {
   const [marketData, setMarketData] = useState<MarketItem[]>([]);
   const [marketLoading, setMarketLoading] = useState(true);
@@ -443,8 +443,8 @@ function MarketsTab() {
     stroke: { curve: "smooth", width: 3 },
     fill: { type: "gradient", gradient: { shadeIntensity: 1, opacityFrom: 0.3, opacityTo: 0.01 } },
     colors: ["#6366f1"],
-    xaxis: { categories: priceHistory?.weeks || [], labels: { style: { fontFamily: "inherit", fontWeight: "700", fontSize: "11px" }, rotate: 0 }, axisBorder: { show: false }, axisTicks: { show: false } },
-    yaxis: { labels: { formatter: (v: number) => `₹${Math.round(v).toLocaleString()}`, style: { fontFamily: "inherit", fontWeight: "700", fontSize: "11px" } }, min: (min: number) => Math.round(min * 0.95), max: (max: number) => Math.round(max * 1.05) },
+    xaxis: { categories: priceHistory?.weeks || [], labels: { style: { fontFamily: "inherit", fontWeight: "700", fontSize: "14px" }, rotate: 0 }, axisBorder: { show: false }, axisTicks: { show: false } },
+    yaxis: { labels: { formatter: (v: number) => `₹${Math.round(v).toLocaleString()}`, style: { fontFamily: "inherit", fontWeight: "700", fontSize: "14px" } }, min: (min: number) => Math.round(min * 0.95), max: (max: number) => Math.round(max * 1.05) },
     grid: { borderColor: "#f1f5f9", padding: { left: 10, right: 10 } },
     tooltip: { theme: "light", y: { formatter: (v: number) => `₹${Math.round(v).toLocaleString()}/q` } },
     dataLabels: { enabled: false },
@@ -469,38 +469,38 @@ function MarketsTab() {
       {/* Price Trend Chart */}
       <div className={glassCardLg}>
         <div className="flex items-center justify-between mb-5">
-          <div className="flex items-center gap-3"><div className="w-9 h-9 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center"><TrendingUp className="w-4 h-4 text-indigo-500" /></div><h2 className="text-lg font-black text-slate-800">Price Trend (12 Weeks)</h2></div>
+          <div className="flex items-center gap-3"><div className="w-9 h-9 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center"><TrendingUp className="w-4 h-4 text-indigo-500" /></div><h2 className="text-base font-black text-slate-800">Price Trend (12 Weeks)</h2></div>
           <div className="flex items-center gap-2">
             <select className={selectCls} value={chartCrop} onChange={e => setChartCrop(e.target.value)}>{CROPS.map(c => <option key={c}>{c}</option>)}</select>
           </div>
         </div>
         {chartLoading ? <div className="h-48 flex items-center justify-center"><Loader2 className="w-6 h-6 text-indigo-400 animate-spin" /></div>
           : priceHistory && <Chart options={chartOptions} series={[{ name: chartCrop, data: priceHistory.prices }]} type="area" height={200} />}
-        {priceHistory && <div className="flex gap-4 mt-2"><div className="bg-indigo-50 border border-indigo-100 rounded-xl px-4 py-2"><p className="text-xs font-black text-indigo-500">Current</p><p className="font-black text-slate-800">₹{Math.round(priceHistory.current_price).toLocaleString()}/q</p></div></div>}
+        {priceHistory && <div className="flex gap-4 mt-2"><div className="bg-indigo-50 border border-indigo-100 rounded-xl px-4 py-2"><p className="text-sm font-black text-indigo-500">Current</p><p className="font-black text-slate-800">₹{Math.round(priceHistory.current_price).toLocaleString()}/q</p></div></div>}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Market Comparison Table */}
         <div className={glassCard}>
           <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2"><BarChart3 className="w-5 h-5 text-emerald-500" /><h2 className="text-lg font-black text-slate-800">Live Mandi Prices</h2></div>
+            <div className="flex items-center gap-2"><BarChart3 className="w-4 h-4 text-emerald-500" /><h2 className="text-base font-black text-slate-800">Live Mandi Prices</h2></div>
             <div className="flex items-center gap-2">
               <div className="relative"><select className={selectCls} value={selectedState} onChange={e => setSelectedState(e.target.value)}>{INDIAN_STATES.map(s => <option key={s} value={s}>{s || "National"}</option>)}</select></div>
               <button onClick={() => loadMarket(selectedState)} className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 transition-colors"><RefreshCw className={`w-3.5 h-3.5 ${marketLoading ? "animate-spin" : ""}`} /></button>
             </div>
           </div>
           <div className="overflow-auto">
-            {marketLoading ? <div className="flex justify-center py-8"><Loader2 className="w-5 h-5 text-slate-300 animate-spin" /></div>
+            {marketLoading ? <div className="flex justify-center py-8"><Loader2 className="w-4 h-4 text-slate-300 animate-spin" /></div>
               : marketData.length === 0 ? <div className="text-center py-8 text-sm font-bold text-slate-400">No active feeds.</div>
-              : <table className="w-full text-sm"><thead><tr className="border-b border-slate-100"><th className="text-left text-xs font-black text-slate-400 pb-2 uppercase tracking-wider">Crop</th><th className="text-right text-xs font-black text-slate-400 pb-2 uppercase tracking-wider">Min</th><th className="text-right text-xs font-black text-slate-400 pb-2 uppercase tracking-wider">Modal</th><th className="text-right text-xs font-black text-slate-400 pb-2 uppercase tracking-wider">Max</th></tr></thead>
-                <tbody>{marketData.map((item, i) => <tr key={i} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors"><td className="py-2.5"><p className="font-bold text-slate-800">{item.crop}</p><p className="text-[10px] text-slate-400">{item.state}</p></td><td className="text-right text-xs font-bold text-slate-500">₹{Math.round(item.min_price).toLocaleString()}</td><td className="text-right font-black text-emerald-600">₹{Math.round(item.modal_price).toLocaleString()}</td><td className="text-right text-xs font-bold text-slate-500">₹{Math.round(item.max_price).toLocaleString()}</td></tr>)}</tbody>
+              : <table className="w-full text-sm"><thead><tr className="border-b border-slate-100"><th className="text-left text-sm font-black text-slate-400 pb-2 uppercase tracking-wider">Crop</th><th className="text-right text-sm font-black text-slate-400 pb-2 uppercase tracking-wider">Min</th><th className="text-right text-sm font-black text-slate-400 pb-2 uppercase tracking-wider">Modal</th><th className="text-right text-sm font-black text-slate-400 pb-2 uppercase tracking-wider">Max</th></tr></thead>
+                <tbody>{marketData.map((item, i) => <tr key={i} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors"><td className="py-2.5"><p className="font-bold text-slate-800">{item.crop}</p><p className="text-sm text-slate-400">{item.state}</p></td><td className="text-right text-sm font-bold text-slate-500">₹{Math.round(item.min_price).toLocaleString()}</td><td className="text-right font-black text-emerald-600">₹{Math.round(item.modal_price).toLocaleString()}</td><td className="text-right text-sm font-bold text-slate-500">₹{Math.round(item.max_price).toLocaleString()}</td></tr>)}</tbody>
               </table>}
           </div>
         </div>
 
         {/* Price Alerts */}
         <div className={glassCard}>
-          <div className="flex items-center gap-2 mb-4"><BellRing className="w-5 h-5 text-amber-500" /><h2 className="text-lg font-black text-slate-800">Custom Price Alerts</h2></div>
+          <div className="flex items-center gap-2 mb-4"><BellRing className="w-4 h-4 text-amber-500" /><h2 className="text-base font-black text-slate-800">Custom Price Alerts</h2></div>
           <div className="flex gap-2 mb-2">
             <select className={`${selectCls} flex-1`} value={alertCrop} onChange={e => setAlertCrop(e.target.value)}>{CROPS.map(c => <option key={c}>{c}</option>)}</select>
             <select className={`${selectCls} w-28`} value={alertDir} onChange={e => setAlertDir(e.target.value as "above" | "below")}><option value="above">Above</option><option value="below">Below</option></select>
@@ -511,27 +511,27 @@ function MarketsTab() {
           </div>
           <div className="flex flex-col gap-2 overflow-y-auto max-h-48">
             {alerts.length === 0 ? <p className="text-sm text-center text-slate-400 font-bold py-4">No alerts set.</p>
-              : alerts.map(a => <div key={a.id} className="flex items-center justify-between bg-white border border-slate-100 rounded-xl px-4 py-2.5 shadow-sm"><div><span className="font-bold text-slate-800 text-sm">{a.crop}</span><span className="text-xs text-slate-400 font-medium ml-2">{a.direction} ₹{a.threshold.toLocaleString()}/q</span></div><button onClick={() => deleteAlert(a.id)} className="text-slate-400 hover:text-rose-500 transition-colors"><Trash2 className="w-4 h-4" /></button></div>)}
+              : alerts.map(a => <div key={a.id} className="flex items-center justify-between bg-white border border-slate-100 rounded-xl px-4 py-2.5 shadow-sm"><div><span className="font-bold text-slate-800 text-sm">{a.crop}</span><span className="text-sm text-slate-400 font-medium ml-2">{a.direction} ₹{a.threshold.toLocaleString()}/q</span></div><button onClick={() => deleteAlert(a.id)} className="text-slate-400 hover:text-rose-500 transition-colors"><Trash2 className="w-4 h-4" /></button></div>)}
           </div>
         </div>
       </div>
 
       {/* Seasonal Price Heatmap */}
       <div className={glassCard}>
-        <div className="flex items-center gap-2 mb-5"><BarChart3 className="w-5 h-5 text-violet-500" /><h2 className="text-lg font-black text-slate-800">Seasonal Price Heatmap</h2><Badge className="bg-violet-100 text-violet-700 border-none text-[10px] font-black ml-2">Best months to sell</Badge></div>
+        <div className="flex items-center gap-2 mb-5"><BarChart3 className="w-4 h-4 text-violet-500" /><h2 className="text-base font-black text-slate-800">Seasonal Price Heatmap</h2><Badge className="bg-violet-100 text-violet-700 border-none text-sm font-black ml-2">Best months to sell</Badge></div>
         <div className="overflow-auto">
-          <table className="w-full text-xs">
+          <table className="w-full text-sm">
             <thead><tr><th className="text-left font-black text-slate-400 pb-2 pr-4 uppercase tracking-wider w-24">Crop</th>{MONTHS.map((m, i) => <th key={i} className="font-black text-slate-400 pb-2 px-1 text-center">{m}</th>)}</tr></thead>
-            <tbody>{Object.entries(HEATMAP).map(([crop, vals]) => <tr key={crop}><td className="font-bold text-slate-700 py-1 pr-4">{crop}</td>{vals.map((v, i) => <td key={i} className="px-0.5 py-1"><div className={`w-8 h-7 rounded-lg flex items-center justify-center font-bold text-[10px] mx-auto ${heatColor(v)}`}>{v === 5 ? "★" : v === 1 ? "✗" : ""}</div></td>)}</tr>)}</tbody>
+            <tbody>{Object.entries(HEATMAP).map(([crop, vals]) => <tr key={crop}><td className="font-bold text-slate-700 py-1 pr-4">{crop}</td>{vals.map((v, i) => <td key={i} className="px-0.5 py-1"><div className={`w-8 h-7 rounded-lg flex items-center justify-center font-bold text-sm mx-auto ${heatColor(v)}`}>{v === 5 ? "★" : v === 1 ? "✗" : ""}</div></td>)}</tr>)}</tbody>
           </table>
         </div>
-        <div className="flex gap-4 mt-4 flex-wrap"><div className="flex items-center gap-1.5 text-xs font-bold text-slate-500"><div className="w-3 h-3 rounded bg-emerald-500" /> Best selling months</div><div className="flex items-center gap-1.5 text-xs font-bold text-slate-500"><div className="w-3 h-3 rounded bg-amber-100" /> Moderate prices</div><div className="flex items-center gap-1.5 text-xs font-bold text-slate-500"><div className="w-3 h-3 rounded bg-red-200" /> Avoid selling</div></div>
+        <div className="flex gap-4 mt-4 flex-wrap"><div className="flex items-center gap-1.5 text-sm font-bold text-slate-500"><div className="w-3 h-3 rounded bg-emerald-500" /> Best selling months</div><div className="flex items-center gap-1.5 text-sm font-bold text-slate-500"><div className="w-3 h-3 rounded bg-amber-100" /> Moderate prices</div><div className="flex items-center gap-1.5 text-sm font-bold text-slate-500"><div className="w-3 h-3 rounded bg-red-200" /> Avoid selling</div></div>
       </div>
     </div>
   );
 }
 
-// ── Tab 4: Advisories ─────────────────────────────────────────────────────────
+//  Tab 4: Advisories 
 function AdvisoriesTab() {
   const [subsidies, setSubsidies] = useState<Subsidy[]>([]);
   const [subsidyLoading, setSubsidyLoading] = useState(true);
@@ -553,14 +553,14 @@ function AdvisoriesTab() {
     <div className="flex flex-col gap-6">
       {/* Expert Tips */}
       <div className={glassCardLg}>
-        <div className="flex items-center gap-2 mb-5"><BookOpen className="w-5 h-5 text-sky-500" /><h2 className="text-lg font-black text-slate-800">Expert Farming Tips</h2></div>
+        <div className="flex items-center gap-2 mb-5"><BookOpen className="w-4 h-4 text-sky-500" /><h2 className="text-base font-black text-slate-800">Expert Farming Tips</h2></div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {EXPERT_TIPS.map((tip, i) => (
             <div key={i} className={`bg-${tip.color}-50/50 border border-${tip.color}-100 rounded-2xl p-5 hover:shadow-md transition-shadow`}>
               <div className="text-2xl mb-3">{tip.icon}</div>
-              <Badge className={`bg-${tip.color}-100 text-${tip.color}-700 border-none text-[10px] font-black mb-2`}>{tip.tag}</Badge>
+              <Badge className={`bg-${tip.color}-100 text-${tip.color}-700 border-none text-sm font-black mb-2`}>{tip.tag}</Badge>
               <h4 className="font-black text-slate-800 mb-2">{tip.title}</h4>
-              <p className="text-xs text-slate-600 leading-relaxed font-medium">{tip.tip}</p>
+              <p className="text-sm text-slate-600 leading-relaxed font-medium">{tip.tip}</p>
             </div>
           ))}
         </div>
@@ -568,29 +568,29 @@ function AdvisoriesTab() {
 
       {/* Pest Risk Map (Simplified State List View) */}
       <div className={glassCard}>
-        <div className="flex items-center gap-2 mb-5"><MapPin className="w-5 h-5 text-rose-500" /><h2 className="text-lg font-black text-slate-800">State-wise Pest Risk</h2></div>
+        <div className="flex items-center gap-2 mb-5"><MapPin className="w-4 h-4 text-rose-500" /><h2 className="text-base font-black text-slate-800">State-wise Pest Risk</h2></div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
           {Object.entries(PEST_MAP_STATES).map(([state, risk]) => (
             <div key={state} className={`p-3 rounded-2xl bg-${RISK_COLOR[risk]}-50 border border-${RISK_COLOR[risk]}-100 flex flex-col gap-1`}>
-              <p className="text-xs font-black text-slate-700 truncate">{state}</p>
+              <p className="text-sm font-black text-slate-700 truncate">{state}</p>
               <Badge className={`bg-${RISK_COLOR[risk]}-100 text-${RISK_COLOR[risk]}-700 border-none text-[9px] font-black self-start capitalize`}>{risk}</Badge>
             </div>
           ))}
         </div>
-        <div className="flex gap-4 mt-4 flex-wrap">{[["critical","rose"],["high","amber"],["moderate","yellow"],["low","emerald"]].map(([label, color]) => <div key={label} className="flex items-center gap-1.5 text-xs font-bold text-slate-500"><div className={`w-3 h-3 rounded-full bg-${color}-400`} /><span className="capitalize">{label} risk</span></div>)}</div>
+        <div className="flex gap-4 mt-4 flex-wrap">{[["critical","rose"],["high","amber"],["moderate","yellow"],["low","emerald"]].map(([label, color]) => <div key={label} className="flex items-center gap-1.5 text-sm font-bold text-slate-500"><div className={`w-3 h-3 rounded-full bg-${color}-400`} /><span className="capitalize">{label} risk</span></div>)}</div>
       </div>
 
       {/* Subsidy Info & Calculator */}
       <div className={glassCardLg}>
-        <div className="flex items-center gap-2 mb-5"><Landmark className="w-5 h-5 text-indigo-500" /><h2 className="text-lg font-black text-slate-800">Government Subsidies</h2></div>
+        <div className="flex items-center gap-2 mb-5"><Landmark className="w-4 h-4 text-indigo-500" /><h2 className="text-base font-black text-slate-800">Government Subsidies</h2></div>
         {subsidyLoading ? <div className="flex justify-center py-8"><Loader2 className="w-6 h-6 text-slate-300 animate-spin" /></div>
           : <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {subsidies.map((s, i) => (
               <a key={i} href={s.link} target="_blank" rel="noreferrer" className={`group bg-${(categoryColor[s.category] || "slate")}-50/50 border border-${(categoryColor[s.category] || "slate")}-100 rounded-2xl p-4 hover:shadow-md transition-all flex flex-col gap-2 no-underline`}>
                 <div className="flex items-start justify-between gap-2"><h4 className="font-black text-slate-800 text-sm leading-tight">{s.name}</h4><ExternalLink className="w-4 h-4 text-slate-400 group-hover:text-indigo-500 shrink-0 transition-colors" /></div>
-                <Badge className={`bg-${(categoryColor[s.category] || "slate")}-100 text-${(categoryColor[s.category] || "slate")}-700 border-none text-[10px] font-black self-start`}>{s.category}</Badge>
-                <p className="text-xs text-slate-600 font-medium leading-relaxed">{s.benefit}</p>
-                <p className="text-[10px] text-slate-400 font-bold">Eligible: {s.eligibility}</p>
+                <Badge className={`bg-${(categoryColor[s.category] || "slate")}-100 text-${(categoryColor[s.category] || "slate")}-700 border-none text-sm font-black self-start`}>{s.category}</Badge>
+                <p className="text-sm text-slate-600 font-medium leading-relaxed">{s.benefit}</p>
+                <p className="text-sm text-slate-400 font-bold">Eligible: {s.eligibility}</p>
               </a>
             ))}
           </div>}
@@ -599,8 +599,8 @@ function AdvisoriesTab() {
   );
 }
 
-// ── Main Component ────────────────────────────────────────────────────────────
-export function Agriculture() {
+//  Main Component 
+function Agriculture() {
   const [activeTab, setActiveTab] = useState<"dashboard" | "planner" | "markets" | "advisories">("dashboard");
   const [weather, setWeather] = useState<WeatherResponse | null>(null);
   const [weatherLoading, setWeatherLoading] = useState(true);
@@ -622,40 +622,55 @@ export function Agriculture() {
   ] as const;
 
   return (
-    <div className="-m-6 flex flex-col h-[calc(100vh-4rem)] relative overflow-hidden font-sans bg-slate-50">
-      {/* Ambient background */}
-      <div className="absolute inset-0 z-0 pointer-events-none opacity-40" style={{ backgroundImage: "radial-gradient(circle at 0% 0%, rgba(16,185,129,0.2), transparent 40%), radial-gradient(circle at 100% 100%, rgba(245,158,11,0.15), transparent 40%), radial-gradient(circle at 50% 100%, rgba(56,189,248,0.15), transparent 40%)" }} />
-      <div className="absolute inset-0 z-0 pointer-events-none" style={{ backgroundImage: "radial-gradient(rgba(148,163,184,0.1) 1px, transparent 1px)", backgroundSize: "32px 32px" }} />
+    <div className="flex flex-col h-[calc(100vh-4rem)] relative overflow-hidden font-sans bg-transparent animate-in fade-in duration-500">
+      {/* Premium Ambient Background */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        <div className="absolute top-[-10%] right-[-5%] w-[40%] h-[40%] rounded-full bg-emerald-400/20 dark:bg-emerald-900/30 blur-[120px] animate-pulse" style={{ animationDuration: '8s' }} />
+        <div className="absolute bottom-[-10%] left-[-5%] w-[40%] h-[40%] rounded-full bg-teal-400/20 dark:bg-teal-900/30 blur-[120px] animate-pulse" style={{ animationDuration: '10s' }} />
+        <div className="absolute inset-0" style={{ backgroundImage: "radial-gradient(rgba(148,163,184,0.1) 1px, transparent 1px)", backgroundSize: "32px 32px" }} />
+      </div>
 
       {/* Header */}
-      <div className="shrink-0 z-20 px-8 pt-6 pb-0">
-        <div className="max-w-[1400px] mx-auto flex items-center justify-between mb-5">
-          <div><h1 className="text-3xl font-black text-slate-900 tracking-tight">Agri-Hub</h1><p className="text-sm font-bold text-slate-500 mt-1">Precision Farming & Market Intelligence</p></div>
-          <div className="flex items-center gap-3">
-            <button onClick={() => setShowChat(true)} className="relative w-10 h-10 rounded-full bg-white/70 backdrop-blur-xl border border-white shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all flex items-center justify-center text-indigo-600">
-              <MessageCircle className="w-5 h-5" />
-              <span className="absolute -top-1 -right-1 w-3 h-3 bg-rose-500 rounded-full border-2 border-white animate-pulse" />
+      <div className="shrink-0 z-20 px-6 lg:px-10 pt-8 pb-2">
+        <div className="max-w-[1400px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6 mb-2">
+          <div>
+            <h1 className="text-2xl font-extrabold tracking-tight flex items-center gap-3">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 via-green-500 to-teal-400 animate-gradient-x">
+                Agri-Hub Dashboard
+              </span>
+              <Sprout className="text-emerald-500 h-10 w-10 animate-bounce" style={{ animationDuration: '3s' }} />
+            </h1>
+            <p className="text-slate-500/80 dark:text-slate-400 mt-2 font-medium text-sm md:text-base">Precision Farming & Market Intelligence</p>
+          </div>
+          <div className="flex items-center gap-4">
+            <button onClick={() => setShowChat(true)} className="relative h-10 px-4 rounded-xl bg-white/60 backdrop-blur-2xl dark:bg-[#1A1F2E]/60 border border-white/60 dark:border-slate-700 shadow-xl shadow-slate-200/40 hover:shadow-2xl hover:scale-105 transition-all flex items-center gap-3 text-emerald-700 dark:text-emerald-400 font-extrabold text-sm group">
+              <MessageCircle className="w-4 h-4 group-hover:rotate-12 transition-transform" />
+              AI Agri-Expert
+              <span className="absolute -top-2 -right-2 w-4 h-4 bg-rose-500 rounded-full border-2 border-white animate-pulse" />
             </button>
-            <button onClick={() => setShowWeather(true)} className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-white/70 backdrop-blur-xl border border-white shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all text-slate-700 font-bold text-sm">
-              {weatherLoading ? <Loader2 className="w-4 h-4 animate-spin text-slate-400" /> : <Cloud className="w-4 h-4 text-sky-500" />}
+            
+            <button onClick={() => setShowWeather(true)} className="h-10 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 shadow-xl shadow-emerald-500/30 text-white font-extrabold text-sm hover:scale-105 transition-all flex items-center gap-3">
+              {weatherLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Cloud className="w-4 h-4" />}
               {today ? `${weather?.city ?? "India"}, ${today.high}°` : "Weather"}
             </button>
           </div>
         </div>
 
         {/* Tab Bar */}
-        <div className="flex gap-1 bg-white/50 backdrop-blur-xl rounded-2xl p-1 border border-white/60 shadow-sm w-fit">
-          {TABS.map(tab => (
-            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === tab.id ? "bg-white shadow-md text-slate-900 shadow-slate-200/80" : "text-slate-500 hover:text-slate-700"}`}>
-              <tab.icon className={`w-4 h-4 ${activeTab === tab.id ? "text-indigo-500" : ""}`} />
-              {tab.label}
-            </button>
-          ))}
+        <div className="max-w-[1400px] mx-auto">
+          <div className="flex gap-2 bg-white/40 dark:bg-slate-800/40 backdrop-blur-2xl rounded-xl p-1 border border-white/60 dark:border-slate-700 shadow-lg w-fit overflow-x-auto">
+            {TABS.map(tab => (
+              <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all duration-300 ${activeTab === tab.id ? "bg-white dark:bg-slate-700 shadow-md text-emerald-700 dark:text-emerald-400" : "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-white/50 dark:hover:bg-slate-700/50"}`}>
+                <tab.icon className={`w-4 h-4 ${activeTab === tab.id ? "text-emerald-500" : ""}`} />
+                {tab.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
       {/* Tab Content */}
-      <div className="flex-1 overflow-y-auto px-8 py-6 z-10 relative" style={{ scrollbarWidth: "none" }}>
+      <div className="flex-1 overflow-y-auto px-6 lg:px-10 pt-4 pb-8 z-10 relative" style={{ scrollbarWidth: "none" }}>
         <div className="max-w-[1400px] mx-auto">
           {activeTab === "dashboard" && <DashboardTab />}
           {activeTab === "planner" && <PlannerTab />}

@@ -83,14 +83,14 @@ function Citizens() {
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <Avatar className="h-8 w-8">
-                        <AvatarFallback className="bg-secondary text-xs text-primary">
+                        <AvatarFallback className="bg-secondary text-sm text-primary">
                           {initials(c.name)}
                         </AvatarFallback>
                       </Avatar>
                       <span className="font-medium">{c.name}</span>
                     </div>
                   </TableCell>
-                  <TableCell className="font-mono text-xs">{c.id}</TableCell>
+                  <TableCell className="font-mono text-sm">{c.id}</TableCell>
                   <TableCell className="text-muted-foreground">{c.ward}</TableCell>
                   <TableCell>{c.schemes}</TableCell>
                   <TableCell>

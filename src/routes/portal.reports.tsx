@@ -43,7 +43,7 @@ function Reports() {
               </span>
               <div className="min-w-0 flex-1">
                 <p className="truncate font-medium">{r.name}</p>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-sm text-muted-foreground">
                   {r.date} · {r.size}
                 </p>
               </div>
