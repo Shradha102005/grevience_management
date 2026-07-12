@@ -23,7 +23,7 @@ import {
   Users,
   FileText
 } from "lucide-react";
-import { ThemeToggle } from "@/components/theme-toggle";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -125,7 +125,6 @@ export function PortalShell({ children }: { children: ReactNode }) {
 
         {/* Right: Notifications & Profile */}
         <div className="flex items-center gap-4">
-          <ThemeToggle />
           
           <button className="relative p-2 text-slate-500 hover:text-indigo-600 hover:bg-white/80 dark:hover:bg-white/10 rounded-xl transition-all shadow-sm border border-transparent hover:border-white/60">
             <Bell className="h-5 w-5" />

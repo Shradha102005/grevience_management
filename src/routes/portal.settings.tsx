@@ -2,14 +2,14 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import {
   User, Shield, Bell, Palette, Building, CreditCard, Key, 
-  MonitorSmartphone, Save, Laptop, Moon, Sun, CheckCircle2
+  MonitorSmartphone, Save, CheckCircle2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useTheme } from "@/lib/theme";
+
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth-context";
 
@@ -28,7 +28,7 @@ const SETTING_SECTIONS = [
 
 function Settings() {
   const { user } = useAuth();
-  const { theme, setTheme } = useTheme();
+
   const [activeSection, setActiveSection] = useState("profile");
   const [saving, setSaving] = useState(false);
 
@@ -115,24 +115,6 @@ function Settings() {
               <div>
                 <h2 className="text-base font-bold mb-1">Appearance</h2>
                 <p className="text-sm text-muted-foreground">Customize how the application looks on your device.</p>
-              </div>
-
-              <div className="space-y-4">
-                <Label className="text-sm uppercase font-bold text-muted-foreground">Theme Preference</Label>
-                <div className="grid grid-cols-3 gap-4">
-                  <button onClick={() => setTheme("light")} className={`flex flex-col items-center gap-3 p-4 border rounded-sm transition-colors ${theme === 'light' ? 'border-primary bg-primary/5' : 'border-border bg-card hover:bg-muted/50'}`}>
-                     <Sun className={`h-6 w-6 ${theme === 'light' ? 'text-primary' : 'text-muted-foreground'}`} />
-                     <span className="text-sm font-medium">Light</span>
-                  </button>
-                  <button onClick={() => setTheme("dark")} className={`flex flex-col items-center gap-3 p-4 border rounded-sm transition-colors ${theme === 'dark' ? 'border-primary bg-primary/5' : 'border-border bg-card hover:bg-muted/50'}`}>
-                     <Moon className={`h-6 w-6 ${theme === 'dark' ? 'text-primary' : 'text-muted-foreground'}`} />
-                     <span className="text-sm font-medium">Dark</span>
-                  </button>
-                  <button onClick={() => setTheme("system")} className={`flex flex-col items-center gap-3 p-4 border rounded-sm transition-colors ${theme === 'system' ? 'border-primary bg-primary/5' : 'border-border bg-card hover:bg-muted/50'}`}>
-                     <Laptop className={`h-6 w-6 ${theme === 'system' ? 'text-primary' : 'text-muted-foreground'}`} />
-                     <span className="text-sm font-medium">System</span>
-                  </button>
-                </div>
               </div>
 
               <div className="space-y-4 pt-4 border-t border-border/50">
