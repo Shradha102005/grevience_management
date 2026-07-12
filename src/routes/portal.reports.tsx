@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/portal/reports")({
-  head: () => ({ meta: [{ title: "Reports — CIVICOS AI" }] }),
+  head: () => ({ meta: [{ title: "Reports — CivicSaathi" }] }),
   component: Reports,
 });
 
@@ -76,7 +76,7 @@ function Reports() {
               </span>
               <div className="min-w-0 flex-1">
                 <p className="truncate font-medium">{r.name}</p>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-sm text-muted-foreground">
                   {r.date} · {r.size}
                 </p>
               </div>

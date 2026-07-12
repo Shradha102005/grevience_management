@@ -14,10 +14,10 @@ import { Logo } from "@/components/logo";
 export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
-      { title: "Sign In — CIVICOS AI" },
+      { title: "Sign In — CivicSaathi" },
       {
         name: "description",
-        content: "Sign in to the CIVICOS AI governance platform.",
+        content: "Sign in to the CivicSaathi governance platform.",
       },
     ],
   }),
@@ -125,7 +125,7 @@ function LoginPage() {
                 <Input
                   id="login-email"
                   type="email"
-                  placeholder="1185780732@qq.com"
+                  placeholder="you@gov.in"
                   autoComplete="email"
                   {...register("email")}
                   aria-invalid={!!errors.email}
@@ -188,7 +188,6 @@ function LoginPage() {
                   />
                   Remember email
                 </label>
-
               </div>
 
               {/* Submit */}
@@ -207,10 +206,18 @@ function LoginPage() {
                 </Button>
               </div>
             </form>
+
+          </div>
+
+          {/* Divider */}
+          <div className="my-8 flex items-center gap-4">
+            <div className="h-px flex-1 bg-[#E2E8F0]" />
+            <span className="text-[10px] font-bold tracking-widest text-[#94A3B8] uppercase">New to CivicSaathi?</span>
+            <div className="h-px flex-1 bg-[#E2E8F0]" />
           </div>
 
           <footer className="text-[11px] font-semibold text-slate-400 dark:text-slate-500">
-            <p>© CIVICOS 2026</p>
+            <p>© CivicSaathi 2026</p>
           </footer>
         </div>
 

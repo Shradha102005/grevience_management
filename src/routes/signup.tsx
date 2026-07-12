@@ -22,10 +22,10 @@ import { Logo } from "@/components/logo";
 export const Route = createFileRoute("/signup")({
   head: () => ({
     meta: [
-      { title: "Create Account — CIVICOS AI" },
+      { title: "Create Account — CivicSaathi" },
       {
         name: "description",
-        content: "Create your CIVICOS AI governance account.",
+        content: "Create your CivicSaathi governance account.",
       },
     ],
   }),
@@ -146,7 +146,7 @@ function SignupPage() {
         values.password,
         values.role,
       );
-      toast.success("Welcome to CIVICOS!");
+      toast.success("Welcome to CivicSaathi!");
       await navigate({ to: "/portal" });
     } catch (err: unknown) {
       const message =
@@ -187,7 +187,7 @@ function SignupPage() {
                 Sign Up
               </h1>
               <p className="mt-1 text-xs text-slate-450 dark:text-slate-500 font-medium leading-relaxed">
-                Welcome to join the CIVICOS governance portal.
+                Welcome to join the CivicSaathi governance portal.
               </p>
             </div>
 
@@ -396,7 +396,7 @@ function SignupPage() {
 
           {/* Bottom copyright */}
           <footer className="text-[11px] font-semibold text-slate-400 dark:text-slate-500">
-            <p>© CIVICOS 2026</p>
+            <p>© CivicSaathi 2026</p>
           </footer>
         </div>
 

@@ -38,7 +38,7 @@ import { useAuth } from "@/lib/auth-context";
 import api from "@/lib/api";
 
 export const Route = createFileRoute("/portal/grievances")({
-  head: () => ({ meta: [{ title: "Grievances — CIVICOS AI" }] }),
+  head: () => ({ meta: [{ title: "Grievances — CivicSaathi" }] }),
   component: Grievances,
 });
 
@@ -259,6 +259,7 @@ function Grievances() {
   ];
 
   return (
+<<<<<<< HEAD
     <div
       className="-m-6 flex flex-col h-[calc(100vh-4rem)] relative overflow-hidden font-sans"
       style={{ background: "#f1f5f9" }}
@@ -268,6 +269,13 @@ function Grievances() {
         className="absolute inset-0 z-0 pointer-events-none opacity-60"
         style={{
           backgroundImage: `
+=======
+    <div className="flex flex-col h-[calc(100vh-4rem)] relative overflow-hidden font-sans bg-transparent">
+
+      {/*  Ambient Background  */}
+      <div className="absolute inset-0 z-0 pointer-events-none opacity-60" style={{
+        backgroundImage: `
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
           radial-gradient(circle at 10% 20%, rgba(244, 63, 94, 0.1), transparent 30%),
           radial-gradient(circle at 90% 70%, rgba(245, 158, 11, 0.12), transparent 30%),
           radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.08), transparent 40%)
@@ -283,6 +291,7 @@ function Grievances() {
         }}
       />
 
+<<<<<<< HEAD
       {/* ── Top Header Glass ── */}
       <div
         className="flex items-center justify-between px-8 py-5 z-10 shrink-0"
@@ -307,9 +316,22 @@ function Grievances() {
               Citizen Grievances
             </h1>
             <p className="text-xs text-slate-500 font-semibold tracking-wide flex items-center gap-2">
+=======
+      {/*  Top Header Glass  */}
+      <div className="flex items-center justify-between px-8 py-6 z-10 shrink-0 bg-white/40 backdrop-blur-3xl border-b border-white/50 shadow-sm">
+        <div className="flex items-center gap-4">
+          <div className="h-14 w-14 rounded-[1.25rem] flex items-center justify-center text-rose-600 shadow-xl shadow-rose-500/20 bg-gradient-to-br from-white to-rose-50 border border-white">
+            <MessageSquareWarning className="h-7 w-7" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">
+              Citizen Grievances
+            </h1>
+            <p className="text-sm text-slate-500 font-semibold tracking-wide flex items-center gap-2">
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
               Public Resolution Network
               {lastUpdated && (
-                <span className="inline-flex items-center gap-1 text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100 font-bold text-[10px]">
+                <span className="inline-flex items-center gap-1 text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100 font-bold text-sm">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse inline-block" />
                   Live · {lastUpdated.toLocaleTimeString()}
                 </span>
@@ -363,14 +385,21 @@ function Grievances() {
         </div>
       </div>
 
+<<<<<<< HEAD
       {/* ── Main Canvas Area ── */}
       <div className="flex-1 flex overflow-hidden p-8 justify-center z-10 relative">
+=======
+      {/*  Main Canvas Area  */}
+      <div className="flex-1 flex overflow-hidden px-8 pt-4 pb-8 justify-center z-10 relative">
+
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
         {/* VIEW 1: List + KPIs */}
         {!activeItem && (
           <div className="w-full max-w-7xl h-full flex flex-col">
             {/* KPI Cards Row */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-2">
               {kpis.map((kpi, idx) => (
+<<<<<<< HEAD
                 <div
                   key={idx}
                   className={`bg-gradient-to-br ${kpi.bg} backdrop-blur-xl border border-white shadow-lg shadow-slate-200/40 rounded-2xl p-5 flex flex-col justify-between`}
@@ -388,6 +417,14 @@ function Grievances() {
                       ) : (
                         <TrendingDown className="h-3 w-3" />
                       )}
+=======
+                <div key={idx} className={`bg-gradient-to-br ${kpi.bg} backdrop-blur-3xl border border-white/60 shadow-xl shadow-slate-200/40 rounded-[2rem] p-6 flex flex-col justify-between hover:-translate-y-1 hover:shadow-2xl transition-all duration-300`}>
+                  <p className="text-sm font-bold uppercase tracking-widest text-slate-500/80 mb-1">{kpi.label}</p>
+                  <div className="flex items-end justify-between mt-2">
+                    <h3 className={`text-2xl font-extrabold tracking-tight ${kpi.color}`}>{kpi.value}</h3>
+                    <span className="text-sm font-bold bg-white/80 px-2.5 py-1 rounded-full border border-white/50 text-slate-600 shadow-sm flex items-center gap-1">
+                      {kpi.trend === "up" ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                       {kpi.delta}
                     </span>
                   </div>
@@ -397,12 +434,17 @@ function Grievances() {
 
             {/* Header row */}
             <div className="flex items-center justify-between mb-4">
+<<<<<<< HEAD
               <h2 className="text-lg font-extrabold text-slate-700 tracking-tight">
                 {loading
                   ? "Syncing..."
                   : `${grievances.length} Grievance${grievances.length !== 1 ? "s" : ""}`}
+=======
+              <h2 className="text-base font-extrabold text-slate-700 tracking-tight">
+                {loading ? "Syncing..." : `${grievances.length} Grievance${grievances.length !== 1 ? "s" : ""}`}
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
               </h2>
-              <Badge className="bg-white text-rose-600 border-rose-100 shadow-sm px-4 py-1.5 text-xs font-bold rounded-full border">
+              <Badge className="bg-white text-rose-600 border-rose-100 shadow-sm px-4 py-1.5 text-sm font-bold rounded-full border">
                 Auto-refresh · 3s
               </Badge>
             </div>
@@ -426,6 +468,7 @@ function Grievances() {
                 grievances.map((r, i) => (
                   <div
                     key={r.id}
+<<<<<<< HEAD
                     onClick={() => {
                       setActiveItem(r);
                       setUpdateStatus(r.status);
@@ -468,14 +511,41 @@ function Grievances() {
                         <span className="truncate max-w-[200px]">
                           {r.location}
                         </span>
+=======
+                    onClick={() => { setActiveItem(r); setUpdateStatus(r.status); }}
+                    className="group bg-white/60 backdrop-blur-3xl border border-white/60 shadow-xl shadow-slate-200/40 hover:shadow-2xl hover:bg-white/80 rounded-[2rem] p-6 cursor-pointer transition-all hover:-translate-y-1 flex items-center gap-6 relative overflow-hidden"
+                    style={{ animation: `slideIn 0.3s cubic-bezier(0.16,1,0.3,1) ${i * 0.04}s both` }}
+                  >
+                    {/* Subtle internal gradient glow */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-rose-500/0 via-transparent to-rose-500/0 group-hover:from-rose-500/5 group-hover:to-orange-500/5 transition-colors pointer-events-none" />
+
+                    <div className="flex-1 min-w-0 relative z-10">
+                      <div className="flex items-center gap-3 mb-3">
+                        <span className="text-sm text-slate-500 font-mono font-bold bg-white/80 px-2.5 py-1 rounded-md border border-white shadow-sm">{r.complaint_number}</span>
+                        <span className={`text-sm font-extrabold uppercase tracking-widest px-3 py-1 rounded-md border shadow-sm ${statusColors[r.status] || 'bg-slate-100 text-slate-600 border-slate-200'}`}>
+                          {r.status}
+                        </span>
+                        <span className="text-sm text-slate-400 font-bold ml-auto">{timeAgo(r.created_at)}</span>
+                      </div>
+                      <h4 className="font-extrabold text-slate-800 text-base leading-tight truncate group-hover:text-rose-600 transition-colors">{r.title}</h4>
+                      <p className="text-sm text-slate-500/90 mt-2 flex items-center gap-2 font-bold">
+                        {r.submitter_name && <><span className="font-extrabold text-slate-700">{r.submitter_name}</span><span className="text-slate-300">•</span></>}
+                        <Building2 className="h-4 w-4 text-slate-400" /> {r.department}
+                        <span className="text-slate-300">•</span>
+                        <MapPin className="h-4 w-4 text-slate-400" /> <span className="truncate max-w-[200px]">{r.location}</span>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                       </p>
                     </div>
 
                     <div className="flex items-center gap-6 shrink-0 border-l border-slate-200/50 pl-6">
                       <div className="text-right">
+<<<<<<< HEAD
                         <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-1">
                           Priority
                         </p>
+=======
+                        <p className="text-sm uppercase font-bold text-slate-400 tracking-wider mb-1">Priority</p>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                         <span className="text-sm font-bold text-slate-700 flex items-center gap-1.5 justify-end">
                           {priorityIcon[r.priority] ?? (
                             <MinusCircle className="h-4 w-4 text-slate-400" />
@@ -510,12 +580,17 @@ function Grievances() {
                 </Button>
                 <div>
                   <div className="flex items-center gap-3 mb-3">
+<<<<<<< HEAD
                     <span className="bg-slate-800 text-white font-mono text-xs px-3 py-1 rounded-md font-bold shadow-md">
                       {activeItem.complaint_number}
                     </span>
                     <span
                       className={`text-[11px] font-extrabold uppercase tracking-widest px-3 py-1 rounded-md border shadow-sm ${statusColors[activeItem.status] || "bg-slate-100 text-slate-600 border-slate-200"}`}
                     >
+=======
+                    <span className="bg-slate-800 text-white font-mono text-sm px-3 py-1 rounded-md font-bold shadow-md">{activeItem.complaint_number}</span>
+                    <span className={`text-sm font-extrabold uppercase tracking-widest px-3 py-1 rounded-md border shadow-sm ${statusColors[activeItem.status] || 'bg-slate-100 text-slate-600 border-slate-200'}`}>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                       {activeItem.status}
                     </span>
                   </div>
@@ -536,9 +611,13 @@ function Grievances() {
 
               {isStaff && (
                 <div className="flex flex-col items-end gap-2 bg-white p-3 rounded-2xl border border-slate-100 shadow-sm">
+<<<<<<< HEAD
                   <Label className="text-xs font-bold text-slate-400 uppercase tracking-wider">
                     Update Status
                   </Label>
+=======
+                  <Label className="text-sm font-bold text-slate-400 uppercase tracking-wider">Update Status</Label>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                   <Select
                     value={updateStatus}
                     onValueChange={(v) => {
@@ -570,6 +649,7 @@ function Grievances() {
                 {/* Left Column */}
                 <div className="lg:col-span-2 space-y-10">
                   <div className="bg-white rounded-3xl p-8 border border-white shadow-xl shadow-slate-200/40">
+<<<<<<< HEAD
                     <h3 className="text-[11px] font-black text-rose-500 uppercase tracking-widest mb-4 flex items-center gap-2">
                       <MessageSquareWarning className="h-4 w-4" /> Grievance
                       Details
@@ -577,6 +657,13 @@ function Grievances() {
                     <p className="text-[16px] text-slate-700 font-medium leading-relaxed whitespace-pre-wrap">
                       {activeItem.description ||
                         "No detailed description provided."}
+=======
+                    <h3 className="text-sm font-black text-rose-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                      <MessageSquareWarning className="h-4 w-4" /> Grievance Details
+                    </h3>
+                    <p className="text-base text-slate-700 font-medium leading-relaxed whitespace-pre-wrap">
+                      {activeItem.description || "No detailed description provided."}
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                     </p>
                   </div>
 
@@ -591,6 +678,7 @@ function Grievances() {
                       }}
                     />
                     <div className="relative z-10">
+<<<<<<< HEAD
                       <p className="text-[10px] uppercase font-black text-slate-400 tracking-widest mb-2">
                         Priority
                       </p>
@@ -616,13 +704,32 @@ function Grievances() {
                       <span className="text-xl font-bold flex items-center gap-3">
                         <Building2 className="h-6 w-6 text-indigo-400" />{" "}
                         {activeItem.department}
+=======
+                      <p className="text-sm uppercase font-black text-slate-400 tracking-widest mb-2">Priority</p>
+                      <span className="text-base font-bold flex items-center gap-3">
+                        {priorityIcon[activeItem.priority] ?? <MinusCircle className="h-5 w-5 text-slate-400" />} {activeItem.priority}
+                      </span>
+                    </div>
+                    <div className="relative z-10">
+                      <p className="text-sm uppercase font-black text-slate-400 tracking-widest mb-2">Category</p>
+                      <span className="text-base font-bold">{activeItem.category}</span>
+                    </div>
+                    <div className="col-span-2 pt-6 border-t border-slate-700/50 relative z-10">
+                      <p className="text-sm uppercase font-black text-slate-400 tracking-widest mb-2">Assigned Department</p>
+                      <span className="text-base font-bold flex items-center gap-3">
+                        <Building2 className="h-6 w-6 text-indigo-400" /> {activeItem.department}
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                       </span>
                     </div>
                     {activeItem.progress > 0 && (
                       <div className="col-span-2 relative z-10">
+<<<<<<< HEAD
                         <p className="text-[10px] uppercase font-black text-slate-400 tracking-widest mb-3">
                           Progress
                         </p>
+=======
+                        <p className="text-sm uppercase font-black text-slate-400 tracking-widest mb-3">Progress</p>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                         <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
                           <div
                             className="h-full bg-gradient-to-r from-indigo-500 to-emerald-400 rounded-full transition-all duration-700"
@@ -638,12 +745,16 @@ function Grievances() {
 
                   {activeItem.officer_notes && (
                     <div className="bg-white rounded-3xl p-8 border border-white shadow-xl shadow-slate-200/40">
-                      <h3 className="text-[11px] font-black text-indigo-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                      <h3 className="text-sm font-black text-indigo-500 uppercase tracking-widest mb-4 flex items-center gap-2">
                         <Pencil className="h-4 w-4" /> Officer Notes
                       </h3>
+<<<<<<< HEAD
                       <p className="text-[15px] text-slate-700 font-medium leading-relaxed">
                         {activeItem.officer_notes}
                       </p>
+=======
+                      <p className="text-base text-slate-700 font-medium leading-relaxed">{activeItem.officer_notes}</p>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                     </div>
                   )}
                 </div>
@@ -670,7 +781,7 @@ function Grievances() {
 
                   {/* Activity Timeline */}
                   <div className="bg-white rounded-3xl p-8 border border-white shadow-xl shadow-slate-200/40">
-                    <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
+                    <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
                       <Activity className="h-4 w-4" /> Activity Log
                     </h3>
                     <div className="space-y-6 border-l-2 border-slate-100 ml-4 pl-8 relative">
@@ -679,11 +790,16 @@ function Grievances() {
                         <div className="absolute -left-[41px] top-0 h-6 w-6 rounded-full bg-slate-50 border-4 border-white flex items-center justify-center shadow-md">
                           <AlertCircle className="h-3 w-3 text-slate-500" />
                         </div>
+<<<<<<< HEAD
                         <p className="text-xs text-slate-900">
                           <span className="font-black">Citizen</span> logged
                           grievance.
                         </p>
                         <span className="text-[10px] text-slate-400 font-mono font-semibold block mt-0.5">
+=======
+                        <p className="text-sm text-slate-900"><span className="font-black">Citizen</span> logged grievance.</p>
+                        <span className="text-sm text-slate-400 font-mono font-semibold block mt-0.5">
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                           {new Date(activeItem.created_at).toLocaleString()}
                         </span>
                       </div>
@@ -723,6 +839,7 @@ function Grievances() {
                               <div className="absolute -left-[41px] top-0 h-6 w-6 rounded-full bg-blue-50 border-4 border-white flex items-center justify-center shadow-md">
                                 <Pencil className="h-3 w-3 text-blue-600" />
                               </div>
+<<<<<<< HEAD
                               <p className="text-xs text-slate-900">
                                 <span className="font-black">System</span>{" "}
                                 updated status.
@@ -734,6 +851,31 @@ function Grievances() {
                               </span>
                             </div>
                           )}
+=======
+                              <p className="text-sm text-slate-900">
+                                <span className="font-black">{h.changed_by_name ?? "Officer"}</span> changed status to{" "}
+                                <span className={`font-bold px-1.5 py-0.5 rounded text-sm ${statusColors[h.new_status] ?? "bg-slate-100 text-slate-600"}`}>{h.new_status}</span>
+                              </p>
+                              {h.note && <p className="text-sm text-slate-500 mt-0.5 italic">"{h.note}"</p>}
+                              <span className="text-sm text-slate-400 font-mono font-semibold block mt-0.5">
+                                {new Date(h.changed_at).toLocaleString()}
+                              </span>
+                            </div>
+                          ))
+                      ) : (
+                        activeItem.status !== "Submitted" && (
+                          <div className="relative">
+                            <div className="absolute -left-[41px] top-0 h-6 w-6 rounded-full bg-blue-50 border-4 border-white flex items-center justify-center shadow-md">
+                              <Pencil className="h-3 w-3 text-blue-600" />
+                            </div>
+                            <p className="text-sm text-slate-900"><span className="font-black">System</span> updated status.</p>
+                            <span className="text-sm text-slate-400 font-mono font-semibold block mt-0.5">
+                              {new Date(activeItem.updated_at).toLocaleString()}
+                            </span>
+                          </div>
+                        )
+                      )}
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
 
                       {/* Last sync */}
                       {lastUpdated && (
@@ -741,10 +883,15 @@ function Grievances() {
                           <div className="absolute -left-[41px] top-0 h-6 w-6 rounded-full bg-emerald-50 border-4 border-white flex items-center justify-center shadow-md">
                             <Clock className="h-3 w-3 text-emerald-600" />
                           </div>
+<<<<<<< HEAD
                           <p className="text-xs text-emerald-600 font-bold">
                             Live sync
                           </p>
                           <span className="text-[10px] text-slate-400 font-mono font-semibold block mt-0.5">
+=======
+                          <p className="text-sm text-emerald-600 font-bold">Live sync</p>
+                          <span className="text-sm text-slate-400 font-mono font-semibold block mt-0.5">
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                             {lastUpdated.toLocaleTimeString()}
                           </span>
                         </div>

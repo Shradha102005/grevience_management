@@ -1,5 +1,5 @@
 """
-Live Data Router — CIVICOS AI
+Live Data Router — CivicSaathi
 Provides real-time data endpoints for all service modules:
   - Weather via OpenWeatherMap API
   - Schemes (50+ Indian govt schemes, searchable, eligibility-checkable)

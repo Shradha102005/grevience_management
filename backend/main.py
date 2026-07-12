@@ -28,13 +28,17 @@ from routers import smart_city as smart_city_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    init_db()
-    logger.info("✅ Database initialized.")
+    try:
+        init_db()
+        logger.info("✅ Database initialized.")
+    except Exception as exc:
+        logger.warning(f"⚠️  DB init skipped — server running in offline mode. ({exc})")
     yield
 
 
+
 app = FastAPI(
-    title="CIVICOS AI — Governance Backend",
+    title="CivicSaathi — Governance Backend",
     description="REST API for citizen governance, authentication and all 9 service modules.",
     version="1.0.0",
     lifespan=lifespan,
@@ -74,4 +78,4 @@ app.include_router(smart_city_router.router)
 # ── Health Check ──────────────────────────────────────────────────────────────
 @app.get("/health", tags=["system"])
 def health():
-    return {"status": "ok", "service": "CIVICOS AI Backend"}
+    return {"status": "ok", "service": "CivicSaathi Backend"}

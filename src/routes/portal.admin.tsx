@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
 export const Route = createFileRoute("/portal/admin")({
-  head: () => ({ meta: [{ title: "Admin Console — CIVICOS AI" }] }),
+  head: () => ({ meta: [{ title: "Admin Console — CivicSaathi" }] }),
   component: Admin,
 });
 
@@ -60,7 +60,7 @@ function Admin() {
         </CardContent>
       </Card>
 
-      <h2 className="mb-4 font-display text-lg font-bold">Management Tools</h2>
+      <h2 className="mb-4 font-display text-base font-bold">Management Tools</h2>
       <FeatureGrid features={FEATURES} />
     </div>
   );

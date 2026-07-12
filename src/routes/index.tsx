@@ -78,9 +78,10 @@ function LightLanding3D() {
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
             className="flex-1 flex flex-col items-start text-left"
           >
+
             <div className="inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-white/70 backdrop-blur-md px-4 py-1.5 text-xs font-black uppercase tracking-widest text-indigo-600 shadow-sm mb-8">
               <Activity className="h-3.5 w-3.5 text-indigo-500 animate-pulse" />
-              Civicos OS Engine v2.0
+              CivicSaathi · AI Governance
             </div>
 
             <h1 className="text-5xl md:text-7xl lg:text-[80px] xl:text-[90px] font-black text-slate-900 tracking-tighter leading-[0.9] mb-8">
@@ -225,10 +226,7 @@ function LightLanding3D() {
                 <div className="flex flex-col items-center gap-0.5">
                   <Sparkles className="w-6 h-6 text-indigo-500 mb-1" />
                   <span className="text-[11px] font-black text-transparent bg-clip-text bg-gradient-to-br from-indigo-600 to-cyan-500 tracking-wider leading-tight text-center">
-                    CIVICOS
-                  </span>
-                  <span className="text-[9px] font-semibold text-slate-400 tracking-widest uppercase">
-                    OS v2.0
+                    CivicSaathi
                   </span>
                 </div>
               </motion.div>
@@ -262,7 +260,7 @@ function LightLanding3D() {
               A Unified Governance Architecture.
             </h2>
             <p className="text-lg text-slate-500 font-semibold leading-relaxed">
-              CIVICOS OS isn't just a collection of apps. It is a deeply
+              CivicSaathi isn't just a collection of apps. It is a deeply
               integrated platform built on three core pillars that transform how
               municipalities operate.
             </p>
@@ -1465,8 +1463,12 @@ function LightLanding3D() {
             </h2>
 
             <p className="text-lg md:text-xl text-slate-500 font-medium mb-10 max-w-2xl leading-relaxed">
+<<<<<<< HEAD
               Step into the control center. Integrate your municipality's data
               and unleash the intelligence of CIVICOS OS.
+=======
+              Step into the control center. Integrate your municipality's data and unleash the intelligence of CivicSaathi.
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
             </p>
 
             <Button

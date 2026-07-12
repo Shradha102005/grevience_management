@@ -144,7 +144,7 @@ def save_to_db(schemes: list[dict]) -> int:
 
 def main():
     logger.info("=" * 60)
-    logger.info("  CIVICOS — Scheme Database Seeder")
+    logger.info("  CivicSaathi — Scheme Database Seeder")
     logger.info("=" * 60)
 
     # Ensure the `schemes` table exists

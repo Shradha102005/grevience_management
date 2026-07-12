@@ -78,6 +78,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
+<<<<<<< HEAD
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   {
     head: () => ({
@@ -127,6 +128,40 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     errorComponent: ErrorComponent,
   },
 );
+=======
+export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  head: () => ({
+    meta: [
+      { charSet: "utf-8" },
+      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { title: "CivicSaathi — AI-Powered Citizen Governance Platform" },
+      { name: "description", content: "CivicSaathi is a unified, AI-powered platform for citizen schemes, grievances, emergency response, municipal services, and governance automation." },
+      { name: "author", content: "CivicSaathi" },
+      { property: "og:title", content: "CivicSaathi — AI-Powered Citizen Governance Platform" },
+      { property: "og:description", content: "One unified platform for schemes, grievances, emergency response, municipal services, citizen engagement and governance automation." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:site", content: "@CivicosAI" },
+    ],
+    links: [
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap",
+      },
+      {
+        rel: "stylesheet",
+        href: appCss,
+      },
+    ],
+  }),
+  shellComponent: RootShell,
+  component: RootComponent,
+  notFoundComponent: NotFoundComponent,
+  errorComponent: ErrorComponent,
+});
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
 
 function RootShell({ children }: { children: ReactNode }) {
   return (

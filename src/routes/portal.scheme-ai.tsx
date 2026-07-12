@@ -27,7 +27,7 @@ import { toast } from "sonner";
 import { ChatPanel } from "@/components/portal/chat-panel";
 
 export const Route = createFileRoute("/portal/scheme-ai")({
-  head: () => ({ meta: [{ title: "Scheme Finder — CIVICOS AI" }] }),
+  head: () => ({ meta: [{ title: "Scheme Finder — CivicSaathi" }] }),
   component: SchemeAI,
 });
 
@@ -87,6 +87,7 @@ function getCategoryPill(cat: string) {
   return CATEGORY_PILL[cat] ?? "bg-slate-100 text-slate-600 border-slate-200";
 }
 
+<<<<<<< HEAD
 // ── Eligibility HUD Modal ────────────────────────────────────────────────────────
 function EligibilityModal({
   open,
@@ -95,6 +96,10 @@ function EligibilityModal({
   open: boolean;
   onClose: () => void;
 }) {
+=======
+//  Eligibility HUD Modal 
+function EligibilityModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
   const [form, setForm] = useState({
     age: "",
     gender: "",
@@ -145,6 +150,7 @@ function EligibilityModal({
       <div className="bg-white/90 backdrop-blur-2xl border border-white shadow-2xl rounded-3xl w-full max-w-2xl max-h-[85vh] overflow-y-auto m-4 animate-in zoom-in-95 duration-300">
         <div className="px-8 py-6 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white/80 backdrop-blur-xl z-10">
           <div>
+<<<<<<< HEAD
             <h2 className="text-xl font-extrabold text-slate-900 flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-indigo-500" /> Auto-Eligibility
               Match
@@ -158,6 +164,15 @@ function EligibilityModal({
             className="p-2 bg-slate-50 hover:bg-slate-100 rounded-full text-slate-500 transition-colors"
           >
             <X className="w-5 h-5" />
+=======
+            <h2 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-indigo-500" /> Auto-Eligibility Match
+            </h2>
+            <p className="text-sm text-slate-500 font-semibold mt-1">AI analyzes your profile to find schemes you qualify for.</p>
+          </div>
+          <button onClick={onClose} className="p-2 bg-slate-50 hover:bg-slate-100 rounded-full text-slate-500 transition-colors">
+            <X className="w-4 h-4" />
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
           </button>
         </div>
 
@@ -186,12 +201,17 @@ function EligibilityModal({
                   },
                 ].map(({ key, label, placeholder, type }) => (
                   <div key={key} className="space-y-2">
+<<<<<<< HEAD
                     <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
                       {label}
                     </Label>
                     <Input
                       type={type}
                       placeholder={placeholder}
+=======
+                    <Label className="text-sm font-black text-slate-400 uppercase tracking-widest">{label}</Label>
+                    <Input type={type} placeholder={placeholder}
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                       value={(form as any)[key]}
                       onChange={(e) =>
                         setForm((f) => ({ ...f, [key]: e.target.value }))
@@ -231,9 +251,13 @@ function EligibilityModal({
                   },
                 ].map(({ key, label, opts }) => (
                   <div key={key} className="space-y-2">
+<<<<<<< HEAD
                     <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
                       {label}
                     </Label>
+=======
+                    <Label className="text-sm font-black text-slate-400 uppercase tracking-widest">{label}</Label>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                     <select
                       value={(form as any)[key]}
                       onChange={(e) =>
@@ -251,6 +275,7 @@ function EligibilityModal({
                   </div>
                 ))}
               </div>
+<<<<<<< HEAD
               <Button
                 onClick={handleCheck}
                 disabled={loading}
@@ -266,12 +291,19 @@ function EligibilityModal({
                     <Sparkles className="w-5 h-5 mr-2" /> Find My Schemes
                   </>
                 )}
+=======
+              <Button onClick={handleCheck} disabled={loading} className="w-full h-12 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-lg shadow-indigo-500/20 text-base">
+                {loading
+                  ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Processing Profile…</>
+                  : <><Sparkles className="w-4 h-4 mr-2" /> Find My Schemes</>}
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
               </Button>
             </div>
           ) : (
             <div className="space-y-6">
               <div className="flex items-center justify-between bg-indigo-50 border border-indigo-100 p-4 rounded-xl">
                 <p className="text-sm text-indigo-900 font-medium">
+<<<<<<< HEAD
                   <span className="font-extrabold text-indigo-700 text-lg mr-1">
                     {results.length}
                   </span>{" "}
@@ -283,10 +315,16 @@ function EligibilityModal({
                 >
                   ← Edit Profile
                 </button>
+=======
+                  <span className="font-extrabold text-indigo-700 text-base mr-1">{results.length}</span> schemes matched your profile.
+                </p>
+                <button onClick={() => setChecked(false)} className="text-sm font-bold text-indigo-600 hover:underline">← Edit Profile</button>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
               </div>
 
               <div className="space-y-4">
                 {results.map(({ scheme, score, reasons }, i) => (
+<<<<<<< HEAD
                   <div
                     key={i}
                     className="bg-white border border-slate-100 shadow-sm rounded-2xl p-5 relative overflow-hidden group hover:border-indigo-200 transition-colors"
@@ -322,6 +360,25 @@ function EligibilityModal({
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-1.5 text-xs text-white bg-slate-800 hover:bg-slate-900 px-4 py-2 rounded-lg font-bold mt-4 transition-colors"
                       >
+=======
+                  <div key={i} className="bg-white/60 backdrop-blur-3xl shadow-xl shadow-slate-200/40 border border-white/60 rounded-2xl p-5 relative overflow-hidden group hover:border-indigo-200 transition-colors">
+                    <div className="absolute top-0 bottom-0 left-0 w-1.5 bg-indigo-500" />
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <p className="font-extrabold text-slate-800 text-base">{scheme.name}</p>
+                        <p className="text-sm text-slate-500 font-semibold mt-1">{scheme.ministry || scheme.state}</p>
+                      </div>
+                      <span className="text-sm font-black text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100 shrink-0">{score}% Match</span>
+                    </div>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {reasons.slice(0, 3).map((r: string, j: number) => (
+                        <span key={j} className="text-sm font-bold uppercase tracking-wider text-slate-500 bg-slate-50 px-2 py-1 rounded-md border border-slate-100">✓ {r}</span>
+                      ))}
+                    </div>
+                    {(scheme.apply_url || scheme.portal_url) && (
+                      <a href={scheme.apply_url || scheme.portal_url} target="_blank" rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 text-sm text-white bg-slate-800 hover:bg-slate-900 px-4 py-2 rounded-lg font-bold mt-4 transition-colors">
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                         Apply Now <ArrowUpRight className="w-3.5 h-3.5" />
                       </a>
                     )}
@@ -336,6 +393,7 @@ function EligibilityModal({
   );
 }
 
+<<<<<<< HEAD
 // ── Custom Searchable Dropdown ────────────────────────────────────────────────
 function SearchableDropdown({
   options,
@@ -346,6 +404,10 @@ function SearchableDropdown({
   value: string;
   onChange: (v: string) => void;
 }) {
+=======
+//  Custom Searchable Dropdown 
+function SearchableDropdown({ options, value, onChange }: { options: string[], value: string, onChange: (v: string) => void }) {
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const ref = useRef<HTMLDivElement>(null);
@@ -440,7 +502,7 @@ function SearchableDropdown({
   );
 }
 
-// ── Main Dashboard ─────────────────────────────────────────────────────────────
+//  Main Dashboard 
 function SchemeAI() {
   const [schemes, setSchemes] = useState<Scheme[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
@@ -540,6 +602,7 @@ function SchemeAI() {
   };
 
   return (
+<<<<<<< HEAD
     <div
       className="-m-6 flex flex-col h-[calc(100vh-4rem)] relative overflow-hidden font-sans"
       style={{ background: "#f1f5f9" }}
@@ -650,10 +713,73 @@ function SchemeAI() {
               )}
             </Button>
           </div>
+=======
+    <div className="flex flex-col h-[calc(100vh-4rem)] relative overflow-hidden font-sans bg-transparent animate-in fade-in duration-500">
+      
+      {/* Premium Ambient Background */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        <div className="absolute top-[-10%] right-[-5%] w-[40%] h-[40%] rounded-full bg-indigo-500/20 dark:bg-indigo-900/30 blur-[120px] animate-pulse" style={{ animationDuration: '8s' }} />
+        <div className="absolute bottom-[-10%] left-[-5%] w-[40%] h-[40%] rounded-full bg-purple-500/20 dark:bg-purple-900/30 blur-[120px] animate-pulse" style={{ animationDuration: '10s' }} />
+        <div className="absolute inset-0" style={{ backgroundImage: "radial-gradient(rgba(148,163,184,0.1) 1px, transparent 1px)", backgroundSize: "32px 32px" }} />
+      </div>
+
+      {/*  Top Header Glass  */}
+      {!selected && (
+        <div className="shrink-0 z-20 px-6 lg:px-10 pt-8 pb-4 border-b border-indigo-500/10">
+          <div className="max-w-[1400px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="flex items-center gap-6">
+              <div className="hidden md:flex h-16 w-16 rounded-[1.5rem] items-center justify-center text-white shadow-2xl shadow-indigo-500/30 bg-gradient-to-br from-indigo-500 to-purple-500 shrink-0">
+                <HeartHandshake className="h-8 w-8" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-extrabold tracking-tight flex items-center gap-3">
+                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-purple-500 to-pink-500 animate-gradient-x">
+                    Scheme Finder AI
+                  </span>
+                </h1>
+                <div className="flex items-center gap-2 mt-2">
+                  <p className="text-slate-500/80 dark:text-slate-400 font-bold text-base">Government Welfare & Grants</p>
+                  {scrapeInfo?.is_scraping && (
+                    <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 ml-2">
+                      <Loader2 className="w-3 h-3 text-indigo-500 animate-spin" />
+                      <span className="text-sm font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">Syncing live data...</span>
+                    </span>
+                  )}
+                  {scrapeInfo?.source === "myscheme.gov.in" && !scrapeInfo?.is_scraping && (
+                    <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 ml-2">
+                      <CheckCircle2 className="w-3 h-3 text-emerald-500" />
+                      <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">Live Synced ({scrapeInfo?.total})</span>
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-3 flex-wrap md:flex-nowrap">
+              <div className="relative shadow-xl shadow-slate-200/40 rounded-[1.25rem]">
+                <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                <Input className="h-14 pl-12 pr-10 text-sm w-64 lg:w-72 bg-white/60 backdrop-blur-2xl border-white/60 shadow-none text-slate-800 focus:border-indigo-300 focus:ring-4 focus:ring-indigo-500/10 rounded-[1.25rem] transition-all placeholder:text-slate-400 font-semibold" placeholder="Search by name, tags..." value={search} onChange={e => handleSearch(e.target.value)} />
+                {search && (
+                  <button onClick={() => handleSearch("")} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700">
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+              
+              <Button onClick={() => setEligibilityOpen(true)} className="h-14 bg-white/60 backdrop-blur-2xl hover:bg-white hover:scale-105 hover:shadow-2xl text-indigo-600 border border-white/60 shadow-xl shadow-slate-200/40 font-extrabold px-6 rounded-[1.25rem] transition-all text-sm shrink-0">
+                <Sparkles className="mr-2 h-5 w-5 animate-pulse" /> Check Eligibility
+              </Button>
+              
+              <Button onClick={() => setChatOpen(!chatOpen)} className={`h-14 font-extrabold px-6 rounded-[1.25rem] shadow-xl transition-all text-sm hover:scale-105 shrink-0 ${chatOpen ? 'bg-slate-800 hover:bg-slate-900 text-white shadow-slate-900/20' : 'bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white shadow-indigo-500/30'}`}>
+                {chatOpen ? <><X className="mr-2 h-5 w-5" /> Close AI</> : <><Bot className="mr-2 h-5 w-5" /> Scheme Assistant</>}
+              </Button>
+            </div>
+          </div>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
         </div>
       )}
 
-      {/* ── Main Canvas Area ── */}
+      {/*  Main Canvas Area  */}
       <div className="flex-1 flex overflow-hidden p-3 justify-center z-10 relative">
         {/* VIEW 1: Scheme Grid / List */}
         {!selected && (
@@ -698,6 +824,7 @@ function SchemeAI() {
                       }}
                     >
                       <div>
+<<<<<<< HEAD
                         <div className="flex items-start justify-between gap-4 mb-4">
                           <span
                             className={`text-[10px] font-extrabold uppercase tracking-widest px-3 py-1 rounded-lg border ${getCategoryPill(scheme.category)}`}
@@ -716,6 +843,21 @@ function SchemeAI() {
                           {scheme.name}
                         </h4>
 
+=======
+                        <div className="flex items-start justify-between gap-4 mb-2">
+                          <span className={`text-sm font-extrabold uppercase tracking-widest px-3 py-1 rounded-lg border ${getCategoryPill(scheme.category)}`}>
+                            {scheme.category}
+                          </span>
+                          {scheme.state && scheme.state !== "Central" && (
+                            <span className="text-sm font-bold text-slate-500 bg-slate-100/80 px-2 py-1 rounded-md border border-slate-200 flex items-center gap-1">
+                              <MapPin className="w-3 h-3" />{scheme.state}
+                            </span>
+                          )}
+                        </div>
+                        
+                        <h4 className="font-extrabold text-slate-800 text-base leading-tight mb-2 group-hover:text-indigo-600 transition-colors line-clamp-2">{scheme.name}</h4>
+                        
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                         {(scheme.benefit || scheme.description) && (
                           <p className="text-sm text-slate-500 font-medium leading-relaxed line-clamp-2">
                             {scheme.benefit || scheme.description}
@@ -724,6 +866,7 @@ function SchemeAI() {
                       </div>
 
                       <div className="mt-5 pt-5 border-t border-slate-200/50 flex items-center justify-between">
+<<<<<<< HEAD
                         <div className="flex flex-col">
                           {scheme.ministry && (
                             <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1 line-clamp-1">
@@ -751,6 +894,22 @@ function SchemeAI() {
                         <div className="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center group-hover:bg-indigo-100 group-hover:text-indigo-600 transition-colors text-slate-400 shrink-0">
                           <ArrowUpRight className="h-5 w-5" />
                         </div>
+=======
+                         <div className="flex flex-col">
+                           {scheme.ministry && <span className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-1 line-clamp-1">{scheme.ministry}</span>}
+                           {scheme.tags && scheme.tags.length > 0 && (
+                             <div className="flex gap-2">
+                               {scheme.tags.slice(0, 2).map((tag, idx) => (
+                                 <span key={idx} className="text-sm bg-white border border-slate-200 text-slate-500 px-2 py-0.5 rounded-md font-semibold">{tag}</span>
+                               ))}
+                               {scheme.tags.length > 2 && <span className="text-sm text-slate-400 font-bold">+{scheme.tags.length - 2}</span>}
+                             </div>
+                           )}
+                         </div>
+                         <div className="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center group-hover:bg-indigo-100 group-hover:text-indigo-600 transition-colors text-slate-400 shrink-0">
+                           <ArrowUpRight className="h-5 w-5" />
+                         </div>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                       </div>
                     </div>
                   ))}
@@ -783,7 +942,7 @@ function SchemeAI() {
               className={`h-1.5 w-full ${CATEGORY_DOT[selected.category] || "bg-slate-300"}`}
             />
 
-            {/* HUD Header — compact */}
+            {/* HUD Header  compact */}
             <div className="px-6 py-4 border-b border-slate-100/80 bg-white/60 flex items-center gap-4 shrink-0">
               <Button
                 variant="ghost"
@@ -795,13 +954,17 @@ function SchemeAI() {
               </Button>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
+<<<<<<< HEAD
                   <span
                     className={`text-[10px] font-extrabold uppercase tracking-widest px-2.5 py-0.5 rounded-md border ${getCategoryPill(selected.category)}`}
                   >
+=======
+                  <span className={`text-sm font-extrabold uppercase tracking-widest px-2.5 py-0.5 rounded-md border ${getCategoryPill(selected.category)}`}>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                     {selected.category}
                   </span>
                   {selected.state && selected.state !== "Central" && (
-                    <span className="flex items-center gap-1 text-[10px] font-bold text-slate-500 bg-slate-50 border border-slate-200 px-2 py-0.5 rounded-md">
+                    <span className="flex items-center gap-1 text-sm font-bold text-slate-500 bg-slate-50 border border-slate-200 px-2 py-0.5 rounded-md">
                       <MapPin className="w-3 h-3" /> {selected.state}
                     </span>
                   )}
@@ -818,6 +981,7 @@ function SchemeAI() {
               </div>
             </div>
 
+<<<<<<< HEAD
             {/* HUD Body — single column, buttons at bottom */}
             <div
               className="px-10 py-8 overflow-y-auto"
@@ -830,15 +994,26 @@ function SchemeAI() {
                     <p className="text-[11px] font-black uppercase tracking-widest text-indigo-500 mb-4 flex items-center gap-1.5">
                       <Sparkles className="w-3 h-3" /> Benefits & Details
                     </p>
+=======
+            {/* HUD Body  single column, buttons at bottom */}
+            <div className="px-10 py-8 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
+              <div className="space-y-8">
+
+                {/* Benefits & Details  plain */}
+                {(selected.benefit || selected.description) && (
+                  <div>
+                    <p className="text-sm font-black uppercase tracking-widest text-indigo-500 mb-4 flex items-center gap-1.5"><Sparkles className="w-3 h-3" /> Benefits & Details</p>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                     <p className="text-base text-slate-700 font-medium leading-relaxed whitespace-pre-wrap">
                       {selected.benefit || selected.description}
                     </p>
                   </div>
                 )}
 
-                {/* Tags — plain */}
+                {/* Tags  plain */}
                 {selected.tags && selected.tags.length > 0 && (
                   <div>
+<<<<<<< HEAD
                     <p className="text-[11px] font-black uppercase tracking-widest text-slate-400 mb-4">
                       Tags
                     </p>
@@ -850,6 +1025,12 @@ function SchemeAI() {
                         >
                           {tag}
                         </span>
+=======
+                    <p className="text-sm font-black uppercase tracking-widest text-slate-400 mb-4">Tags</p>
+                    <div className="flex flex-wrap gap-2">
+                      {selected.tags.map((tag, i) => (
+                        <span key={i} className="px-3 py-1.5 text-sm font-semibold rounded-lg border border-slate-200 bg-slate-50 text-slate-600">{tag}</span>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                       ))}
                     </div>
                   </div>
@@ -868,18 +1049,24 @@ function SchemeAI() {
                       }}
                     />
                     <div className="relative z-10">
+<<<<<<< HEAD
                       <p className="text-[11px] font-black uppercase tracking-widest text-indigo-400 mb-4 flex items-center gap-2">
                         Who is Eligible?
                       </p>
                       <p className="text-base font-medium leading-relaxed whitespace-pre-wrap text-slate-200">
                         {selected.eligibility}
                       </p>
+=======
+                      <p className="text-sm font-black uppercase tracking-widest text-indigo-400 mb-4 flex items-center gap-2">Who is Eligible?</p>
+                      <p className="text-base font-medium leading-relaxed whitespace-pre-wrap text-slate-200">{selected.eligibility}</p>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                     </div>
                   </div>
                 )}
 
                 {/* Documents */}
                 {selected.documents && (
+<<<<<<< HEAD
                   <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
                     <p className="text-[11px] font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
                       <FileText className="w-3.5 h-3.5 text-slate-500" />{" "}
@@ -888,10 +1075,15 @@ function SchemeAI() {
                     <p className="text-base text-slate-700 font-medium leading-relaxed whitespace-pre-wrap">
                       {selected.documents}
                     </p>
+=======
+                  <div className="bg-white/60 backdrop-blur-3xl rounded-2xl p-6 shadow-xl shadow-slate-200/40 border border-white/60 transition-all hover:shadow-2xl">
+                    <p className="text-sm font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2"><FileText className="w-3.5 h-3.5 text-slate-500" /> Required Documents</p>
+                    <p className="text-base text-slate-700 font-medium leading-relaxed whitespace-pre-wrap">{selected.documents}</p>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                   </div>
                 )}
 
-                {/* Action Buttons — bottom row with divider */}
+                {/* Action Buttons  bottom row with divider */}
                 <div className="flex flex-wrap items-center gap-3 pt-6 border-t border-slate-100">
                   {(selected.apply_url || selected.portal_url) && (
                     <a
@@ -912,6 +1104,7 @@ function SchemeAI() {
                     View on myScheme <ExternalLink className="w-3.5 h-3.5" />
                   </a>
                   {selected.launched_year && (
+<<<<<<< HEAD
                     <span className="flex items-center gap-1.5 text-xs text-slate-400 font-bold ml-auto">
                       <Clock className="w-3.5 h-3.5 text-indigo-400" /> Est.{" "}
                       {selected.launched_year}
@@ -922,6 +1115,12 @@ function SchemeAI() {
                       <Phone className="w-3.5 h-3.5 text-indigo-400" />{" "}
                       {selected.helpline}
                     </span>
+=======
+                    <span className="flex items-center gap-1.5 text-sm text-slate-400 font-bold ml-auto"><Clock className="w-3.5 h-3.5 text-indigo-400" /> Est. {selected.launched_year}</span>
+                  )}
+                  {selected.helpline && (
+                    <span className="flex items-center gap-1.5 text-sm text-slate-400 font-bold"><Phone className="w-3.5 h-3.5 text-indigo-400" /> {selected.helpline}</span>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                   )}
                 </div>
               </div>
@@ -930,10 +1129,11 @@ function SchemeAI() {
         )}
       </div>
 
-      {/* ── Floating AI Chat Modal ── */}
+      {/*  Floating AI Chat Modal  */}
       {chatOpen && (
         <div className="fixed bottom-6 right-6 w-[28rem] z-50 bg-white/90 backdrop-blur-2xl shadow-2xl shadow-slate-300/60 rounded-3xl overflow-hidden border border-white animate-in slide-in-from-bottom-8 duration-300">
           <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-slate-900 to-slate-800 text-white">
+<<<<<<< HEAD
             <span className="flex items-center gap-3 font-bold text-lg">
               <Bot className="w-5 h-5 text-indigo-400" /> Scheme Assistant
             </span>
@@ -942,6 +1142,11 @@ function SchemeAI() {
               className="hover:bg-white/20 p-2 rounded-full transition-colors"
             >
               <X className="w-5 h-5" />
+=======
+            <span className="flex items-center gap-3 font-bold text-base"><Bot className="w-4 h-4 text-indigo-400" /> Scheme Assistant</span>
+            <button onClick={() => setChatOpen(false)} className="hover:bg-white/20 p-2 rounded-full transition-colors">
+              <X className="w-4 h-4" />
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
             </button>
           </div>
           <div className="bg-slate-50/50">

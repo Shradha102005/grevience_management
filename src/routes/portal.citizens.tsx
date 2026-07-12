@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/table";
 
 export const Route = createFileRoute("/portal/citizens")({
-  head: () => ({ meta: [{ title: "Citizen Directory — CIVICOS AI" }] }),
+  head: () => ({ meta: [{ title: "Citizen Directory — CivicSaathi" }] }),
   component: Citizens,
 });
 
@@ -125,17 +125,22 @@ function Citizens() {
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <Avatar className="h-8 w-8">
-                        <AvatarFallback className="bg-secondary text-xs text-primary">
+                        <AvatarFallback className="bg-secondary text-sm text-primary">
                           {initials(c.name)}
                         </AvatarFallback>
                       </Avatar>
                       <span className="font-medium">{c.name}</span>
                     </div>
                   </TableCell>
+<<<<<<< HEAD
                   <TableCell className="font-mono text-xs">{c.id}</TableCell>
                   <TableCell className="text-muted-foreground">
                     {c.ward}
                   </TableCell>
+=======
+                  <TableCell className="font-mono text-sm">{c.id}</TableCell>
+                  <TableCell className="text-muted-foreground">{c.ward}</TableCell>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                   <TableCell>{c.schemes}</TableCell>
                   <TableCell>
                     <Badge

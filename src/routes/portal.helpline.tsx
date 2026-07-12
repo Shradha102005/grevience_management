@@ -56,7 +56,7 @@ export const Route = createFileRoute("/portal/helpline")({
 
 const API_BASE = "http://localhost:8000";
 
-// ── Types ─────────────────────────────────────────────────────────────────────
+//  Types 
 interface Message {
   sender: string;
   sender_type: "user" | "agent";
@@ -86,8 +86,13 @@ interface BotMessage {
   role: "user" | "assistant";
   content: string;
   ts: number;
+<<<<<<< HEAD
   isVoice?: boolean; // true if this message came from mic input
   resolved?: boolean; // from AI response — false triggers escalation
+=======
+  isVoice?: boolean;           // true if this message came from mic input
+  resolved?: boolean;          // from AI response  false triggers escalation
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
   suggestedReplies?: string[]; // quick-reply chips shown below the bot bubble
 }
 
@@ -104,6 +109,7 @@ interface HelplineStats {
   top_topics: { topic: string; count: number }[];
 }
 
+<<<<<<< HEAD
 // ── Language config ───────────────────────────────────────────────────────────
 const LANGUAGES: {
   code: string;
@@ -113,6 +119,10 @@ const LANGUAGES: {
   placeholder: string;
   quickPrompts: string[];
 }[] = [
+=======
+//  Language config 
+const LANGUAGES: { code: string; label: string; native: string; greeting: string; placeholder: string; quickPrompts: string[] }[] = [
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
   {
     code: "en",
     label: "English",
@@ -227,7 +237,7 @@ const LANGUAGES: {
   },
 ];
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+//  Helpers 
 function relativeTime(iso: string): string {
   const s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
   if (s < 60) return `${s}s ago`;
@@ -366,10 +376,10 @@ const MACROS = [
   },
 ];
 
-// ── Animated AI Orb ───────────────────────────────────────────────────────────
+//  Animated AI Orb 
 type OrbState = "idle" | "listening" | "thinking" | "speaking";
 
-// Holographic multi-ring sphere — static rings, pulsing core
+// Holographic multi-ring sphere  static rings, pulsing core
 function AIOrb({ state }: { state: OrbState }) {
   const C = {
     idle: {
@@ -411,7 +421,13 @@ function AIOrb({ state }: { state: OrbState }) {
   };
   const col = C[state];
 
+<<<<<<< HEAD
   // Heartbeat animation on the WHOLE orb — faster
+=======
+
+
+  // Heartbeat animation on the WHOLE orb  faster
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
   const orbAnim =
     state === "listening"
       ? "orbHeartbeat 1.4s ease-in-out infinite"
@@ -422,6 +438,7 @@ function AIOrb({ state }: { state: OrbState }) {
           : "orbIdle 4s ease-in-out infinite";
 
   return (
+<<<<<<< HEAD
     // Outer shell — fixed size, background matches panel so PNG dark areas vanish
     <div
       style={{
@@ -431,6 +448,18 @@ function AIOrb({ state }: { state: OrbState }) {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+=======
+    // Outer shell  fixed size, background matches panel so PNG dark areas vanish
+    <div style={{
+      position: "relative", width: "220px", height: "220px",
+      display: "flex", alignItems: "center", justifyContent: "center",
+      background: "transparent",
+    }}>
+      {/* Inner orb  entire image heartbeat-pulses as one */}
+      <div style={{
+        position: "relative", width: "220px", height: "220px",
+        display: "flex", alignItems: "center", justifyContent: "center",
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
         background: "transparent",
       }}
     >
@@ -485,7 +514,13 @@ function AIOrb({ state }: { state: OrbState }) {
   );
 }
 
+<<<<<<< HEAD
 // ── Bot Chat Bubble ────────────────────────────────────────────────────────────
+=======
+
+
+//  Bot Chat Bubble 
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
 function BotBubble({
   msg,
   isBot,
@@ -513,6 +548,7 @@ function BotBubble({
       }}
     >
       {/* Name + time */}
+<<<<<<< HEAD
       <div
         style={{
           display: "flex",
@@ -534,6 +570,20 @@ function BotBubble({
         <span style={{ fontSize: "9px", color: "rgba(100,116,139,0.5)" }}>
           {timeStr}
         </span>
+=======
+      <div style={{
+        display: "flex", alignItems: "center", gap: "6px",
+        paddingLeft: isBot ? "36px" : "0",
+        paddingRight: isBot ? "0" : "36px",
+      }}>
+        <span style={{
+          fontSize: "14px", fontWeight: 700,
+          color: isBot ? "rgba(56,189,248,0.75)" : "rgba(167,139,250,0.85)",
+        }}>
+          {isBot ? "CivicSaathi" : (userName || "You")}
+        </span>
+        <span style={{ fontSize: "14px", color: "rgba(100,116,139,0.5)" }}>{timeStr}</span>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
         {msg.isVoice && !isBot && (
           <span
             style={{
@@ -578,6 +628,7 @@ function BotBubble({
             <Sparkles style={{ width: 12, height: 12, color: "white" }} />
           </div>
         ) : (
+<<<<<<< HEAD
           <div
             style={{
               width: "28px",
@@ -595,11 +646,22 @@ function BotBubble({
               color: "white",
             }}
           >
+=======
+          <div style={{
+            width: "28px", height: "28px", borderRadius: "50%", flexShrink: 0,
+            background: "linear-gradient(135deg,#8b5cf6,#6366f1)",
+            border: "1px solid rgba(139,92,246,0.45)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            boxShadow: "0 0 10px rgba(139,92,246,0.35)",
+            fontSize: "14px", fontWeight: 800, color: "white",
+          }}>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
             {(userName || "Y").slice(0, 1).toUpperCase()}
           </div>
         )}
 
         {/* Bubble */}
+<<<<<<< HEAD
         <div
           style={{
             maxWidth: "75%",
@@ -628,12 +690,32 @@ function BotBubble({
               opacity: 0.95,
             }}
           >
+=======
+        <div style={{
+          maxWidth: "75%",
+          padding: "10px 14px",
+          borderRadius: isBot ? "4px 16px 16px 16px" : "16px 4px 16px 16px",
+          fontSize: "14px", lineHeight: 1.65,
+          background: isBot
+            ? "linear-gradient(135deg,rgba(56,189,248,0.14),rgba(129,140,248,0.10))"
+            : "linear-gradient(135deg,rgba(139,92,246,0.28),rgba(99,102,241,0.18))",
+          border: isBot
+            ? "1px solid rgba(56,189,248,0.25)"
+            : "1px solid rgba(139,92,246,0.4)",
+          color: "white",
+          wordBreak: "break-word",
+          boxShadow: isBot
+            ? "0 2px 12px rgba(56,189,248,0.08)"
+            : "0 2px 12px rgba(139,92,246,0.18)",
+        }}>
+          <span style={{ display: "block", whiteSpace: "pre-wrap", color: "white", opacity: 0.95 }}>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
             {msg.content}
           </span>
         </div>
       </div>
 
-      {/* Suggested reply chips — only on bot messages */}
+      {/* Suggested reply chips  only on bot messages */}
       {isBot && msg.suggestedReplies && msg.suggestedReplies.length > 0 && (
         <div
           style={{
@@ -649,10 +731,15 @@ function BotBubble({
               key={i}
               onClick={() => onSuggestedReply(s)}
               style={{
+<<<<<<< HEAD
                 fontSize: "11px",
                 fontWeight: 600,
                 padding: "5px 12px",
                 borderRadius: "20px",
+=======
+                fontSize: "14px", fontWeight: 600,
+                padding: "5px 12px", borderRadius: "20px",
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                 background: "rgba(56,189,248,0.07)",
                 border: "1px solid rgba(56,189,248,0.25)",
                 color: "#38bdf8",
@@ -678,9 +765,10 @@ function BotBubble({
   );
 }
 
-// ── Typing Indicator ────────────────────────────────────────────────────────────
+//  Typing Indicator 
 function TypingIndicator() {
   return (
+<<<<<<< HEAD
     <div
       style={{
         display: "flex",
@@ -698,6 +786,11 @@ function TypingIndicator() {
         }}
       >
         CivicOS AI
+=======
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: "4px" }}>
+      <span style={{ fontSize: "14px", fontWeight: 700, color: "rgba(56,189,248,0.6)", paddingLeft: "36px" }}>
+        CivicSaathi
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
       </span>
       <div style={{ display: "flex", gap: "8px", alignItems: "flex-end" }}>
         <div
@@ -747,6 +840,7 @@ function TypingIndicator() {
   );
 }
 
+<<<<<<< HEAD
 // ── New Ticket Modal ──────────────────────────────────────────────────────────
 function NewTicketModal({
   open,
@@ -760,6 +854,13 @@ function NewTicketModal({
   onCreated: (t: Ticket) => void;
   prefillQuery?: string;
   prefillName?: string;
+=======
+
+//  New Ticket Modal 
+function NewTicketModal({ open, onClose, onCreated, prefillQuery = "", prefillName = "" }: {
+  open: boolean; onClose: () => void; onCreated: (t: Ticket) => void;
+  prefillQuery?: string; prefillName?: string;
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
 }) {
   const { user } = useAuth();
   const [form, setForm] = useState({
@@ -810,6 +911,7 @@ function NewTicketModal({
   };
 
   const inputStyle = {
+<<<<<<< HEAD
     width: "100%",
     height: "40px",
     padding: "0 14px",
@@ -822,6 +924,12 @@ function NewTicketModal({
     transition: "border-color 0.2s",
     boxSizing: "border-box" as const,
     fontFamily: "inherit",
+=======
+    width: "100%", height: "40px", padding: "0 14px",
+    background: "rgba(255,255,255,0.05)", border: "1px solid rgba(56,189,248,0.2)",
+    borderRadius: "10px", color: "white", fontSize: "14px", outline: "none",
+    transition: "border-color 0.2s", boxSizing: "border-box" as const, fontFamily: "inherit",
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
   };
 
   return (
@@ -858,6 +966,7 @@ function NewTicketModal({
                 <TicketIcon className="w-4 h-4 text-white" />
               </div>
               <div>
+<<<<<<< HEAD
                 <DialogTitle className="text-base font-bold text-white">
                   Log as Helpline Ticket
                 </DialogTitle>
@@ -867,12 +976,17 @@ function NewTicketModal({
                 >
                   Create a tracked support ticket from this query
                 </DialogDescription>
+=======
+                <DialogTitle className="text-base font-bold text-white">Log as Helpline Ticket</DialogTitle>
+                <DialogDescription className="text-sm mt-0.5" style={{ color: "rgba(147,210,234,0.7)" }}>Create a tracked support ticket from this query</DialogDescription>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
               </div>
             </div>
           </div>
           <div className="p-7 space-y-5">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
+<<<<<<< HEAD
                 <label
                   className="text-[10px] font-bold uppercase tracking-[0.15em]"
                   style={{ color: "rgba(147,210,234,0.7)" }}
@@ -913,10 +1027,21 @@ function NewTicketModal({
                       {c}
                     </option>
                   ))}
+=======
+                <label className="text-sm font-bold uppercase tracking-[0.15em]" style={{ color: "rgba(147,210,234,0.7)" }}>Citizen Name</label>
+                <input value={form.requester_name} onChange={e => setForm(f => ({ ...f, requester_name: e.target.value }))} placeholder="e.g. Rajesh Kumar" style={inputStyle}
+                  onFocus={e => (e.target.style.borderColor = "rgba(56,189,248,0.6)")} onBlur={e => (e.target.style.borderColor = "rgba(56,189,248,0.2)")} />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-bold uppercase tracking-[0.15em]" style={{ color: "rgba(147,210,234,0.7)" }}>Channel</label>
+                <select value={form.channel} onChange={e => setForm(f => ({ ...f, channel: e.target.value }))} style={{ ...inputStyle }}>
+                  {["Web","Phone","Email","App"].map(c => <option key={c} style={{ background: "#0a1628" }}>{c}</option>)}
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                 </select>
               </div>
             </div>
             <div className="space-y-2">
+<<<<<<< HEAD
               <label
                 className="text-[10px] font-bold uppercase tracking-[0.15em]"
                 style={{ color: "rgba(147,210,234,0.7)" }}
@@ -972,12 +1097,27 @@ function NewTicketModal({
               >
                 Priority
               </label>
+=======
+              <label className="text-sm font-bold uppercase tracking-[0.15em]" style={{ color: "rgba(147,210,234,0.7)" }}>Subject</label>
+              <input value={form.subject} onChange={e => setForm(f => ({ ...f, subject: e.target.value }))} placeholder="Short subject" style={inputStyle}
+                onFocus={e => (e.target.style.borderColor = "rgba(56,189,248,0.6)")} onBlur={e => (e.target.style.borderColor = "rgba(56,189,248,0.2)")} />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-bold uppercase tracking-[0.15em]" style={{ color: "rgba(147,210,234,0.7)" }}>Description</label>
+              <textarea value={form.query} onChange={e => setForm(f => ({ ...f, query: e.target.value }))} rows={4}
+                style={{ ...inputStyle, height: "auto", padding: "12px 14px", resize: "none" }}
+                onFocus={e => (e.target.style.borderColor = "rgba(56,189,248,0.6)")} onBlur={e => (e.target.style.borderColor = "rgba(56,189,248,0.2)")} />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-bold uppercase tracking-[0.15em]" style={{ color: "rgba(147,210,234,0.7)" }}>Priority</label>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
               <div className="flex gap-2">
                 {["Low", "Normal", "High", "Critical"].map((p) => (
                   <button
                     key={p}
                     onClick={() => setForm((f) => ({ ...f, priority: p }))}
                     style={{
+<<<<<<< HEAD
                       flex: 1,
                       padding: "8px 0",
                       fontSize: "12px",
@@ -1001,6 +1141,13 @@ function NewTicketModal({
                   >
                     {p}
                   </button>
+=======
+                      flex: 1, padding: "8px 0", fontSize: "14px", fontWeight: 600, borderRadius: "8px",
+                      border: form.priority === p ? "1px solid rgba(56,189,248,0.6)" : "1px solid rgba(255,255,255,0.1)",
+                      background: form.priority === p ? "linear-gradient(135deg,rgba(56,189,248,0.25),rgba(129,140,248,0.15))" : "rgba(255,255,255,0.03)",
+                      color: form.priority === p ? "#38bdf8" : "rgba(255,255,255,0.4)", cursor: "pointer", transition: "all 0.2s",
+                    }}>{p}</button>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                 ))}
               </div>
             </div>
@@ -1046,9 +1193,10 @@ function NewTicketModal({
   );
 }
 
-// ── Avatar ────────────────────────────────────────────────────────────────────
+//  Avatar 
 function Avatar({ name, isAgent }: { name: string; isAgent: boolean }) {
   return (
+<<<<<<< HEAD
     <div
       style={{
         width: "32px",
@@ -1072,10 +1220,21 @@ function Avatar({ name, isAgent }: { name: string; isAgent: boolean }) {
     >
       {initials(name)}
     </div>
+=======
+    <div style={{
+      width: "32px", height: "32px", borderRadius: "50%", flexShrink: 0,
+      display: "flex", alignItems: "center", justifyContent: "center",
+      fontSize: "14px", fontWeight: 800,
+      background: isAgent ? "linear-gradient(135deg,#8b5cf6,#6366f1)" : "rgba(100,116,139,0.2)",
+      border: isAgent ? "1px solid rgba(139,92,246,0.5)" : "1px solid rgba(100,116,139,0.25)",
+      color: isAgent ? "white" : "var(--color-muted-foreground)",
+      boxShadow: isAgent ? "0 0 10px rgba(139,92,246,0.3)" : "none",
+    }}>{initials(name)}</div>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
   );
 }
 
-// ── Ticket Card ───────────────────────────────────────────────────────────────
+//  Ticket Card 
 function TicketCard({ t, onClick }: { t: Ticket; onClick: () => void }) {
   const sc = STATUS_CONFIG[t.status] ?? STATUS_CONFIG.Open;
   const pc = PRIORITY_CONFIG[t.priority] ?? PRIORITY_CONFIG.Normal;
@@ -1130,6 +1289,7 @@ function TicketCard({ t, onClick }: { t: Ticket; onClick: () => void }) {
         }}
       />
 
+<<<<<<< HEAD
       <div
         style={{
           display: "flex",
@@ -1168,10 +1328,25 @@ function TicketCard({ t, onClick }: { t: Ticket; onClick: () => void }) {
         >
           {sc.icon}
           {sc.label}
+=======
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <span style={{
+          fontSize: "14px", fontFamily: "monospace", fontWeight: 700, letterSpacing: "0.08em",
+          color: "#7c3aed", background: "#f5f3ff",
+          padding: "2px 8px", borderRadius: "5px", border: "1px solid #ddd6fe",
+        }}>{t.ticket_id}</span>
+        <span style={{
+          display: "flex", alignItems: "center", gap: "4px",
+          fontSize: "14px", fontWeight: 700, padding: "3px 9px", borderRadius: "20px",
+          background: sc.bg, color: sc.color, border: `1px solid ${sc.border}`,
+        }}>
+          {sc.icon}{sc.label}
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
         </span>
       </div>
 
       <div>
+<<<<<<< HEAD
         <p
           style={{
             fontSize: "14px",
@@ -1200,6 +1375,17 @@ function TicketCard({ t, onClick }: { t: Ticket; onClick: () => void }) {
         >
           {t.query}
         </p>
+=======
+        <p style={{
+          fontSize: "14px", fontWeight: 700, lineHeight: 1.35, color: "#0f172a",
+          marginBottom: "5px",
+          display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden",
+        }}>{t.subject}</p>
+        <p style={{
+          fontSize: "14px", color: "#64748b", lineHeight: 1.5,
+          display: "-webkit-box", WebkitLineClamp: 1, WebkitBoxOrient: "vertical", overflow: "hidden",
+        }}>{t.query}</p>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
       </div>
 
       <div
@@ -1212,6 +1398,7 @@ function TicketCard({ t, onClick }: { t: Ticket; onClick: () => void }) {
       >
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+<<<<<<< HEAD
             <div
               style={{
                 width: "20px",
@@ -1248,11 +1435,24 @@ function TicketCard({ t, onClick }: { t: Ticket; onClick: () => void }) {
             >
               {ch.icon}
               {t.channel}
+=======
+            <div style={{
+              width: "20px", height: "20px", borderRadius: "50%", background: "#ede9fe",
+              display: "flex", alignItems: "center", justifyContent: "center", fontSize: "8px", fontWeight: 800,
+              color: "#7c3aed", border: "1px solid #ddd6fe",
+            }}>{initials(t.requester_name)}</div>
+            <span style={{ fontSize: "14px", color: "#475569", fontWeight: 500 }}>{t.requester_name}</span>
+          </div>
+          {ch && (
+            <span style={{ display: "flex", alignItems: "center", gap: "3px", fontSize: "14px", color: ch.color, fontWeight: 600 }}>
+              {ch.icon}{t.channel}
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
             </span>
           )}
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
           {msgCount > 0 && (
+<<<<<<< HEAD
             <span
               style={{
                 display: "flex",
@@ -1280,6 +1480,17 @@ function TicketCard({ t, onClick }: { t: Ticket; onClick: () => void }) {
               justifyContent: "center",
             }}
           >
+=======
+            <span style={{ display: "flex", alignItems: "center", gap: "3px", fontSize: "14px", color: "#94a3b8" }}>
+              <MessageSquare style={{ width: 10, height: 10 }} />{msgCount}
+            </span>
+          )}
+          <span style={{ fontSize: "14px", color: "#94a3b8" }}>{relativeTime(t.updated_at)}</span>
+          <div style={{
+            width: "20px", height: "20px", borderRadius: "6px",
+            background: "#ede9fe", display: "flex", alignItems: "center", justifyContent: "center",
+          }}>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
             <ArrowRight style={{ width: 10, height: 10, color: "#7c3aed" }} />
           </div>
         </div>
@@ -1288,7 +1499,7 @@ function TicketCard({ t, onClick }: { t: Ticket; onClick: () => void }) {
   );
 }
 
-// ── Status Timeline ────────────────────────────────────────────────────────────
+//  Status Timeline 
 function StatusTimeline({ status }: { status: string }) {
   const steps = [
     { key: "Open", label: "Opened", icon: "📩" },
@@ -1310,6 +1521,7 @@ function StatusTimeline({ status }: { status: string }) {
         const done = i < activeIdx;
         const current = i === activeIdx;
         return (
+<<<<<<< HEAD
           <div
             key={s.key}
             style={{
@@ -1365,6 +1577,29 @@ function StatusTimeline({ status }: { status: string }) {
               >
                 {s.label}
               </span>
+=======
+          <div key={s.key} style={{ display: "flex", alignItems: "center", flex: 1, minWidth: 0 }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px", flexShrink: 0 }}>
+              <div style={{
+                width: "30px", height: "30px", borderRadius: "50%", fontSize: "14px",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                background: done || current
+                  ? current ? "linear-gradient(135deg,#ede9fe,#ddd6fe)" : "#ecfdf5"
+                  : "#f1f5f9",
+                border: done || current
+                  ? current ? "2px solid #c4b5fd" : "2px solid #a7f3d0"
+                  : "2px solid #e2e8f0",
+                boxShadow: current ? "0 0 12px rgba(139,92,246,0.2)" : "none",
+                transition: "all 0.3s ease",
+              }}>
+                {done ? "✓" : s.icon}
+              </div>
+              <span style={{
+                fontSize: "14px", fontWeight: current ? 800 : 600,
+                color: current ? "#7c3aed" : done ? "#059669" : "#94a3b8",
+                whiteSpace: "nowrap",
+              }}>{s.label}</span>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
             </div>
             {i < steps.length - 1 && (
               <div
@@ -1387,6 +1622,7 @@ function StatusTimeline({ status }: { status: string }) {
   );
 }
 
+<<<<<<< HEAD
 // ── Conversation Drawer (quick-commerce helpline style) ───────────────────────
 function ConversationDrawer({
   ticket,
@@ -1396,6 +1632,11 @@ function ConversationDrawer({
   ticket: Ticket;
   onClose: () => void;
   onUpdate: () => void;
+=======
+//  Conversation Drawer (quick-commerce helpline style) 
+function ConversationDrawer({ ticket, onClose, onUpdate }: {
+  ticket: Ticket; onClose: () => void; onUpdate: () => void;
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
 }) {
   const { user } = useAuth();
   const [replyText, setReplyText] = useState("");
@@ -1406,7 +1647,7 @@ function ConversationDrawer({
 
   // Role-based identity
   const isOfficer = user?.role === "officer" || user?.role === "admin";
-  // Always use the real logged-in name as sender — citizens get their own name, not "Agent"
+  // Always use the real logged-in name as sender  citizens get their own name, not "Agent"
   const senderName = user?.name || (isOfficer ? "Officer" : "Citizen");
   const senderBadge =
     user?.role === "admin"
@@ -1513,6 +1754,7 @@ function ConversationDrawer({
       />
 
       {/* Drawer panel */}
+<<<<<<< HEAD
       <div
         style={{
           position: "fixed",
@@ -1549,6 +1791,27 @@ function ConversationDrawer({
               marginBottom: "12px",
             }}
           >
+=======
+      <div style={{
+        position: "fixed", top: 0, right: 0, bottom: 0,
+        width: "min(580px, 56vw)",
+        background: "rgba(248, 250, 252, 0.95)", // light slate 50
+        backdropFilter: "blur(20px)",
+        borderLeft: "1px solid rgba(226, 232, 240, 0.8)",
+        boxShadow: "-24px 0 80px rgba(0,0,0,0.1)",
+        zIndex: 50, display: "flex", flexDirection: "column",
+        animation: "slideIn 0.28s cubic-bezier(0.16,1,0.3,1)",
+      }}>
+
+        {/*  TOP HEADER: Ticket identity  */}
+        <div style={{
+          padding: "18px 22px 0",
+          background: "linear-gradient(180deg,rgba(255,255,255,1) 0%,rgba(248,250,252,1) 100%)",
+          borderBottom: "1px solid #e2e8f0",
+          flexShrink: 0,
+        }}>
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "10px", marginBottom: "12px" }}>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
             {/* Left: ID + subject + person */}
             <div style={{ flex: 1, minWidth: 0 }}>
               <div
@@ -1561,6 +1824,7 @@ function ConversationDrawer({
                 }}
               >
                 {/* Ticket ID badge */}
+<<<<<<< HEAD
                 <span
                   style={{
                     fontSize: "10px",
@@ -1602,11 +1866,28 @@ function ConversationDrawer({
                       display: "inline-block",
                     }}
                   />
+=======
+                <span style={{
+                  fontSize: "14px", fontFamily: "monospace", fontWeight: 800, letterSpacing: "0.12em",
+                  color: "#7c3aed", background: "#f5f3ff",
+                  padding: "3px 9px", borderRadius: "6px", border: "1px solid #ddd6fe",
+                }}>{currentTicket.ticket_id}</span>
+
+                {/* Priority badge */}
+                <span style={{
+                  fontSize: "14px", fontWeight: 800, padding: "3px 9px", borderRadius: "20px",
+                  background: `${pc.dot}15`, color: pc.dot,
+                  border: `1px solid ${pc.dot}30`, letterSpacing: "0.06em",
+                  display: "flex", alignItems: "center", gap: "4px",
+                }}>
+                  <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: pc.dot, display: "inline-block" }} />
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                   {currentTicket.priority}
                 </span>
 
                 {/* Channel badge */}
                 {ch && (
+<<<<<<< HEAD
                   <span
                     style={{
                       display: "flex",
@@ -1619,10 +1900,15 @@ function ConversationDrawer({
                   >
                     {ch.icon}
                     {currentTicket.channel}
+=======
+                  <span style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "14px", fontWeight: 700, color: ch.color }}>
+                    {ch.icon}{currentTicket.channel}
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                   </span>
                 )}
 
                 {/* Time */}
+<<<<<<< HEAD
                 <span
                   style={{
                     fontSize: "9px",
@@ -1683,6 +1969,24 @@ function ConversationDrawer({
                 >
                   {currentTicket.requester_name}
                 </span>
+=======
+                <span style={{ fontSize: "14px", color: "#94a3b8", marginLeft: "auto" }}>{relativeTime(currentTicket.created_at)}</span>
+              </div>
+
+              {/* Subject */}
+              <h2 style={{ fontSize: "14px", fontWeight: 800, color: "#0f172a", margin: "0 0 8px", lineHeight: 1.3 }}>{currentTicket.subject}</h2>
+
+              {/* Requester chip */}
+              <div style={{ display: "flex", alignItems: "center", gap: "6px", paddingBottom: "12px" }}>
+                <div style={{
+                  width: "22px", height: "22px", borderRadius: "50%",
+                  background: "linear-gradient(135deg, #ede9fe, #ddd6fe)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: "8px", fontWeight: 800, color: "#7c3aed",
+                  border: "1px solid #c4b5fd", flexShrink: 0,
+                }}>{initials(currentTicket.requester_name)}</div>
+                <span style={{ fontSize: "14px", color: "#475569", fontWeight: 600 }}>{currentTicket.requester_name}</span>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
               </div>
             </div>
 
@@ -1715,9 +2019,10 @@ function ConversationDrawer({
           </div>
         </div>
 
-        {/* ── STATUS TIMELINE (quick-commerce order tracker style) ── */}
+        {/*  STATUS TIMELINE (quick-commerce order tracker style)  */}
         <StatusTimeline status={currentTicket.status} />
 
+<<<<<<< HEAD
         {/* ── STATUS ACTION BUTTONS ── */}
         <div
           style={{
@@ -1751,6 +2056,26 @@ function ConversationDrawer({
                   boxShadow: active ? "none" : "0 1px 2px rgba(0,0,0,0.05)",
                 }}
               >
+=======
+        {/*  STATUS ACTION BUTTONS  */}
+        <div style={{
+          display: "flex", gap: "6px", padding: "0 22px 14px",
+          borderBottom: "1px solid #e2e8f0", flexShrink: 0,
+        }}>
+          {(["Open", "Pending", "Resolved"] as const).map(s => {
+            const ssc = STATUS_CONFIG[s] ?? STATUS_CONFIG.Open;
+            const active = currentTicket.status === s;
+            return (
+              <button key={s} onClick={() => changeStatus(s)} style={{
+                padding: "5px 14px", borderRadius: "20px", fontSize: "14px", fontWeight: 700,
+                border: `1px solid ${active ? ssc.border : "#e2e8f0"}`,
+                background: active ? ssc.bg : "white",
+                color: active ? ssc.color : "#94a3b8",
+                cursor: "pointer", transition: "all 0.18s",
+                display: "flex", alignItems: "center", gap: "5px",
+                boxShadow: active ? "none" : "0 1px 2px rgba(0,0,0,0.05)",
+              }}>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                 {active && ssc.icon}
                 {active ? "✓ " : ""}
                 {s}
@@ -1759,8 +2084,9 @@ function ConversationDrawer({
           })}
         </div>
 
-        {/* ── ORIGINAL QUERY banner ── */}
+        {/*  ORIGINAL QUERY banner  */}
         {currentTicket.query && (
+<<<<<<< HEAD
           <div
             style={{
               margin: "12px 22px 0",
@@ -1820,6 +2146,32 @@ function ConversationDrawer({
               >
                 No messages yet — start the conversation
               </p>
+=======
+          <div style={{
+            margin: "12px 22px 0",
+            padding: "10px 14px", borderRadius: "10px",
+            background: "#f8fafc",
+            border: "1px solid #e2e8f0",
+            flexShrink: 0,
+          }}>
+            <p style={{ fontSize: "14px", fontWeight: 800, color: "#64748b", marginBottom: "3px", letterSpacing: "0.08em" }}>ORIGINAL QUERY</p>
+            <p style={{ fontSize: "14px", color: "#334155", lineHeight: 1.6 }}>{currentTicket.query}</p>
+          </div>
+        )}
+
+        {/*  CHAT THREAD  */}
+        <div ref={threadRef} style={{
+          flex: 1, overflowY: "auto", padding: "10px 22px 14px",
+          display: "flex", flexDirection: "column", gap: "14px",
+        }}>
+          {(currentTicket.messages || []).length === 0 && (
+            <div style={{
+              display: "flex", flexDirection: "column", alignItems: "center",
+              justifyContent: "center", height: "100%", gap: "10px", opacity: 0.6,
+            }}>
+              <MessageSquare style={{ width: 32, height: 32, color: "#94a3b8" }} />
+              <p style={{ fontSize: "14px", color: "#64748b", fontWeight: 500 }}>No messages yet — start the conversation</p>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
             </div>
           )}
 
@@ -1874,6 +2226,7 @@ function ConversationDrawer({
                   }}
                 >
                   {isMine && (
+<<<<<<< HEAD
                     <span style={{ fontSize: "9px", color: "#94a3b8" }}>
                       {timeStr}
                     </span>
@@ -1891,6 +2244,16 @@ function ConversationDrawer({
                     <span style={{ fontSize: "9px", color: "#94a3b8" }}>
                       {timeStr}
                     </span>
+=======
+                    <span style={{ fontSize: "14px", color: "#94a3b8" }}>{timeStr}</span>
+                  )}
+                  <span style={{
+                    fontSize: "14px", fontWeight: 700,
+                    color: isMine ? senderColor : "#475569",
+                  }}>{displayName}</span>
+                  {!isMine && (
+                    <span style={{ fontSize: "14px", color: "#94a3b8" }}>{timeStr}</span>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                   )}
                 </div>
 
@@ -1905,6 +2268,7 @@ function ConversationDrawer({
                 >
                   {/* Avatar */}
                   {isMine ? (
+<<<<<<< HEAD
                     <div
                       style={{
                         width: "28px",
@@ -1945,11 +2309,35 @@ function ConversationDrawer({
                         color: isStaff ? "#7c3aed" : "#475569",
                       }}
                     >
+=======
+                    <div style={{
+                      width: "28px", height: "28px", borderRadius: "50%", flexShrink: 0,
+                      background: `linear-gradient(135deg, ${senderColor}e6, ${senderColor}b3)`,
+                      border: `1px solid ${senderColor}`,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      boxShadow: `0 2px 8px ${senderColor}40`,
+                      fontSize: "14px", fontWeight: 800, color: "white",
+                    }}>
+                      {(senderName || "Me").slice(0, 1).toUpperCase()}
+                    </div>
+                  ) : (
+                    <div style={{
+                      width: "28px", height: "28px", borderRadius: "50%", flexShrink: 0,
+                      background: isStaff
+                        ? "linear-gradient(135deg, #ede9fe, #ddd6fe)"
+                        : "linear-gradient(135deg, #f1f5f9, #e2e8f0)",
+                      border: isStaff ? "1px solid #c4b5fd" : "1px solid #cbd5e1",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: "14px", fontWeight: 800,
+                      color: isStaff ? "#7c3aed" : "#475569",
+                    }}>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                       {initials(displayName || currentTicket.requester_name)}
                     </div>
                   )}
 
                   {/* Bubble */}
+<<<<<<< HEAD
                   <div
                     style={{
                       maxWidth: "72%",
@@ -1967,10 +2355,21 @@ function ConversationDrawer({
                   >
                     {m.text}
                   </div>
+=======
+                  <div style={{
+                    maxWidth: "72%", padding: "10px 14px",
+                    borderRadius: isMine ? "16px 3px 16px 16px" : "3px 16px 16px 16px",
+                    fontSize: "14px", lineHeight: 1.65, color: "#1e293b",
+                    background: isMine ? myBubbleBg : otherBubbleBg,
+                    border: `1px solid ${isMine ? myBubbleBorder : otherBubbleBorder}`,
+                    wordBreak: "break-word",
+                  }}>{m.text}</div>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                 </div>
 
-                {/* Suggest chips — only for officers below last citizen message */}
+                {/* Suggest chips  only for officers below last citizen message */}
                 {isOfficer && isLastIncoming && !isMine && (
+<<<<<<< HEAD
                   <div
                     style={{
                       display: "flex",
@@ -1992,6 +2391,16 @@ function ConversationDrawer({
                     >
                       💬 suggest:
                     </span>
+=======
+                  <div style={{
+                    display: "flex", flexWrap: "wrap", gap: "5px",
+                    paddingLeft: "37px", marginTop: "2px",
+                  }}>
+                    <span style={{
+                      fontSize: "14px", fontWeight: 700, color: "#94a3b8",
+                      alignSelf: "center", letterSpacing: "0.08em", marginRight: "1px",
+                    }}>💬 suggest:</span>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                     {MACROS.map((mac, j) => (
                       <button
                         key={j}
@@ -2001,10 +2410,14 @@ function ConversationDrawer({
                           )
                         }
                         style={{
+<<<<<<< HEAD
                           fontSize: "10px",
                           fontWeight: 600,
                           padding: "3px 10px",
                           borderRadius: "20px",
+=======
+                          fontSize: "14px", fontWeight: 600, padding: "3px 10px", borderRadius: "20px",
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                           background: "#f5f3ff",
                           border: "1px solid #ddd6fe",
                           color: "#7c3aed",
@@ -2024,8 +2437,12 @@ function ConversationDrawer({
                             "#f5f3ff";
                         }}
                       >
+<<<<<<< HEAD
                         <span style={{ fontSize: "9px" }}>{mac.emoji}</span>
                         {mac.label}
+=======
+                        <span style={{ fontSize: "14px" }}>{mac.emoji}</span>{mac.label}
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                       </button>
                     ))}
                   </div>
@@ -2036,6 +2453,7 @@ function ConversationDrawer({
 
           {/* Live sending indicator */}
           {sending && (
+<<<<<<< HEAD
             <div
               style={{
                 display: "flex",
@@ -2111,6 +2529,33 @@ function ConversationDrawer({
                         animationDelay: `${k * 0.2}s`,
                       }}
                     />
+=======
+            <div style={{ display: "flex", flexDirection: "column", gap: "4px", animation: "bubbleIn 0.2s ease" }}>
+              <div style={{ display: "flex", justifyContent: "flex-end", paddingRight: "36px" }}>
+                <span style={{ fontSize: "14px", fontWeight: 700, color: `${senderColor}80` }}>{senderName}</span>
+              </div>
+              <div style={{ display: "flex", flexDirection: "row-reverse", gap: "9px", alignItems: "flex-end" }}>
+                <div style={{
+                  width: "28px", height: "28px", borderRadius: "50%", flexShrink: 0,
+                  background: `linear-gradient(135deg,${senderColor}e6,${senderColor}b3)`,
+                  border: `1px solid ${senderColor}`,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: "14px", fontWeight: 800, color: "white",
+                  boxShadow: `0 2px 8px ${senderColor}40`,
+                }}>{(senderName || "A").slice(0, 1).toUpperCase()}</div>
+                <div style={{
+                  padding: "10px 16px", borderRadius: "16px 3px 16px 16px",
+                  background: `linear-gradient(135deg,${senderColor}22,${senderColor}10)`,
+                  border: `1px solid ${senderColor}35`,
+                  display: "flex", gap: "5px", alignItems: "center",
+                }}>
+                  {[0,1,2].map(k => (
+                    <div key={k} style={{
+                      width: "5px", height: "5px", borderRadius: "50%", background: senderColor,
+                      animation: "typingDot 1.2s ease-in-out infinite",
+                      animationDelay: `${k * 0.2}s`,
+                    }} />
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                   ))}
                 </div>
               </div>
@@ -2118,6 +2563,7 @@ function ConversationDrawer({
           )}
         </div>
 
+<<<<<<< HEAD
         {/* ── REPLY COMPOSER ── */}
         <div
           style={{
@@ -2126,6 +2572,24 @@ function ConversationDrawer({
             background: "rgba(255,255,255,0.8)",
             backdropFilter: "blur(10px)",
             flexShrink: 0,
+=======
+        {/*  REPLY COMPOSER  */}
+        <div style={{
+          padding: "10px 22px 18px",
+          borderTop: "1px solid #e2e8f0",
+          background: "rgba(255,255,255,0.8)",
+          backdropFilter: "blur(10px)",
+          flexShrink: 0,
+        }}>
+          {/* Composer box */}
+          <div style={{
+            borderRadius: "14px",
+            border: "1px solid #cbd5e1",
+            background: "white",
+            overflow: "hidden",
+            transition: "border-color 0.2s, box-shadow 0.2s",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
           }}
         >
           {/* Composer box */}
@@ -2148,6 +2612,7 @@ function ConversationDrawer({
             }}
           >
             {/* Reply label */}
+<<<<<<< HEAD
             <div
               style={{
                 padding: "10px 14px 0",
@@ -2181,6 +2646,18 @@ function ConversationDrawer({
                 <span style={{ fontWeight: 600, opacity: 0.7 }}>
                   {senderBadge}
                 </span>
+=======
+            <div style={{
+              padding: "10px 14px 0",
+              display: "flex", alignItems: "center", gap: "6px",
+            }}>
+              <div style={{
+                width: "6px", height: "6px", borderRadius: "50%",
+                background: senderColor, boxShadow: `0 0 6px ${senderColor}80`,
+              }} />
+              <span style={{ fontSize: "14px", fontWeight: 700, color: "#64748b", letterSpacing: "0.06em" }}>
+                REPLYING AS <span style={{ color: senderColor }}>{senderName.toUpperCase()}</span> · <span style={{ fontWeight: 600, opacity: 0.7 }}>{senderBadge}</span>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
               </span>
             </div>
 
@@ -2189,6 +2666,7 @@ function ConversationDrawer({
               onChange={(e) => setReplyText(e.target.value)}
               placeholder={`Type your reply here…`}
               style={{
+<<<<<<< HEAD
                 width: "100%",
                 resize: "none",
                 fontSize: "13px",
@@ -2200,6 +2678,12 @@ function ConversationDrawer({
                 color: "#0f172a",
                 fontFamily: "inherit",
                 lineHeight: 1.6,
+=======
+                width: "100%", resize: "none", fontSize: "14px",
+                border: "none", background: "transparent", outline: "none",
+                padding: "8px 14px 10px", minHeight: "72px",
+                color: "#0f172a", fontFamily: "inherit", lineHeight: 1.6,
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
               }}
               className="focus-visible:ring-0 focus-visible:ring-offset-0 border-0 shadow-none"
               onKeyDown={(e) => {
@@ -2208,6 +2692,7 @@ function ConversationDrawer({
             />
 
             {/* Bottom bar: hint + status dropdown + send */}
+<<<<<<< HEAD
             <div
               style={{
                 display: "flex",
@@ -2221,12 +2706,22 @@ function ConversationDrawer({
               <p
                 style={{ fontSize: "10px", color: "#94a3b8", fontWeight: 600 }}
               >
+=======
+            <div style={{
+              display: "flex", alignItems: "center", justifyContent: "space-between",
+              padding: "8px 12px",
+              borderTop: "1px solid #f1f5f9",
+              background: "#f8fafc",
+            }}>
+              <p style={{ fontSize: "14px", color: "#94a3b8", fontWeight: 600 }}>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                 ⌘ + ↵ to send
               </p>
               <div
                 style={{ display: "flex", alignItems: "center", gap: "7px" }}
               >
                 <Select value={submitAs} onValueChange={setSubmitAs}>
+<<<<<<< HEAD
                   <SelectTrigger
                     style={{
                       height: "30px",
@@ -2250,6 +2745,20 @@ function ConversationDrawer({
                     <SelectItem value="Resolved" className="text-xs">
                       Submit as Resolved
                     </SelectItem>
+=======
+                  <SelectTrigger style={{
+                    height: "30px", fontSize: "14px", width: "138px",
+                    background: "white",
+                    border: "1px solid #cbd5e1",
+                    borderRadius: "8px", color: "#475569",
+                  }}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Open"     className="text-sm">Submit as Open</SelectItem>
+                    <SelectItem value="Pending"  className="text-sm">Submit as Pending</SelectItem>
+                    <SelectItem value="Resolved" className="text-sm">Submit as Resolved</SelectItem>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                   </SelectContent>
                 </Select>
 
@@ -2257,6 +2766,7 @@ function ConversationDrawer({
                   onClick={sendReply}
                   disabled={sending || !replyText.trim()}
                   style={{
+<<<<<<< HEAD
                     height: "30px",
                     padding: "0 18px",
                     borderRadius: "8px",
@@ -2277,6 +2787,16 @@ function ConversationDrawer({
                       !sending && replyText.trim()
                         ? "0 4px 16px rgba(139,92,246,0.45)"
                         : "none",
+=======
+                    height: "30px", padding: "0 18px", borderRadius: "8px", border: "none",
+                    background: sending || !replyText.trim()
+                      ? "#cbd5e1"
+                      : "linear-gradient(135deg, #8b5cf6, #6366f1)",
+                    color: "white", fontSize: "14px", fontWeight: 700,
+                    cursor: sending || !replyText.trim() ? "not-allowed" : "pointer",
+                    display: "flex", alignItems: "center", gap: "5px",
+                    boxShadow: !sending && replyText.trim() ? "0 4px 16px rgba(139,92,246,0.45)" : "none",
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                     opacity: sending || !replyText.trim() ? 0.5 : 1,
                     transition: "all 0.2s",
                   }}
@@ -2297,6 +2817,7 @@ function ConversationDrawer({
   );
 }
 
+<<<<<<< HEAD
 // ── Stat Card ──────────────────────────────────────────────────────────────────
 function StatCard({
   label,
@@ -2316,6 +2837,12 @@ function StatCard({
   border: string;
   onClick: () => void;
   active: boolean;
+=======
+//  Stat Card 
+function StatCard({ label, count, icon: Icon, color, bg, border, onClick, active }: {
+  label: string; count: number; icon: React.ElementType;
+  color: string; bg: string; border: string; onClick: () => void; active: boolean;
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
 }) {
   return (
     <button
@@ -2357,6 +2884,7 @@ function StatCard({
         />
       </div>
       <div>
+<<<<<<< HEAD
         <p
           style={{
             fontSize: "20px",
@@ -2377,11 +2905,16 @@ function StatCard({
         >
           {label}
         </p>
+=======
+        <p style={{ fontSize: "14px", fontWeight: 800, color: active ? color : "var(--color-foreground)", lineHeight: 1 }}>{count}</p>
+        <p style={{ fontSize: "14px", color: "var(--color-muted-foreground)", fontWeight: 600, marginTop: "2px" }}>{label}</p>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
       </div>
     </button>
   );
 }
 
+<<<<<<< HEAD
 // ── AI Bot Panel ─────────────────────────────────────────────────────────────
 // Continuous voice conversation: VAD-based auto-detect → STT → AI → TTS → loop
 function AIBotPanel({
@@ -2389,6 +2922,11 @@ function AIBotPanel({
 }: {
   onTicketCreated: (t: Ticket) => void;
 }) {
+=======
+//  AI Bot Panel 
+// Continuous voice conversation: VAD-based auto-detect  STT  AI  TTS  loop
+function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void }) {
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
   const { user } = useAuth();
   const [langIdx, setLangIdx] = useState(0);
   const lang = LANGUAGES[langIdx];
@@ -2403,6 +2941,7 @@ function AIBotPanel({
   const [ticketPrefill, setTicketPrefill] = useState("");
   const [showLangMenu, setShowLangMenu] = useState(false);
 
+<<<<<<< HEAD
   // ── Voice state ────────────────────────────────────────────────────────────
   const [voiceMode, setVoiceMode] = useState(false); // continuous voice loop on/off
   const [isRecording, setIsRecording] = useState(false); // mic active right now
@@ -2412,6 +2951,17 @@ function AIBotPanel({
 
   // ── Auto-escalation ────────────────────────────────────────────────────────
   const [unresolvedTurns, setUnresolvedTurns] = useState(0); // consecutive unresolved
+=======
+  //  Voice state 
+  const [voiceMode, setVoiceMode] = useState(false);      // continuous voice loop on/off
+  const [isRecording, setIsRecording] = useState(false);  // mic active right now
+  const [sttEngine, setSttEngine] = useState("");          // shows which engine is used
+  const [detectedLang, setDetectedLang] = useState("");    // detected language badge
+  const [audioLevel, setAudioLevel] = useState(0);        // 0100 for waveform bars
+
+  //  Auto-escalation 
+  const [unresolvedTurns, setUnresolvedTurns] = useState(0);   // consecutive unresolved
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
   const [escalationOffered, setEscalationOffered] = useState(false);
   const [autoEscalated, setAutoEscalated] = useState(false);
   const [escalatedTicketId, setEscalatedTicketId] = useState("");
@@ -2454,12 +3004,59 @@ function AIBotPanel({
     setEscalationOffered(false);
   };
 
+<<<<<<< HEAD
   // ── TTS: play bot reply via edge-tts backend ───────────────────────────────
   const speakText = useCallback(
     async (text: string, langCode: string): Promise<void> => {
       // Cancel any currently playing audio
       if (currentAudioRef.current) {
         currentAudioRef.current.pause();
+=======
+  //  TTS: play bot reply via edge-tts backend 
+  const speakText = useCallback(async (text: string, langCode: string): Promise<void> => {
+    // Cancel any currently playing audio
+    if (currentAudioRef.current) {
+      currentAudioRef.current.pause();
+      currentAudioRef.current = null;
+    }
+    setOrbState("speaking");
+    try {
+      const res = await fetch(`${API_BASE}/voice/tts`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text, language: langCode }),
+      });
+
+      // If edge-tts not installed, backend returns JSON with fallback:true
+      const contentType = res.headers.get("content-type") || "";
+      if (contentType.includes("application/json")) {
+        // Browser speechSynthesis fallback
+        const data = await res.json();
+        if (data.fallback && "speechSynthesis" in window) {
+          await new Promise<void>((resolve) => {
+            const utt = new SpeechSynthesisUtterance(data.text);
+            utt.lang = langCode + "-IN";
+            utt.rate = 1.0;
+            const voices = window.speechSynthesis.getVoices();
+            const match = voices.find(v => v.lang.startsWith(langCode));
+            if (match) utt.voice = match;
+            utt.onend = () => resolve();
+            utt.onerror = () => resolve();
+            window.speechSynthesis.speak(utt);
+          });
+        }
+      } else {
+        // Real audio from edge-tts
+        const blob = await res.blob();
+        const url  = URL.createObjectURL(blob);
+        await new Promise<void>((resolve) => {
+          const audio = new Audio(url);
+          currentAudioRef.current = audio;
+          audio.onended = () => { URL.revokeObjectURL(url); resolve(); };
+          audio.onerror = () => { URL.revokeObjectURL(url); resolve(); };
+          audio.play().catch(() => resolve());
+        });
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
         currentAudioRef.current = null;
       }
       setOrbState("speaking");
@@ -2515,7 +3112,7 @@ function AIBotPanel({
     [],
   );
 
-  // ── STT: send recorded blob to backend ─────────────────────────────────────
+  //  STT: send recorded blob to backend 
   const transcribeAudio = useCallback(
     async (
       blob: Blob,
@@ -2549,7 +3146,7 @@ function AIBotPanel({
     [],
   );
 
-  // ── Core: send message and handle AI response ──────────────────────────────
+  //  Core: send message and handle AI response 
   // activeLang: the language to use for AI + TTS (auto-detected from speech, else dropdown)
   const sendMessage = useCallback(
     async (text: string, isVoice = false, activeLang?: string) => {
@@ -2559,9 +3156,78 @@ function AIBotPanel({
       // Use the auto-detected language if provided, otherwise fall back to dropdown
       const effectiveLang = activeLang || lang.code;
 
+<<<<<<< HEAD
       const userMsg: BotMessage = {
         role: "user",
         content: trimmed,
+=======
+    const userMsg: BotMessage = { role: "user", content: trimmed, ts: Date.now(), isVoice };
+    setMessages(prev => [...prev, userMsg]);
+    setInput("");
+    setOrbState("listening");
+    setTimeout(() => setOrbState("thinking"), 600);
+    setIsTyping(true);
+
+    try {
+      const history = messages.map(m => ({ role: m.role, content: m.content }));
+      const res = await fetch(`${API_BASE}/ai/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          module: "helpline",
+          message: trimmed,
+          language: effectiveLang,          // use detected lang, not just dropdown
+          detected_language: effectiveLang, // extra hint for backend prompt
+          user_name: user?.name || "",      // personalised greeting
+          user_id: user?.id || "",
+          history,
+        }),
+      });
+      const data = await res.json();
+      const reply   = data.reply || "I'm sorry, I couldn't process that. Please try again.";
+      const resolved: boolean = data.resolved !== false; // default true if missing
+
+      setIsTyping(false);
+      const suggested: string[] = Array.isArray(data.suggested_replies) ? data.suggested_replies : [];
+      setMessages(prev => [...prev, { role: "assistant", content: reply, ts: Date.now(), resolved, suggestedReplies: suggested }]);
+
+      //  Escalation tracking 
+      if (!resolved) {
+        setUnresolvedTurns(prev => {
+          const next = prev + 1;
+          if (next >= 5 && !autoEscalated) {
+            // Auto-create ticket after 5 unresolved turns
+            autoCreateTicket(trimmed, reply);
+          } else if (next >= 3 && !escalationOffered) {
+            setEscalationOffered(true);
+          }
+          return next;
+        });
+      } else {
+        setUnresolvedTurns(0);
+        setEscalationOffered(false);
+      }
+
+      //  TTS playback 
+      if (voiceModeRef.current) {
+        await speakText(reply, effectiveLang);   // speak in same language user spoke
+        // Echo-guard: 700ms gap after TTS ends so mic doesn't pick up speakers
+        await new Promise(r => setTimeout(r, 700));
+        // Restart listening loop if voice mode still on
+        if (voiceModeRef.current && !loopActiveRef.current) {
+          startListeningLoop();
+        }
+      } else {
+        setTimeout(() => setOrbState("idle"), 2000);
+      }
+
+    } catch {
+      setIsTyping(false);
+      setOrbState("idle");
+      setMessages(prev => [...prev, {
+        role: "assistant",
+        content: "Connection error. Please check the backend service and try again.",
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
         ts: Date.now(),
         isVoice,
       };
@@ -2656,6 +3322,7 @@ function AIBotPanel({
     [messages, lang, orbState, speakText, escalationOffered, autoEscalated],
   );
 
+<<<<<<< HEAD
   // ── Auto-create ticket from conversation ───────────────────────────────────
   const autoCreateTicket = useCallback(
     async (lastQuery: string, lastReply: string) => {
@@ -2701,8 +3368,47 @@ function AIBotPanel({
     },
     [autoEscalated, messages, user, unresolvedTurns, onTicketCreated],
   );
+=======
+  //  Auto-create ticket from conversation 
+  const autoCreateTicket = useCallback(async (lastQuery: string, lastReply: string) => {
+    if (autoEscalated) return;
+    setAutoEscalated(true);
+    try {
+      const transcript = messages
+        .map(m => `${m.role === "user" ? "User" : "Bot"}: ${m.content}`)
+        .join("\n");
+      const payload = {
+        requester_name: user?.name || "Citizen",
+        subject: lastQuery.slice(0, 60) || "Helpline Query",
+        query: `Auto-escalated after ${unresolvedTurns} unresolved turns.\n\nConversation:\n${transcript}`,
+        priority: "High",
+        channel: "Web",
+        submitted_by: user?.id || null,
+      };
+      const r1 = await fetch(`${API_BASE}/live/helpline/ticket`, {
+        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
+      });
+      if (!r1.ok) throw new Error();
+      const { ticket_id } = await r1.json();
+      const r2 = await fetch(`${API_BASE}/live/helpline/ticket/${ticket_id}`);
+      const full: Ticket = await r2.json();
+      setEscalatedTicketId(ticket_id);
+      onTicketCreated(full);
+      // Inject the real ticket ID into chat history so future questions
+      // like "what's the status of my ticket" resolve correctly
+      setMessages(prev => [...prev, {
+        role: "assistant",
+        content: `Ticket ${ticket_id} has been created. Status: Open. You can ask me about this ticket anytime by mentioning the ID.`,
+        ts: Date.now(),
+      }]);
+      toast.success(`Ticket ${ticket_id} auto-created`);
+    } catch {
+      toast.error("Auto-escalation failed — please create a ticket manually");
+    }
+  }, [autoEscalated, messages, user, unresolvedTurns, onTicketCreated]);
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
 
-  // ── VAD: Voice Activity Detection using Web Audio ──────────────────────────
+  //  VAD: Voice Activity Detection using Web Audio 
   const stopLevelMeter = () => {
     if (levelRafRef.current) {
       cancelAnimationFrame(levelRafRef.current);
@@ -2733,7 +3439,7 @@ function AIBotPanel({
     }
   };
 
-  // ── Start a single recording session (VAD-triggered auto-stop) ─────────────
+  //  Start a single recording session (VAD-triggered auto-stop) 
   const startListeningLoop = useCallback(async () => {
     if (loopActiveRef.current) return;
     loopActiveRef.current = true;
@@ -2782,7 +3488,7 @@ function AIBotPanel({
       audioChunksRef.current = [];
 
       if (blob.size < 1000) {
-        // Too short — restart listening
+        // Too short  restart listening
         loopActiveRef.current = false;
         if (voiceModeRef.current) setTimeout(() => startListeningLoop(), 300);
         return;
@@ -2799,7 +3505,7 @@ function AIBotPanel({
         // Pass the spoken language so AI replies in same language
         await sendMessage(transcript, true, spoken);
       } else {
-        // Nothing transcribed — loop again
+        // Nothing transcribed  loop again
         if (voiceModeRef.current) setTimeout(() => startListeningLoop(), 500);
         else setOrbState("idle");
       }
@@ -2807,11 +3513,17 @@ function AIBotPanel({
 
     recorder.start();
 
-    // VAD — monitor audio levels; stop after sustained silence
+    // VAD  monitor audio levels; stop after sustained silence
     // Raised noise floor (15) to ignore mic hiss / ambient noise
+<<<<<<< HEAD
     const VAD_SILENCE_MS = 1800; // stop after this long of silence (was 1200 — increased to avoid mid-sentence cutoff)
     const VAD_START_DELAY = 1500; // wait this long before VAD kicks in (let user start speaking)
     const NOISE_FLOOR = 15; // avg frequency energy below this = silence
+=======
+    const VAD_SILENCE_MS   = 1800;  // stop after this long of silence (was 1200  increased to avoid mid-sentence cutoff)
+    const VAD_START_DELAY  = 1500;  // wait this long before VAD kicks in (let user start speaking)
+    const NOISE_FLOOR      = 15;    // avg frequency energy below this = silence
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
 
     let hasSpeechStarted = false; // only allow silence countdown after user has spoken
 
@@ -2824,14 +3536,14 @@ function AIBotPanel({
       analyserRef.current?.getByteFrequencyData(data);
       const avg = data.reduce((a, b) => a + b, 0) / (data.length || 1);
       if (avg >= NOISE_FLOOR) {
-        // Sound detected — mark speech started and cancel any pending stop
+        // Sound detected  mark speech started and cancel any pending stop
         hasSpeechStarted = true;
         if (vadTimerRef.current) {
           clearTimeout(vadTimerRef.current);
           vadTimerRef.current = null;
         }
       } else if (hasSpeechStarted) {
-        // Below noise floor AND user has already spoken — start silence countdown
+        // Below noise floor AND user has already spoken  start silence countdown
         if (vadTimerRef.current === null) {
           vadTimerRef.current = setTimeout(() => {
             vadTimerRef.current = null;
@@ -2839,14 +3551,14 @@ function AIBotPanel({
           }, VAD_SILENCE_MS);
         }
       }
-      // If hasSpeechStarted is still false, do nothing — don't start any countdown yet
+      // If hasSpeechStarted is still false, do nothing  don't start any countdown yet
       if (recorder.state === "recording") setTimeout(checkSilence, 80);
     };
     setTimeout(checkSilence, VAD_START_DELAY);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lang.code, transcribeAudio, sendMessage]);
 
-  // ── Toggle voice mode ──────────────────────────────────────────────────────
+  //  Toggle voice mode 
   const toggleVoiceMode = () => {
     if (voiceMode) {
       // Turn off
@@ -2915,7 +3627,7 @@ function AIBotPanel({
     speaking: "Speaking…",
   };
 
-  // ── Waveform bars (react to live audio level) ──────────────────────────────
+  //  Waveform bars (react to live audio level) 
   const WaveformBars = () => (
     <div
       style={{
@@ -3045,6 +3757,7 @@ function AIBotPanel({
             </div>
 
             <div>
+<<<<<<< HEAD
               <p
                 style={{
                   fontSize: "14px",
@@ -3076,6 +3789,11 @@ function AIBotPanel({
                     display: "inline-block",
                   }}
                 />
+=======
+              <p style={{ fontSize: "14px", fontWeight: 800, color: "white", margin: 0, letterSpacing: "-0.01em" }}>CivicSaathi</p>
+              <p style={{ fontSize: "14px", color: "rgba(34,197,94,0.85)", fontWeight: 600, margin: 0, display: "flex", alignItems: "center", gap: "3px" }}>
+                <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#22c55e", display: "inline-block" }} />
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                 We're online · {sttEngine ? `STT: ${sttEngine}` : lang.label}
               </p>
             </div>
@@ -3087,6 +3805,7 @@ function AIBotPanel({
               <button
                 onClick={() => setShowLangMenu((p) => !p)}
                 style={{
+<<<<<<< HEAD
                   height: "30px",
                   padding: "0 10px",
                   borderRadius: "8px",
@@ -3101,6 +3820,13 @@ function AIBotPanel({
                   gap: "4px",
                 }}
               >
+=======
+                  height: "30px", padding: "0 10px", borderRadius: "8px",
+                  background: "rgba(56,189,248,0.1)", border: "1px solid rgba(56,189,248,0.25)",
+                  color: "#38bdf8", fontSize: "14px", fontWeight: 700, cursor: "pointer",
+                  display: "flex", alignItems: "center", gap: "4px",
+                }}>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                 {lang.native} <ChevronDown style={{ width: 10, height: 10 }} />
               </button>
               {showLangMenu && (
@@ -3123,6 +3849,7 @@ function AIBotPanel({
                       key={l.code}
                       onClick={() => switchLanguage(i)}
                       style={{
+<<<<<<< HEAD
                         width: "100%",
                         padding: "9px 14px",
                         display: "flex",
@@ -3172,6 +3899,16 @@ function AIBotPanel({
                           ✓
                         </span>
                       )}
+=======
+                        width: "100%", padding: "9px 14px", display: "flex", alignItems: "center", gap: "8px",
+                        background: i === langIdx ? "rgba(56,189,248,0.1)" : "transparent",
+                        border: "none", cursor: "pointer", textAlign: "left",
+                        borderBottom: i < LANGUAGES.length - 1 ? "1px solid rgba(56,189,248,0.06)" : "none",
+                      }}>
+                      <span style={{ fontSize: "14px", fontWeight: 700, color: "#38bdf8", width: "24px" }}>{l.native}</span>
+                      <span style={{ fontSize: "14px", color: i === langIdx ? "#38bdf8" : "rgba(255,255,255,0.6)", fontWeight: i === langIdx ? 700 : 400 }}>{l.label}</span>
+                      {i === langIdx && <span style={{ marginLeft: "auto", color: "#38bdf8", fontSize: "14px" }}>✓</span>}
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                     </button>
                   ))}
                 </div>
@@ -3205,7 +3942,7 @@ function AIBotPanel({
           </div>
         </div>
 
-        {/* ── Voice Mode Banner ── */}
+        {/*  Voice Mode Banner  */}
         {voiceMode && (
           <div
             style={{
@@ -3221,6 +3958,7 @@ function AIBotPanel({
             }}
           >
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+<<<<<<< HEAD
               <div
                 style={{
                   width: "7px",
@@ -3268,6 +4006,20 @@ function AIBotPanel({
                     fontWeight: 700,
                   }}
                 >
+=======
+              <div style={{
+                width: "7px", height: "7px", borderRadius: "50%", background: isRecording ? "#22d3ee" : "#64748b",
+                boxShadow: isRecording ? "0 0 10px #22d3ee" : "none",
+                animation: isRecording ? "dotPulse 0.6s ease-in-out infinite alternate" : "none",
+              }} />
+              <span style={{ fontSize: "14px", color: "#22d3ee", fontWeight: 700 }}>
+                {isRecording ? "Listening — speak now" : orbState === "thinking" ? "Processing…" : orbState === "speaking" ? "Speaking…" : "Voice mode active"}
+              </span>
+              {isRecording && <span style={{ fontSize: "14px", color: "rgba(34,211,238,0.6)", fontWeight: 600 }}>● REC</span>}
+
+              {detectedLang && detectedLang !== lang.code && (
+                <span style={{ fontSize: "14px", padding: "2px 7px", borderRadius: "10px", background: "rgba(168,85,247,0.15)", border: "1px solid rgba(168,85,247,0.3)", color: "#c4b5fd", fontWeight: 700 }}>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                   Detected: {detectedLang.toUpperCase()}
                 </span>
               )}
@@ -3275,6 +4027,7 @@ function AIBotPanel({
             <button
               onClick={toggleVoiceMode}
               style={{
+<<<<<<< HEAD
                 fontSize: "10px",
                 fontWeight: 700,
                 padding: "3px 10px",
@@ -3285,12 +4038,19 @@ function AIBotPanel({
                 cursor: "pointer",
               }}
             >
+=======
+                fontSize: "14px", fontWeight: 700, padding: "3px 10px", borderRadius: "6px",
+                background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.3)",
+                color: "#f87171", cursor: "pointer",
+              }}>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
               Stop Voice
             </button>
           </div>
         )}
 
         {/* Orb + state label */}
+<<<<<<< HEAD
         <div
           style={{
             display: "flex",
@@ -3304,6 +4064,13 @@ function AIBotPanel({
           }}
         >
           {/* Clickable orb — tap to start recording in voice mode */}
+=======
+        <div style={{
+          display: "flex", flexDirection: "column", alignItems: "center", paddingTop: "16px", paddingBottom: "8px",
+          flexShrink: 0, position: "relative", zIndex: 2,
+        }}>
+          {/* Clickable orb  tap to start recording in voice mode */}
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
           <div
             onClick={() => {
               if (voiceMode && !isRecording && orbState === "idle")
@@ -3328,6 +4095,7 @@ function AIBotPanel({
               />
             )}
           </div>
+<<<<<<< HEAD
           <div
             style={{
               marginTop: "8px",
@@ -3366,6 +4134,19 @@ function AIBotPanel({
                 fontWeight: 600,
               }}
             >
+=======
+          <div style={{
+            marginTop: "8px", display: "flex", alignItems: "center", gap: "6px",
+            padding: "4px 12px", borderRadius: "20px",
+            background: "rgba(56,189,248,0.06)", border: "1px solid rgba(56,189,248,0.12)",
+          }}>
+            <div style={{
+              width: "6px", height: "6px", borderRadius: "50%",
+              background: orbState === "idle" ? "#64748b" : orbState === "listening" ? "#22d3ee" : orbState === "thinking" ? "#a78bfa" : "#34d399",
+              animation: orbState !== "idle" ? "dotPulse 0.8s ease-in-out infinite alternate" : "none",
+            }} />
+            <span style={{ fontSize: "14px", color: "rgba(56,189,248,0.8)", fontWeight: 600 }}>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
               {stateLabel[orbState]}
             </span>
           </div>
@@ -3373,6 +4154,7 @@ function AIBotPanel({
             <button
               onClick={toggleVoiceMode}
               style={{
+<<<<<<< HEAD
                 marginTop: "8px",
                 padding: "6px 16px",
                 borderRadius: "20px",
@@ -3388,6 +4170,14 @@ function AIBotPanel({
                 gap: "5px",
                 boxShadow: "0 0 16px rgba(34,211,238,0.1)",
                 transition: "all 0.2s",
+=======
+                marginTop: "8px", padding: "6px 16px", borderRadius: "20px",
+                background: "linear-gradient(135deg, rgba(34,211,238,0.15), rgba(56,189,248,0.1))",
+                border: "1px solid rgba(34,211,238,0.3)", color: "#22d3ee",
+                fontSize: "14px", fontWeight: 700, cursor: "pointer",
+                display: "flex", alignItems: "center", gap: "5px",
+                boxShadow: "0 0 16px rgba(34,211,238,0.1)", transition: "all 0.2s",
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
               }}
               onMouseEnter={(e) =>
                 (e.currentTarget.style.background = "rgba(34,211,238,0.22)")
@@ -3422,6 +4212,7 @@ function AIBotPanel({
                 key={i}
                 onClick={() => sendMessage(p)}
                 style={{
+<<<<<<< HEAD
                   fontSize: "11px",
                   fontWeight: 600,
                   padding: "5px 12px",
@@ -3431,6 +4222,11 @@ function AIBotPanel({
                   color: "#38bdf8",
                   cursor: "pointer",
                   transition: "all 0.15s",
+=======
+                  fontSize: "14px", fontWeight: 600, padding: "5px 12px", borderRadius: "20px",
+                  background: "rgba(56,189,248,0.07)", border: "1px solid rgba(56,189,248,0.18)",
+                  color: "#38bdf8", cursor: "pointer", transition: "all 0.15s",
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                   animation: `bubbleIn 0.4s ease ${i * 0.08}s both`,
                 }}
                 onMouseEnter={(e) => {
@@ -3448,8 +4244,9 @@ function AIBotPanel({
           </div>
         )}
 
-        {/* ── Auto-escalation card ── */}
+        {/*  Auto-escalation card  */}
         {escalationOffered && !autoEscalated && (
+<<<<<<< HEAD
           <div
             style={{
               margin: "0 14px 8px",
@@ -3488,11 +4285,27 @@ function AIBotPanel({
             >
               Would you like to log this as a support ticket so an agent can
               follow up?
+=======
+          <div style={{
+            margin: "0 14px 8px", padding: "12px 14px", borderRadius: "12px",
+            background: "linear-gradient(135deg,rgba(251,191,36,0.1),rgba(245,158,11,0.06))",
+            border: "1px solid rgba(251,191,36,0.3)",
+            flexShrink: 0, position: "relative", zIndex: 2,
+            animation: "bubbleIn 0.35s ease",
+          }}>
+            <p style={{ fontSize: "14px", fontWeight: 700, color: "#fbbf24", marginBottom: "6px", display: "flex", alignItems: "center", gap: "5px" }}>
+              <AlertCircle style={{ width: 12, height: 12 }} />
+              Issue not resolved after {unresolvedTurns} turns
+            </p>
+            <p style={{ fontSize: "14px", color: "rgba(251,191,36,0.8)", marginBottom: "10px", lineHeight: 1.5 }}>
+              Would you like to log this as a support ticket so an agent can follow up?
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
             </p>
             <div style={{ display: "flex", gap: "6px" }}>
               <button
                 onClick={handleLogTicket}
                 style={{
+<<<<<<< HEAD
                   flex: 1,
                   height: "30px",
                   borderRadius: "8px",
@@ -3510,10 +4323,19 @@ function AIBotPanel({
               >
                 <TicketIcon style={{ width: 11, height: 11 }} /> Yes, Create
                 Ticket
+=======
+                  flex: 1, height: "30px", borderRadius: "8px", border: "none",
+                  background: "linear-gradient(135deg,#f59e0b,#d97706)", color: "white",
+                  fontSize: "14px", fontWeight: 700, cursor: "pointer",
+                  display: "flex", alignItems: "center", justifyContent: "center", gap: "4px",
+                }}>
+                <TicketIcon style={{ width: 11, height: 11 }} /> Yes, Create Ticket
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
               </button>
               <button
                 onClick={() => setEscalationOffered(false)}
                 style={{
+<<<<<<< HEAD
                   padding: "0 12px",
                   height: "30px",
                   borderRadius: "8px",
@@ -3524,6 +4346,12 @@ function AIBotPanel({
                   cursor: "pointer",
                 }}
               >
+=======
+                  padding: "0 12px", height: "30px", borderRadius: "8px",
+                  background: "transparent", border: "1px solid rgba(251,191,36,0.2)",
+                  color: "rgba(251,191,36,0.6)", fontSize: "14px", cursor: "pointer",
+                }}>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                 Continue
               </button>
             </div>
@@ -3549,6 +4377,7 @@ function AIBotPanel({
           >
             <CheckCircle2 style={{ width: 14, height: 14, color: "#34d399" }} />
             <div>
+<<<<<<< HEAD
               <p
                 style={{
                   fontSize: "11px",
@@ -3568,6 +4397,10 @@ function AIBotPanel({
               >
                 An agent will follow up on your issue
               </p>
+=======
+              <p style={{ fontSize: "14px", fontWeight: 700, color: "#34d399", margin: 0 }}>Ticket auto-created: {escalatedTicketId}</p>
+              <p style={{ fontSize: "14px", color: "rgba(52,211,153,0.7)", margin: 0 }}>An agent will follow up on your issue</p>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
             </div>
           </div>
         )}
@@ -3610,6 +4443,7 @@ function AIBotPanel({
             <button
               onClick={handleLogTicket}
               style={{
+<<<<<<< HEAD
                 width: "100%",
                 height: "30px",
                 borderRadius: "8px",
@@ -3623,6 +4457,11 @@ function AIBotPanel({
                 alignItems: "center",
                 justifyContent: "center",
                 gap: "6px",
+=======
+                width: "100%", height: "30px", borderRadius: "8px", border: "1px solid rgba(56,189,248,0.2)",
+                background: "rgba(56,189,248,0.06)", color: "#38bdf8", fontSize: "14px", fontWeight: 700,
+                cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px",
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                 transition: "all 0.15s",
               }}
               onMouseEnter={(e) => {
@@ -3682,6 +4521,7 @@ function AIBotPanel({
               rows={1}
               disabled={orbState === "thinking"}
               style={{
+<<<<<<< HEAD
                 flex: 1,
                 background: "transparent",
                 border: "none",
@@ -3693,6 +4533,11 @@ function AIBotPanel({
                 lineHeight: 1.5,
                 maxHeight: "80px",
                 overflowY: "auto",
+=======
+                flex: 1, background: "transparent", border: "none", outline: "none", resize: "none",
+                fontSize: "14px", color: "white", fontFamily: "inherit", lineHeight: 1.5,
+                maxHeight: "80px", overflowY: "auto",
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
               }}
             />
             {/* Voice toggle button */}
@@ -3769,6 +4614,7 @@ function AIBotPanel({
               )}
             </button>
           </div>
+<<<<<<< HEAD
           <p
             style={{
               fontSize: "9px",
@@ -3778,6 +4624,9 @@ function AIBotPanel({
               fontWeight: 500,
             }}
           >
+=======
+          <p style={{ fontSize: "14px", color: "rgba(56,189,248,0.3)", textAlign: "center", marginTop: "5px", fontWeight: 500 }}>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
             ↵ send · Shift+↵ new line · tap 🎤 for voice conversation
           </p>
         </div>
@@ -3815,8 +4664,8 @@ function AIBotPanel({
   );
 }
 
-// ── Main Helpline Page ────────────────────────────────────────────────────────
-export function Helpline() {
+//  Main Helpline Page 
+function Helpline() {
   const { user } = useAuth();
   const isStaff = user?.role === "admin" || user?.role === "officer";
 
@@ -3884,6 +4733,7 @@ export function Helpline() {
       : tickets.filter((t) => t.status === activeQueue);
 
   return (
+<<<<<<< HEAD
     <div
       style={{
         display: "flex",
@@ -3903,6 +4753,14 @@ export function Helpline() {
           pointerEvents: "none",
           opacity: 0.55,
           backgroundImage: `
+=======
+    <div style={{ display: "flex", height: "calc(100vh - 6rem)", overflow: "hidden", background: "transparent", position: "relative" }} className="bg-transparent">
+
+      {/*  Ambient background  */}
+      <div style={{
+        position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none", opacity: 0.55,
+        backgroundImage: `
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
           radial-gradient(circle at 15% 25%, rgba(139,92,246,0.10), transparent 35%),
           radial-gradient(circle at 85% 65%, rgba(99,102,241,0.09), transparent 35%),
           radial-gradient(circle at 50% 85%, rgba(34,211,238,0.06), transparent 30%)
@@ -3921,6 +4779,7 @@ export function Helpline() {
         }}
       />
 
+<<<<<<< HEAD
       {/* ── LEFT: Ticket Dashboard ─────────────────────────────── */}
       <div
         style={{
@@ -4113,10 +4972,63 @@ export function Helpline() {
               }}
             >
               <Plus className="w-3.5 h-3.5" /> New
+=======
+      {/*  LEFT: Ticket Dashboard  */}
+      <div style={{ flex: "0 0 58%", display: "flex", flexDirection: "column", overflow: "hidden", position: "relative", zIndex: 1 }}>
+
+        {/* Premium Command-Center Hero Header */}
+        <div className="relative overflow-hidden shrink-0">
+          <div className="absolute inset-0 bg-gradient-to-r from-teal-500/10 via-cyan-500/5 to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-soft-light pointer-events-none"></div>
+          
+          <div className="relative p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-white/60 bg-white/40 backdrop-blur-3xl shadow-sm">
+            <div className="flex items-center gap-5">
+              <div className="relative">
+                <div className="absolute inset-0 bg-teal-400 blur-xl opacity-40 rounded-full animate-pulse" />
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-teal-50 to-cyan-100/50 border border-teal-200/50 flex items-center justify-center shadow-lg shadow-teal-500/20 relative z-10 backdrop-blur-xl">
+                  <Headphones className="w-7 h-7 text-teal-600" />
+                </div>
+              </div>
+              <div>
+                <h1 className="text-3xl font-black tracking-tight text-slate-800 mb-1">
+                  Public Helpline
+                </h1>
+                <p className="text-sm text-slate-500 font-medium flex items-center gap-2">
+                  Citizen Support Dashboard
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-100/80 text-emerald-700 text-sm font-bold border border-emerald-200/50 shadow-sm">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    Live System
+                  </span>
+                </p>
+              </div>
+            </div>
+
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search tickets…"
+                className="w-[200px] h-10 pl-9 pr-8 bg-white/70 backdrop-blur-md border border-white/60 rounded-xl text-sm text-slate-800 outline-none focus:ring-4 focus:ring-teal-500/20 focus:border-teal-300 transition-all placeholder:text-slate-400 shadow-sm" />
+              {search && (
+                <button onClick={() => setSearch("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 hover:bg-slate-200/50 rounded-full transition-colors cursor-pointer border-none bg-transparent">
+                  <X className="w-4 h-4 text-slate-400" />
+                </button>
+              )}
+            </div>
+            <button onClick={() => fetchTickets()}
+              className="w-10 h-10 rounded-xl border border-white/60 bg-white/70 backdrop-blur-md flex items-center justify-center shadow-sm hover:bg-white/90 transition-all cursor-pointer">
+              <RefreshCw className={`w-4 h-4 text-teal-600 ${loading ? "animate-spin" : ""}`} />
             </button>
+            <button onClick={() => setNewOpen(true)}
+              className="h-10 px-5 rounded-xl border border-teal-500/30 bg-gradient-to-r from-teal-500 to-cyan-600 text-white font-bold flex items-center gap-2 shadow-lg shadow-teal-500/25 hover:shadow-teal-500/40 hover:-translate-y-0.5 transition-all cursor-pointer"
+            >
+              <Plus className="w-4 h-4" /> New
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
+            </button>
+          </div>
           </div>
         </div>
 
+<<<<<<< HEAD
         {/* KPI Stat cards — matching grievances page style */}
         <div
           style={{
@@ -4126,6 +5038,10 @@ export function Helpline() {
             flexShrink: 0,
           }}
         >
+=======
+        {/* KPI Stat cards  matching grievances page style */}
+        <div style={{ display: "flex", gap: "10px", padding: "14px 24px 0", flexShrink: 0 }}>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
           {[
             {
               label: "All",
@@ -4221,6 +5137,7 @@ export function Helpline() {
                   <Icon style={{ width: 16, height: 16, color }} />
                 </div>
                 <div>
+<<<<<<< HEAD
                   <p
                     style={{
                       fontSize: "22px",
@@ -4242,6 +5159,10 @@ export function Helpline() {
                   >
                     {label}
                   </p>
+=======
+                  <p style={{ fontSize: "24px", fontWeight: 800, color: active ? color : "#1e293b", margin: 0, lineHeight: 1 }}>{count}</p>
+                  <p style={{ fontSize: "14px", fontWeight: 600, color: active ? color : "#64748b", margin: 0 }}>{label}</p>
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                 </div>
               </button>
             );
@@ -4295,6 +5216,7 @@ export function Helpline() {
                   }}
                 />
               </div>
+<<<<<<< HEAD
               <p
                 style={{
                   fontSize: "13px",
@@ -4320,6 +5242,12 @@ export function Helpline() {
               >
                 <Plus className="w-3.5 h-3.5 inline mr-1" />
                 Create Ticket
+=======
+              <p style={{ fontSize: "14px", color: "var(--color-muted-foreground)", fontWeight: 500 }}>No tickets found</p>
+              <button onClick={() => setNewOpen(true)}
+                style={{ padding: "7px 18px", borderRadius: "9px", background: "linear-gradient(135deg,rgba(139,92,246,0.2),rgba(99,102,241,0.1))", border: "1px solid rgba(139,92,246,0.25)", color: "#a78bfa", fontSize: "14px", fontWeight: 700, cursor: "pointer" }}>
+                <Plus className="w-3.5 h-3.5 inline mr-1" />Create Ticket
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
               </button>
             </div>
           ) : (
@@ -4342,6 +5270,7 @@ export function Helpline() {
         </div>
       </div>
 
+<<<<<<< HEAD
       {/* ── RIGHT: AI Bot Panel ────────────────────────────────── */}
       <div
         style={{
@@ -4357,6 +5286,11 @@ export function Helpline() {
             fetchTickets(true);
           }}
         />
+=======
+      {/*  RIGHT: AI Bot Panel  */}
+      <div style={{ flex: "0 0 42%", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+        <AIBotPanel onTicketCreated={t => { setTickets(p => [t, ...p]); fetchTickets(true); }} />
+>>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
       </div>
 
       {/* Conversation Drawer */}
