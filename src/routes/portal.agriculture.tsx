@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect, type ChangeEvent } from "react";
+import { createPortal } from "react-dom";
 import { createFileRoute } from "@tanstack/react-router";
 import {
   Upload, Cloud, Bug, Loader2, X, Droplets, Wind,
@@ -67,7 +68,8 @@ const glassCardLg = "bg-white/70 backdrop-blur-2xl border border-white shadow-2x
 
 //  Weather Drawer 
 function WeatherDrawer({ weather, loading, onClose }: { weather: WeatherResponse | null; loading: boolean; onClose: () => void; }) {
-  return (
+  if (typeof document === "undefined") return null;
+  return createPortal(
     <>
       <div onClick={onClose} className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 animate-in fade-in" />
       <div className="fixed top-0 right-0 bottom-0 w-full md:w-[480px] bg-white shadow-2xl z-50 flex flex-col animate-in slide-in-from-right-12">
@@ -96,7 +98,8 @@ function WeatherDrawer({ weather, loading, onClose }: { weather: WeatherResponse
           </div>}
         </div>
       </div>
-    </>
+    </>,
+    document.body
   );
 }
 
@@ -153,7 +156,8 @@ function AgriChatModal({ onClose }: { onClose: () => void; }) {
     } finally { setLoading(false); }
   };
 
-  return (
+  if (typeof document === "undefined") return null;
+  return createPortal(
     <>
       <div onClick={onClose} className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 animate-in fade-in" />
       <div className="fixed inset-4 md:inset-x-20 md:inset-y-10 lg:left-[50%] lg:-translate-x-[50%] lg:inset-y-8 lg:w-[760px] bg-white shadow-2xl rounded-[2.5rem] z-50 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
@@ -196,7 +200,8 @@ function AgriChatModal({ onClose }: { onClose: () => void; }) {
           </form>
         </div>
       </div>
-    </>
+    </>,
+    document.body
   );
 }
 

@@ -28,9 +28,13 @@ from routers import smart_city as smart_city_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    init_db()
-    logger.info("✅ Database initialized.")
+    try:
+        init_db()
+        logger.info("✅ Database initialized.")
+    except Exception as exc:
+        logger.warning(f"⚠️  DB init skipped — server running in offline mode. ({exc})")
     yield
+
 
 
 app = FastAPI(
