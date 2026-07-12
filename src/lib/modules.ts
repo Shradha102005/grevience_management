@@ -106,12 +106,30 @@ export const MODULES: ModuleDef[] = [
 ];
 
 export const TRUST_POINTS = [
-  { title: "Government Ready", desc: "Built to comply with public-sector standards and procurement requirements." },
-  { title: "Enterprise Security", desc: "End-to-end encryption, audit logs and SOC-grade access controls." },
-  { title: "Role Based Access", desc: "Granular permissions across departments, officers and administrators." },
-  { title: "AI Powered Workflows", desc: "Automate triage, routing and citizen responses at national scale." },
-  { title: "Multilingual Support", desc: "Serve citizens across 8+ Indian languages out of the box." },
-  { title: "Voice First Governance", desc: "Natural language voice access for every core citizen service." },
+  {
+    title: "Government Ready",
+    desc: "Built to comply with public-sector standards and procurement requirements.",
+  },
+  {
+    title: "Enterprise Security",
+    desc: "End-to-end encryption, audit logs and SOC-grade access controls.",
+  },
+  {
+    title: "Role Based Access",
+    desc: "Granular permissions across departments, officers and administrators.",
+  },
+  {
+    title: "AI Powered Workflows",
+    desc: "Automate triage, routing and citizen responses at national scale.",
+  },
+  {
+    title: "Multilingual Support",
+    desc: "Serve citizens across 8+ Indian languages out of the box.",
+  },
+  {
+    title: "Voice First Governance",
+    desc: "Natural language voice access for every core citizen service.",
+  },
 ];
 
 export const STATS = [

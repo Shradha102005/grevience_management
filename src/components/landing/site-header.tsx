@@ -25,7 +25,10 @@ export function SiteHeader() {
           ))}
         </nav>
         <div className="flex items-center gap-2">
-          <Button asChild className="rounded-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6">
+          <Button
+            asChild
+            className="rounded-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6"
+          >
             <Link to="/portal">Enter Portal</Link>
           </Button>
         </div>

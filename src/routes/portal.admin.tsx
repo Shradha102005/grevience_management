@@ -12,7 +12,11 @@ export const Route = createFileRoute("/portal/admin")({
 
 const ROLES = [
   { role: "Super Admin", users: 4, scope: "Full platform access" },
-  { role: "Department Officer", users: 86, scope: "Department-level operations" },
+  {
+    role: "Department Officer",
+    users: 86,
+    scope: "Department-level operations",
+  },
   { role: "Municipal Officer", users: 142, scope: "Complaints & services" },
   { role: "Scheme Officer", users: 38, scope: "Scheme management" },
   { role: "Emergency Officer", users: 21, scope: "Broadcast & alerts" },

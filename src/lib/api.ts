@@ -58,7 +58,7 @@ api.interceptors.response.use(
         const { data } = await axios.post<{ access_token: string }>(
           `${BASE_URL}/api/auth/refresh`,
           {},
-          { withCredentials: true }
+          { withCredentials: true },
         );
         const newToken = data.access_token;
         if (typeof window !== "undefined") {
@@ -72,7 +72,10 @@ api.interceptors.response.use(
         processQueue(refreshError, null);
         if (typeof window !== "undefined") {
           // Only force logout if the refresh definitively failed due to auth (e.g. 401)
-          if (refreshError.response?.status === 401 || refreshError.response?.status === 403) {
+          if (
+            refreshError.response?.status === 401 ||
+            refreshError.response?.status === 403
+          ) {
             localStorage.removeItem("access_token");
             localStorage.removeItem("civicos_user");
             window.location.href = "/login";

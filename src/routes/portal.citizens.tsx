@@ -22,22 +22,64 @@ export const Route = createFileRoute("/portal/citizens")({
 });
 
 const CITIZENS = [
-  { name: "Ravi Sharma", id: "CIT-88210", ward: "Ward 3", schemes: 3, status: "Verified" },
-  { name: "Meera Patel", id: "CIT-88211", ward: "Ward 1", schemes: 1, status: "Verified" },
-  { name: "Arjun Nair", id: "CIT-88212", ward: "Ward 5", schemes: 2, status: "Pending" },
-  { name: "Sana Khan", id: "CIT-88213", ward: "Ward 2", schemes: 4, status: "Verified" },
-  { name: "Vikram Rao", id: "CIT-88214", ward: "Ward 4", schemes: 0, status: "Pending" },
-  { name: "Priya Das", id: "CIT-88215", ward: "Ward 6", schemes: 2, status: "Verified" },
+  {
+    name: "Ravi Sharma",
+    id: "CIT-88210",
+    ward: "Ward 3",
+    schemes: 3,
+    status: "Verified",
+  },
+  {
+    name: "Meera Patel",
+    id: "CIT-88211",
+    ward: "Ward 1",
+    schemes: 1,
+    status: "Verified",
+  },
+  {
+    name: "Arjun Nair",
+    id: "CIT-88212",
+    ward: "Ward 5",
+    schemes: 2,
+    status: "Pending",
+  },
+  {
+    name: "Sana Khan",
+    id: "CIT-88213",
+    ward: "Ward 2",
+    schemes: 4,
+    status: "Verified",
+  },
+  {
+    name: "Vikram Rao",
+    id: "CIT-88214",
+    ward: "Ward 4",
+    schemes: 0,
+    status: "Pending",
+  },
+  {
+    name: "Priya Das",
+    id: "CIT-88215",
+    ward: "Ward 6",
+    schemes: 2,
+    status: "Verified",
+  },
 ];
 
 function initials(name: string) {
-  return name.split(" ").map((n) => n[0]).join("").slice(0, 2);
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .slice(0, 2);
 }
 
 function Citizens() {
   const [q, setQ] = useState("");
   const rows = CITIZENS.filter(
-    (c) => c.name.toLowerCase().includes(q.toLowerCase()) || c.id.toLowerCase().includes(q.toLowerCase()),
+    (c) =>
+      c.name.toLowerCase().includes(q.toLowerCase()) ||
+      c.id.toLowerCase().includes(q.toLowerCase()),
   );
 
   return (
@@ -91,7 +133,9 @@ function Citizens() {
                     </div>
                   </TableCell>
                   <TableCell className="font-mono text-xs">{c.id}</TableCell>
-                  <TableCell className="text-muted-foreground">{c.ward}</TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {c.ward}
+                  </TableCell>
                   <TableCell>{c.schemes}</TableCell>
                   <TableCell>
                     <Badge

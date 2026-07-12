@@ -70,8 +70,12 @@ export function StatCard({
     <Card className="p-4 shadow-sm border border-border bg-card transition-shadow hover:shadow-md">
       <div className="flex items-start justify-between">
         <div>
-          <span className="text-[13px] font-medium text-muted-foreground">{label}</span>
-          <div className="mt-1 font-sans text-2xl font-semibold tracking-tight text-foreground">{value}</div>
+          <span className="text-[13px] font-medium text-muted-foreground">
+            {label}
+          </span>
+          <div className="mt-1 font-sans text-2xl font-semibold tracking-tight text-foreground">
+            {value}
+          </div>
           {delta && (
             <div
               className={cn(
@@ -96,7 +100,13 @@ export function StatCard({
       </div>
       {data && data.length > 0 && (
         <div className="mt-4 h-10 w-full">
-          <Chart options={chartOptions} series={chartSeries} type="area" height="100%" width="100%" />
+          <Chart
+            options={chartOptions}
+            series={chartSeries}
+            type="area"
+            height="100%"
+            width="100%"
+          />
         </div>
       )}
     </Card>

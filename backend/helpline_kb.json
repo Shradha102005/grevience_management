@@ -1,118 +1,106 @@
 [
-    {
-        "id": "ration_card",
-        "keywords": [
-            "ration card",
-            "fsc",
-            "food security card",
-            "pds",
-            "fair price shop",
-            "aay",
-            "రేషన్ కార్డు"
-        ],
-        "content": "RATION CARD / FOOD SECURITY CARD (FSC) - Telangana:\nIssuing Authority: Department of Consumer Affairs, Food & Civil Supplies, Telangana. Address: Civil Supplies Bhavan, Somajiguda, Hyderabad - 500082.\nHow to apply: Download 'New Food Security Card' application from the MeeSeva portal (Civil Supplies section), fill it, attach documents, and submit at your nearest MeeSeva or Praja Palana centre. The form cannot be fully submitted online; final submission is in person.\nDocuments required: Aadhaar card, address proof (utility bill/rental agreement/voter ID/driving licence), income proof, passport-size photographs of all family members, caste certificate if applicable.\nCard types: FSC (Food Security Card) for low-income households; AAY (Antyodaya Anna Yojana) for the poorest families.\nProcessing time: 15-30 working days.\nStatus check: epds.telangana.gov.in -> FSC Search, using FSC reference number, ration card number, or Aadhaar number.\nHelpline: 1967 or 1800-425-0333."
-    },
-    {
-        "id": "birth_certificate",
-        "keywords": [
-            "birth certificate",
-            "date of birth certificate",
-            "newborn registration",
-            "జననం సర్టిఫికేట్"
-        ],
-        "content": "BIRTH CERTIFICATE - Telangana / Hyderabad (GHMC):\nIssuing Authority (Hyderabad/GHMC limits): GHMC Birth & Death Department, Tank Bund Road, Hyderabad - 500063. Portal: bnd.ghmc.gov.in. Outside GHMC (municipalities, panchayats): apply via MeeSeva under CDMA.\nLegal requirement: Every birth must be registered within 21 days of occurrence (Registration of Birth & Deaths Act, 1969).\nHow to apply: Hospital or head of family submits the filled application with documents to the nearest MeeSeva centre; the operator uploads it online and issues an acknowledgement/application number. For births after 2024, some are also registered on the central CRS portal (crs.gov.in).\nDocuments required: Hospital discharge summary / birth intimation letter, both parents' Aadhaar cards. For births at home, a declaration from the local Panchayat/Municipal Commissioner is needed instead.\nName inclusion: The certificate may be issued without the child's name initially; name can be added later (simpler if done before the child turns 1 year) via MeeSeva with the original certificate + Aadhaar.\nLate registration (birth not registered within 1 year): requires a Non-Availability Certificate from the Gram Panchayat/Municipal Commissioner, a notarized affidavit, and supporting documents (ration card, school certificate, SSC memo).\nProcessing time: Typically 2-3 days for GHMC-registered births with complete documents.\nHelpline: GHMC 040-21111111 | MeeSeva 1800-599-4788."
-    },
-    {
-        "id": "driving_license",
-        "keywords": [
-            "driving license",
-            "driving licence",
-            "learner licence",
-            "learner's license",
-            "dl",
-            "rta",
-            "sarathi",
-            "డ్రైవింగ్ లైసెన్స్"
-        ],
-        "content": "DRIVING LICENCE - Telangana:\nIssuing Authority: Regional Transport Authority (RTA) / RTO with jurisdiction over the applicant's residential area. Statewide portal: transport.telangana.gov.in. National portal for applications/status: sarathi.parivahan.gov.in (select state 'Telangana').\nProcess: First obtain a Learner's Licence (LL) by passing a computerised test (15 questions on traffic rules, minimum 11 correct to pass). After holding the LL for at least 30 days (valid up to 6 months), apply for the Permanent Driving Licence using Form 4, and pass a practical driving test at the RTO.\nEligibility by age: 16 years for gearless two-wheelers up to 50cc (with parental consent); 18 years for other two-wheelers and light motor vehicles; 20 years for transport/commercial vehicles.\nDocuments required: Valid Learner's Licence, proof of identity (Aadhaar/passport/voter ID/PAN), proof of address (Aadhaar/utility bill/rent agreement), proof of age (birth certificate/school certificate/passport), passport-size photographs, medical certificate (Form 1A) if applicant is over 50 years or applying for a transport licence.\nValidity: 20 years or until the holder turns 50, whichever is earlier. A 30-day grace period is allowed after expiry for renewal without re-test; beyond 5 years past expiry, a fresh test may be required.\nStatus check: sarathi.parivahan.gov.in -> Applicant Status, using application number and date of birth.\nHelpline: 040-23453635 (Telangana Transport Department)."
-    },
-    {
-        "id": "passport",
-        "keywords": [
-            "passport",
-            "passport seva",
-            "tatkal",
-            "psk",
-            "పాస్‌పోర్ట్"
-        ],
-        "content": "PASSPORT (applies uniformly across India, including Telangana):\nIssuing Authority: Ministry of External Affairs (MEA), via Passport Seva Kendras (PSKs) and Post Office PSKs. Regional Passport Office for Hyderabad/Telangana handles local applications. Portal: passportindia.gov.in.\nHow to apply: Register/login on passportindia.gov.in, choose 'Apply for Fresh Passport/Reissue', fill the form, pay the fee online, and book a PSK appointment (any PSK in India, regardless of registered address). Visit the PSK on the appointment date with original documents for biometrics and verification.\nService types: Normal processing (15-30 working days, includes police verification) or Tatkal (expedited, 1-3 working days; police verification often done after issuance). Tatkal requires 3 of 15 specified additional verification documents.\nValidity: 10 years for adults, 5 years for minors under 18.\nLost passport: File an FIR at the nearest police station immediately, then apply for reissue under the 'Lost Passport' category. This cannot be handled by the call centre alone.\nStatus check: passportindia.gov.in -> Track Application Status (File Number + Date of Birth), or SMS 'STATUS <File Number>' to 9704100100.\nHelpline: 1800-258-1800 (toll-free, 24x7, National Passport Call Centre, supports 17 languages). J&K: 040-66720567 (paid). North-East states: 040-66720581 (paid)."
-    },
-    {
-        "id": "property_tax",
-        "keywords": [
-            "property tax",
-            "ghmc tax",
-            "ptin",
-            "house tax",
-            "ఆస్తి పన్ను"
-        ],
-        "content": "PROPERTY TAX - Greater Hyderabad (GHMC):\nIssuing/Collecting Authority: Greater Hyderabad Municipal Corporation (GHMC), covering Hyderabad, Secunderabad, Malkajgiri, Kukatpally, LB Nagar, Serilingampally, Uppal and surrounding areas. Payment portal: onlinepayments.ghmc.gov.in.\nHow to pay online: Search your property using PTIN (Property Tax Identification Number, a 10-digit number printed on any old GHMC receipt), Door Number, Mobile Number, or Owner Name. Enter PTIN and mobile number to receive an OTP, review dues, and pay via UPI/net banking/card.\nOffline payment: MeeSeva centres, designated banks (including SBI), or GHMC Bill Collectors, carrying sale deed, occupancy certificate, and previous tax receipts.\nPenalty for late payment: 2% simple interest per month on overdue amount; long-term default can lead to property attachment.\nExemptions/concessions: 50% vacancy remission if unoccupied (needs Tax Inspector's report); reduced rates for low-income/rental properties with monthly rental value below a government-notified threshold; government-recognised schools up to 10th standard are exempt (colleges and private institutions are not).\nReceipt: Available for download 24-48 hours after payment via 'Print Receipts' on the portal using PTIN + OTP.\nHelpline: 040-21111111 or 1800-425-0203 (toll-free)."
-    },
-    {
-        "id": "pan_card",
-        "keywords": [
-            "pan card",
-            "pan number",
-            "permanent account number",
-            "పాన్ కార్డు"
-        ],
-        "content": "PAN CARD (applies uniformly across India, including Telangana):\nIssuing Authorities (on behalf of Income Tax Department): Protean eGov Technologies (formerly NSDL) and UTIITSL. Apply online via onlineservices.nsdl.com or pan.utiitsl.com.\nHow to apply: Fill the online PAN application form, upload identity/address/date-of-birth proof, pay the fee (approx. Rs 107 for physical + e-PAN, or Rs 72 for e-PAN only), and complete either Aadhaar-based e-KYC or submit documents physically/via courier depending on the mode chosen.\nDocuments required: Proof of identity, proof of address, proof of date of birth (Aadhaar is commonly used for all three).\nAadhaar-PAN linking: Mandatory for most taxpayers; can be done on the Income Tax e-filing portal (incometax.gov.in) under 'Link Aadhaar'.\nStatus check: SMS 'NSDLPAN <15-digit acknowledgement number>' to 57575, or check status online via the NSDL/UTIITSL portal.\nHelpline: Protean/NSDL - 020-27218080 (7 AM-11 PM, all days) or 08069708080 (24/7). UTIITSL - 033-40802999 (9 AM-8 PM, all days). Income Tax Dept toll-free (Aaykar Sampark Kendra) - 1800-180-1961."
-    },
-    {
-        "id": "aadhaar",
-        "keywords": [
-            "aadhaar",
-            "aadhar",
-            "uidai",
-            "aadhaar update",
-            "ఆధార్"
-        ],
-        "content": "AADHAAR CARD (applies uniformly across India, including Telangana):\nIssuing Authority: Unique Identification Authority of India (UIDAI). Portal: uidai.gov.in.\nUpdates: Demographic updates (name, DOB, gender, address) and biometric updates (fingerprint, iris, photo) can be done at any Aadhaar Enrolment/Update Centre. Address and some document updates can also be done online.\nDocuments for name/DOB change: Passport, PAN card, birth certificate, or other UIDAI-approved proof; a name change beyond the permitted 2 updates requires a gazette notification.\nFees: Rs 50 for demographic updates, Rs 100 for biometric updates.\nDownload: e-Aadhaar can be downloaded anytime after generation via uidai.gov.in -> Download Aadhaar.\nGrievance process: Complaints can be raised via the 1947 helpline, email, or the Centralized Public Grievance Redress and Monitoring System (CPGRAMS) at pgportal.gov.in.\nHelpline: 1947 (toll-free, 24/7, multilingual) or email help@uidai.gov.in."
-    },
-    {
-        "id": "voter_id",
-        "keywords": [
-            "voter id",
-            "voter card",
-            "epic",
-            "nvsp",
-            "election commission",
-            "ఓటరు గుర్తింపు కార్డు"
-        ],
-        "content": "VOTER ID / EPIC CARD (applies uniformly across India, including Telangana):\nIssuing Authority: Election Commission of India (ECI). Portal: voters.eci.gov.in (National Voters' Service Portal / NVSP).\nNew registration/correction: Use Form 6 (new registration), Form 8 (correction/address change), or Form 6B (Aadhaar linking) on the NVSP portal or via the Voter Helpline App.\nAadhaar linking: Voluntary, not mandatory for voting rights (per Election Laws Amendment Act 2021 and ECI's submission to the Supreme Court). Can be done via NVSP, the Voter Helpline App, by calling 1950, or by SMS to 166 or 51969.\nAddress update timeline: Typically 2-4 weeks after submitting Form 8 and verification.\nStatus check: NVSP portal -> Track Application Status, using the reference number generated at submission, or contact your local Booth Level Officer (BLO).\nHelpline: 1950 (toll-free, nationwide, Mon-Fri 10 AM-5 PM for some services; general voter helpline otherwise widely available)."
-    },
-    {
-        "id": "electricity",
-        "keywords": [
-            "electricity bill",
-            "power cut",
-            "tsspdcl",
-            "tsnpdcl",
-            "current bill",
-            "కరెంటు బిల్లు"
-        ],
-        "content": "ELECTRICITY (Telangana):\nDistribution Companies: TSSPDCL (Telangana State Southern Power Distribution Company Limited) covers most of Hyderabad and southern Telangana districts; TSNPDCL (Northern) covers northern districts. Portal: tssouthernpower.com (TSSPDCL) or tsnpdcl.in (TSNPDCL).\nComplaint types handled: Power outages, faulty meters, billing disputes/incorrect readings, new connection requests.\nHow to complain: Call 1912 (common toll-free helpline for both discoms) or 1800-599-01912; register online via the discom's website/'Grievance' section with photos of the meter/bill if disputing a reading; or use the TSSPDCL/TSNPDCL mobile app.\nEscalation path if unresolved within 60 days: Internal Grievance Redressal Cell (IGRC) of the discom, then the Consumer Grievance Redressal Forum (CGRF), then the Electricity Ombudsman under TSERC (Telangana State Electricity Regulatory Commission).\nHelpline: 1912 or 1800-599-01912 (TSSPDCL), 1800-425-2424 (TSNPDCL)."
-    },
-    {
-        "id": "water_bill",
-        "keywords": [
-            "water bill",
-            "water supply",
-            "hmwssb",
-            "sewerage",
-            "tanker",
-            "నీటి బిల్లు"
-        ],
-        "content": "WATER SUPPLY & SEWERAGE - Hyderabad:\nAuthority: Hyderabad Metropolitan Water Supply & Sewerage Board (HMWSSB). Portal: hyderabadwater.gov.in.\nComplaint types: Water quality/contamination, tanker service issues, supply interruptions, billing disputes, sewerage/drainage problems.\nHow to complain: Call the water complaint number 155313 or the sewerage helpline 14420; email customer-support@hyderabadwater.gov.in; use the 'Register Grievances' option under Customer Services on the portal (requires Consumer Account Number/CAN); or WhatsApp +91 9154170968.\nBefore complaining: Register/update your mobile number by SMS to 9223166166 in the format 'HW REGMOB <CAN> <Latest Bill No>'.\nEscalation: If unresolved, escalate to the Deputy/Chief General Manager of the respective circle office, then to the Managing Director of HMWSSB.\nHelpline: Water - 155313 | Sewerage - 14420."
-    }
+  {
+    "id": "ration_card",
+    "keywords": [
+      "ration card",
+      "fsc",
+      "food security card",
+      "pds",
+      "fair price shop",
+      "aay",
+      "రేషన్ కార్డు"
+    ],
+    "content": "RATION CARD / FOOD SECURITY CARD (FSC) - Telangana:\nIssuing Authority: Department of Consumer Affairs, Food & Civil Supplies, Telangana. Address: Civil Supplies Bhavan, Somajiguda, Hyderabad - 500082.\nHow to apply: Download 'New Food Security Card' application from the MeeSeva portal (Civil Supplies section), fill it, attach documents, and submit at your nearest MeeSeva or Praja Palana centre. The form cannot be fully submitted online; final submission is in person.\nDocuments required: Aadhaar card, address proof (utility bill/rental agreement/voter ID/driving licence), income proof, passport-size photographs of all family members, caste certificate if applicable.\nCard types: FSC (Food Security Card) for low-income households; AAY (Antyodaya Anna Yojana) for the poorest families.\nProcessing time: 15-30 working days.\nStatus check: epds.telangana.gov.in -> FSC Search, using FSC reference number, ration card number, or Aadhaar number.\nHelpline: 1967 or 1800-425-0333."
+  },
+  {
+    "id": "birth_certificate",
+    "keywords": [
+      "birth certificate",
+      "date of birth certificate",
+      "newborn registration",
+      "జననం సర్టిఫికేట్"
+    ],
+    "content": "BIRTH CERTIFICATE - Telangana / Hyderabad (GHMC):\nIssuing Authority (Hyderabad/GHMC limits): GHMC Birth & Death Department, Tank Bund Road, Hyderabad - 500063. Portal: bnd.ghmc.gov.in. Outside GHMC (municipalities, panchayats): apply via MeeSeva under CDMA.\nLegal requirement: Every birth must be registered within 21 days of occurrence (Registration of Birth & Deaths Act, 1969).\nHow to apply: Hospital or head of family submits the filled application with documents to the nearest MeeSeva centre; the operator uploads it online and issues an acknowledgement/application number. For births after 2024, some are also registered on the central CRS portal (crs.gov.in).\nDocuments required: Hospital discharge summary / birth intimation letter, both parents' Aadhaar cards. For births at home, a declaration from the local Panchayat/Municipal Commissioner is needed instead.\nName inclusion: The certificate may be issued without the child's name initially; name can be added later (simpler if done before the child turns 1 year) via MeeSeva with the original certificate + Aadhaar.\nLate registration (birth not registered within 1 year): requires a Non-Availability Certificate from the Gram Panchayat/Municipal Commissioner, a notarized affidavit, and supporting documents (ration card, school certificate, SSC memo).\nProcessing time: Typically 2-3 days for GHMC-registered births with complete documents.\nHelpline: GHMC 040-21111111 | MeeSeva 1800-599-4788."
+  },
+  {
+    "id": "driving_license",
+    "keywords": [
+      "driving license",
+      "driving licence",
+      "learner licence",
+      "learner's license",
+      "dl",
+      "rta",
+      "sarathi",
+      "డ్రైవింగ్ లైసెన్స్"
+    ],
+    "content": "DRIVING LICENCE - Telangana:\nIssuing Authority: Regional Transport Authority (RTA) / RTO with jurisdiction over the applicant's residential area. Statewide portal: transport.telangana.gov.in. National portal for applications/status: sarathi.parivahan.gov.in (select state 'Telangana').\nProcess: First obtain a Learner's Licence (LL) by passing a computerised test (15 questions on traffic rules, minimum 11 correct to pass). After holding the LL for at least 30 days (valid up to 6 months), apply for the Permanent Driving Licence using Form 4, and pass a practical driving test at the RTO.\nEligibility by age: 16 years for gearless two-wheelers up to 50cc (with parental consent); 18 years for other two-wheelers and light motor vehicles; 20 years for transport/commercial vehicles.\nDocuments required: Valid Learner's Licence, proof of identity (Aadhaar/passport/voter ID/PAN), proof of address (Aadhaar/utility bill/rent agreement), proof of age (birth certificate/school certificate/passport), passport-size photographs, medical certificate (Form 1A) if applicant is over 50 years or applying for a transport licence.\nValidity: 20 years or until the holder turns 50, whichever is earlier. A 30-day grace period is allowed after expiry for renewal without re-test; beyond 5 years past expiry, a fresh test may be required.\nStatus check: sarathi.parivahan.gov.in -> Applicant Status, using application number and date of birth.\nHelpline: 040-23453635 (Telangana Transport Department)."
+  },
+  {
+    "id": "passport",
+    "keywords": ["passport", "passport seva", "tatkal", "psk", "పాస్‌పోర్ట్"],
+    "content": "PASSPORT (applies uniformly across India, including Telangana):\nIssuing Authority: Ministry of External Affairs (MEA), via Passport Seva Kendras (PSKs) and Post Office PSKs. Regional Passport Office for Hyderabad/Telangana handles local applications. Portal: passportindia.gov.in.\nHow to apply: Register/login on passportindia.gov.in, choose 'Apply for Fresh Passport/Reissue', fill the form, pay the fee online, and book a PSK appointment (any PSK in India, regardless of registered address). Visit the PSK on the appointment date with original documents for biometrics and verification.\nService types: Normal processing (15-30 working days, includes police verification) or Tatkal (expedited, 1-3 working days; police verification often done after issuance). Tatkal requires 3 of 15 specified additional verification documents.\nValidity: 10 years for adults, 5 years for minors under 18.\nLost passport: File an FIR at the nearest police station immediately, then apply for reissue under the 'Lost Passport' category. This cannot be handled by the call centre alone.\nStatus check: passportindia.gov.in -> Track Application Status (File Number + Date of Birth), or SMS 'STATUS <File Number>' to 9704100100.\nHelpline: 1800-258-1800 (toll-free, 24x7, National Passport Call Centre, supports 17 languages). J&K: 040-66720567 (paid). North-East states: 040-66720581 (paid)."
+  },
+  {
+    "id": "property_tax",
+    "keywords": [
+      "property tax",
+      "ghmc tax",
+      "ptin",
+      "house tax",
+      "ఆస్తి పన్ను"
+    ],
+    "content": "PROPERTY TAX - Greater Hyderabad (GHMC):\nIssuing/Collecting Authority: Greater Hyderabad Municipal Corporation (GHMC), covering Hyderabad, Secunderabad, Malkajgiri, Kukatpally, LB Nagar, Serilingampally, Uppal and surrounding areas. Payment portal: onlinepayments.ghmc.gov.in.\nHow to pay online: Search your property using PTIN (Property Tax Identification Number, a 10-digit number printed on any old GHMC receipt), Door Number, Mobile Number, or Owner Name. Enter PTIN and mobile number to receive an OTP, review dues, and pay via UPI/net banking/card.\nOffline payment: MeeSeva centres, designated banks (including SBI), or GHMC Bill Collectors, carrying sale deed, occupancy certificate, and previous tax receipts.\nPenalty for late payment: 2% simple interest per month on overdue amount; long-term default can lead to property attachment.\nExemptions/concessions: 50% vacancy remission if unoccupied (needs Tax Inspector's report); reduced rates for low-income/rental properties with monthly rental value below a government-notified threshold; government-recognised schools up to 10th standard are exempt (colleges and private institutions are not).\nReceipt: Available for download 24-48 hours after payment via 'Print Receipts' on the portal using PTIN + OTP.\nHelpline: 040-21111111 or 1800-425-0203 (toll-free)."
+  },
+  {
+    "id": "pan_card",
+    "keywords": [
+      "pan card",
+      "pan number",
+      "permanent account number",
+      "పాన్ కార్డు"
+    ],
+    "content": "PAN CARD (applies uniformly across India, including Telangana):\nIssuing Authorities (on behalf of Income Tax Department): Protean eGov Technologies (formerly NSDL) and UTIITSL. Apply online via onlineservices.nsdl.com or pan.utiitsl.com.\nHow to apply: Fill the online PAN application form, upload identity/address/date-of-birth proof, pay the fee (approx. Rs 107 for physical + e-PAN, or Rs 72 for e-PAN only), and complete either Aadhaar-based e-KYC or submit documents physically/via courier depending on the mode chosen.\nDocuments required: Proof of identity, proof of address, proof of date of birth (Aadhaar is commonly used for all three).\nAadhaar-PAN linking: Mandatory for most taxpayers; can be done on the Income Tax e-filing portal (incometax.gov.in) under 'Link Aadhaar'.\nStatus check: SMS 'NSDLPAN <15-digit acknowledgement number>' to 57575, or check status online via the NSDL/UTIITSL portal.\nHelpline: Protean/NSDL - 020-27218080 (7 AM-11 PM, all days) or 08069708080 (24/7). UTIITSL - 033-40802999 (9 AM-8 PM, all days). Income Tax Dept toll-free (Aaykar Sampark Kendra) - 1800-180-1961."
+  },
+  {
+    "id": "aadhaar",
+    "keywords": ["aadhaar", "aadhar", "uidai", "aadhaar update", "ఆధార్"],
+    "content": "AADHAAR CARD (applies uniformly across India, including Telangana):\nIssuing Authority: Unique Identification Authority of India (UIDAI). Portal: uidai.gov.in.\nUpdates: Demographic updates (name, DOB, gender, address) and biometric updates (fingerprint, iris, photo) can be done at any Aadhaar Enrolment/Update Centre. Address and some document updates can also be done online.\nDocuments for name/DOB change: Passport, PAN card, birth certificate, or other UIDAI-approved proof; a name change beyond the permitted 2 updates requires a gazette notification.\nFees: Rs 50 for demographic updates, Rs 100 for biometric updates.\nDownload: e-Aadhaar can be downloaded anytime after generation via uidai.gov.in -> Download Aadhaar.\nGrievance process: Complaints can be raised via the 1947 helpline, email, or the Centralized Public Grievance Redress and Monitoring System (CPGRAMS) at pgportal.gov.in.\nHelpline: 1947 (toll-free, 24/7, multilingual) or email help@uidai.gov.in."
+  },
+  {
+    "id": "voter_id",
+    "keywords": [
+      "voter id",
+      "voter card",
+      "epic",
+      "nvsp",
+      "election commission",
+      "ఓటరు గుర్తింపు కార్డు"
+    ],
+    "content": "VOTER ID / EPIC CARD (applies uniformly across India, including Telangana):\nIssuing Authority: Election Commission of India (ECI). Portal: voters.eci.gov.in (National Voters' Service Portal / NVSP).\nNew registration/correction: Use Form 6 (new registration), Form 8 (correction/address change), or Form 6B (Aadhaar linking) on the NVSP portal or via the Voter Helpline App.\nAadhaar linking: Voluntary, not mandatory for voting rights (per Election Laws Amendment Act 2021 and ECI's submission to the Supreme Court). Can be done via NVSP, the Voter Helpline App, by calling 1950, or by SMS to 166 or 51969.\nAddress update timeline: Typically 2-4 weeks after submitting Form 8 and verification.\nStatus check: NVSP portal -> Track Application Status, using the reference number generated at submission, or contact your local Booth Level Officer (BLO).\nHelpline: 1950 (toll-free, nationwide, Mon-Fri 10 AM-5 PM for some services; general voter helpline otherwise widely available)."
+  },
+  {
+    "id": "electricity",
+    "keywords": [
+      "electricity bill",
+      "power cut",
+      "tsspdcl",
+      "tsnpdcl",
+      "current bill",
+      "కరెంటు బిల్లు"
+    ],
+    "content": "ELECTRICITY (Telangana):\nDistribution Companies: TSSPDCL (Telangana State Southern Power Distribution Company Limited) covers most of Hyderabad and southern Telangana districts; TSNPDCL (Northern) covers northern districts. Portal: tssouthernpower.com (TSSPDCL) or tsnpdcl.in (TSNPDCL).\nComplaint types handled: Power outages, faulty meters, billing disputes/incorrect readings, new connection requests.\nHow to complain: Call 1912 (common toll-free helpline for both discoms) or 1800-599-01912; register online via the discom's website/'Grievance' section with photos of the meter/bill if disputing a reading; or use the TSSPDCL/TSNPDCL mobile app.\nEscalation path if unresolved within 60 days: Internal Grievance Redressal Cell (IGRC) of the discom, then the Consumer Grievance Redressal Forum (CGRF), then the Electricity Ombudsman under TSERC (Telangana State Electricity Regulatory Commission).\nHelpline: 1912 or 1800-599-01912 (TSSPDCL), 1800-425-2424 (TSNPDCL)."
+  },
+  {
+    "id": "water_bill",
+    "keywords": [
+      "water bill",
+      "water supply",
+      "hmwssb",
+      "sewerage",
+      "tanker",
+      "నీటి బిల్లు"
+    ],
+    "content": "WATER SUPPLY & SEWERAGE - Hyderabad:\nAuthority: Hyderabad Metropolitan Water Supply & Sewerage Board (HMWSSB). Portal: hyderabadwater.gov.in.\nComplaint types: Water quality/contamination, tanker service issues, supply interruptions, billing disputes, sewerage/drainage problems.\nHow to complain: Call the water complaint number 155313 or the sewerage helpline 14420; email customer-support@hyderabadwater.gov.in; use the 'Register Grievances' option under Customer Services on the portal (requires Consumer Account Number/CAN); or WhatsApp +91 9154170968.\nBefore complaining: Register/update your mobile number by SMS to 9223166166 in the format 'HW REGMOB <CAN> <Latest Bill No>'.\nEscalation: If unresolved, escalate to the Deputy/Chief General Manager of the respective circle office, then to the Managing Director of HMWSSB.\nHelpline: Water - 155313 | Sewerage - 14420."
+  }
 ]

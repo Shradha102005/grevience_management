@@ -12,12 +12,42 @@ export const Route = createFileRoute("/portal/reports")({
 });
 
 const REPORTS = [
-  { name: "Monthly Grievance Summary", type: "Operations", date: "Jun 2026", size: "2.4 MB" },
-  { name: "Scheme Enrollment Report", type: "Schemes", date: "Jun 2026", size: "1.8 MB" },
-  { name: "Emergency Response Audit", type: "Disaster", date: "May 2026", size: "3.1 MB" },
-  { name: "Department Performance Review", type: "Analytics", date: "May 2026", size: "4.2 MB" },
-  { name: "Citizen Satisfaction Survey", type: "Citizens", date: "Q2 2026", size: "1.2 MB" },
-  { name: "Voice Assistant Usage", type: "Operations", date: "Jun 2026", size: "980 KB" },
+  {
+    name: "Monthly Grievance Summary",
+    type: "Operations",
+    date: "Jun 2026",
+    size: "2.4 MB",
+  },
+  {
+    name: "Scheme Enrollment Report",
+    type: "Schemes",
+    date: "Jun 2026",
+    size: "1.8 MB",
+  },
+  {
+    name: "Emergency Response Audit",
+    type: "Disaster",
+    date: "May 2026",
+    size: "3.1 MB",
+  },
+  {
+    name: "Department Performance Review",
+    type: "Analytics",
+    date: "May 2026",
+    size: "4.2 MB",
+  },
+  {
+    name: "Citizen Satisfaction Survey",
+    type: "Citizens",
+    date: "Q2 2026",
+    size: "1.2 MB",
+  },
+  {
+    name: "Voice Assistant Usage",
+    type: "Operations",
+    date: "Jun 2026",
+    size: "980 KB",
+  },
 ];
 
 function Reports() {
@@ -28,7 +58,10 @@ function Reports() {
         title="Reports"
         description="Generate, schedule and export governance reports."
         actions={
-          <Button size="sm" onClick={() => toast.success("New report generation started.")}>
+          <Button
+            size="sm"
+            onClick={() => toast.success("New report generation started.")}
+          >
             Generate Report
           </Button>
         }

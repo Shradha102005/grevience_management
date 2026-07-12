@@ -43,9 +43,15 @@ declare class SpeechRecognition extends EventTarget {
   onaudiostart: ((this: SpeechRecognition, ev: Event) => unknown) | null;
   onaudioend: ((this: SpeechRecognition, ev: Event) => unknown) | null;
   onend: ((this: SpeechRecognition, ev: Event) => unknown) | null;
-  onerror: ((this: SpeechRecognition, ev: SpeechRecognitionErrorEvent) => unknown) | null;
-  onnomatch: ((this: SpeechRecognition, ev: SpeechRecognitionEvent) => unknown) | null;
-  onresult: ((this: SpeechRecognition, ev: SpeechRecognitionEvent) => unknown) | null;
+  onerror:
+    | ((this: SpeechRecognition, ev: SpeechRecognitionErrorEvent) => unknown)
+    | null;
+  onnomatch:
+    | ((this: SpeechRecognition, ev: SpeechRecognitionEvent) => unknown)
+    | null;
+  onresult:
+    | ((this: SpeechRecognition, ev: SpeechRecognitionEvent) => unknown)
+    | null;
   onsoundstart: ((this: SpeechRecognition, ev: Event) => unknown) | null;
   onsoundend: ((this: SpeechRecognition, ev: Event) => unknown) | null;
   onspeechstart: ((this: SpeechRecognition, ev: Event) => unknown) | null;

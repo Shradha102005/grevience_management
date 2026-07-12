@@ -29,7 +29,9 @@ export function VoiceOrb({
           <span
             className={cn(
               "absolute rounded-full border-2 opacity-0",
-              state === "listening" ? "border-primary animate-ping" : "border-accent animate-ping",
+              state === "listening"
+                ? "border-primary animate-ping"
+                : "border-accent animate-ping",
               s.rings,
             )}
             style={{ animationDuration: "1.2s" }}
@@ -37,7 +39,9 @@ export function VoiceOrb({
           <span
             className={cn(
               "absolute rounded-full border opacity-0",
-              state === "listening" ? "border-primary/40 animate-ping" : "border-accent/40 animate-ping",
+              state === "listening"
+                ? "border-primary/40 animate-ping"
+                : "border-accent/40 animate-ping",
               "scale-90",
             )}
             style={{
@@ -79,7 +83,9 @@ export function VoiceOrb({
         {state === "processing" ? (
           <Loader2 className={cn(s.icon, "animate-spin")} />
         ) : (
-          <Mic className={cn(s.icon, state === "listening" && "animate-pulse")} />
+          <Mic
+            className={cn(s.icon, state === "listening" && "animate-pulse")}
+          />
         )}
 
         {/* Waveform bars when speaking */}

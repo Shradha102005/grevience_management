@@ -4,7 +4,15 @@
  * Supports 8 Indian languages.
  */
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Mic, MicOff, Send, Sparkles, Volume2, VolumeX, Loader2 } from "lucide-react";
+import {
+  Mic,
+  MicOff,
+  Send,
+  Sparkles,
+  Volume2,
+  VolumeX,
+  Loader2,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -43,7 +51,9 @@ export function ChatPanel({
   module?: string;
   showLanguageSelector?: boolean;
 }) {
-  const [messages, setMessages] = useState<Msg[]>([{ role: "bot", text: greeting }]);
+  const [messages, setMessages] = useState<Msg[]>([
+    { role: "bot", text: greeting },
+  ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [language, setLanguage] = useState("en");
@@ -53,13 +63,18 @@ export function ChatPanel({
   const [error, setError] = useState<string | null>(null);
 
   const scrollRef = useRef<HTMLDivElement>(null);
-  const recognitionRef = useRef<InstanceType<typeof SpeechRecognition> | null>(null);
+  const recognitionRef = useRef<InstanceType<typeof SpeechRecognition> | null>(
+    null,
+  );
   const synthRef = useRef<SpeechSynthesisUtterance | null>(null);
   const historyRef = useRef<{ role: string; content: string }[]>([]);
 
   // Auto-scroll
   useEffect(() => {
-    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
+    scrollRef.current?.scrollTo({
+      top: scrollRef.current.scrollHeight,
+      behavior: "smooth",
+    });
   }, [messages, loading]);
 
   // Keep history ref in sync
@@ -72,7 +87,12 @@ export function ChatPanel({
 
   const speakText = useCallback(
     (text: string) => {
-      if (!voiceEnabled || typeof window === "undefined" || !window.speechSynthesis) return;
+      if (
+        !voiceEnabled ||
+        typeof window === "undefined" ||
+        !window.speechSynthesis
+      )
+        return;
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = SPEECH_LANG_MAP[language] ?? "en-IN";
@@ -130,7 +150,9 @@ export function ChatPanel({
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 
     if (!SR) {
-      setError("Voice input not supported in this browser. Please use Chrome or Edge.");
+      setError(
+        "Voice input not supported in this browser. Please use Chrome or Edge.",
+      );
       return;
     }
 
@@ -173,11 +195,17 @@ export function ChatPanel({
         <div className="flex items-center gap-2">
           <Sparkles className="h-4 w-4 text-accent" />
           <span className="font-display text-sm font-bold">{title}</span>
-          {loading && <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />}
+          {loading && (
+            <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
+          )}
         </div>
         <div className="flex items-center gap-2">
           {showLanguageSelector && (
-            <LanguageDropdown value={language} onChange={setLanguage} className="h-8 text-xs" />
+            <LanguageDropdown
+              value={language}
+              onChange={setLanguage}
+              className="h-8 text-xs"
+            />
           )}
           <Button
             variant="ghost"
@@ -187,7 +215,12 @@ export function ChatPanel({
             title={voiceEnabled ? "Mute voice output" : "Enable voice output"}
           >
             {voiceEnabled ? (
-              <Volume2 className={cn("h-4 w-4", isSpeaking && "text-accent animate-pulse")} />
+              <Volume2
+                className={cn(
+                  "h-4 w-4",
+                  isSpeaking && "text-accent animate-pulse",
+                )}
+              />
             ) : (
               <VolumeX className="h-4 w-4 text-muted-foreground" />
             )}
@@ -198,7 +231,13 @@ export function ChatPanel({
       {/* Messages */}
       <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto p-4">
         {messages.map((m, i) => (
-          <div key={i} className={cn("flex", m.role === "user" ? "justify-end" : "justify-start")}>
+          <div
+            key={i}
+            className={cn(
+              "flex",
+              m.role === "user" ? "justify-end" : "justify-start",
+            )}
+          >
             <div
               className={cn(
                 "max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed",
@@ -257,7 +296,11 @@ export function ChatPanel({
           onClick={isListening ? stopListening : startListening}
           aria-label={isListening ? "Stop listening" : "Start voice input"}
         >
-          {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+          {isListening ? (
+            <MicOff className="h-4 w-4" />
+          ) : (
+            <Mic className="h-4 w-4" />
+          )}
         </Button>
         <Input
           value={input}
@@ -273,7 +316,11 @@ export function ChatPanel({
           disabled={loading || !input.trim()}
           aria-label="Send message"
         >
-          {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+          {loading ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Send className="h-4 w-4" />
+          )}
         </Button>
       </form>
     </Card>

@@ -64,20 +64,69 @@ function Analytics() {
               <AreaChart data={usage}>
                 <defs>
                   <linearGradient id="a1" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="var(--color-chart-1)" stopOpacity={0.35} />
-                    <stop offset="95%" stopColor="var(--color-chart-1)" stopOpacity={0} />
+                    <stop
+                      offset="5%"
+                      stopColor="var(--color-chart-1)"
+                      stopOpacity={0.35}
+                    />
+                    <stop
+                      offset="95%"
+                      stopColor="var(--color-chart-1)"
+                      stopOpacity={0}
+                    />
                   </linearGradient>
                   <linearGradient id="a2" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="var(--color-chart-2)" stopOpacity={0.35} />
-                    <stop offset="95%" stopColor="var(--color-chart-2)" stopOpacity={0} />
+                    <stop
+                      offset="5%"
+                      stopColor="var(--color-chart-2)"
+                      stopOpacity={0.35}
+                    />
+                    <stop
+                      offset="95%"
+                      stopColor="var(--color-chart-2)"
+                      stopOpacity={0}
+                    />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
-                <XAxis dataKey="m" stroke="var(--color-muted-foreground)" fontSize={12} tickLine={false} axisLine={false} />
-                <YAxis stroke="var(--color-muted-foreground)" fontSize={12} tickLine={false} axisLine={false} />
-                <Tooltip contentStyle={{ background: "var(--color-popover)", border: "1px solid var(--color-border)", borderRadius: 12 }} />
-                <Area type="monotone" dataKey="schemes" stroke="var(--color-chart-1)" fill="url(#a1)" strokeWidth={2} />
-                <Area type="monotone" dataKey="voice" stroke="var(--color-chart-2)" fill="url(#a2)" strokeWidth={2} />
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="var(--color-border)"
+                  vertical={false}
+                />
+                <XAxis
+                  dataKey="m"
+                  stroke="var(--color-muted-foreground)"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <YAxis
+                  stroke="var(--color-muted-foreground)"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <Tooltip
+                  contentStyle={{
+                    background: "var(--color-popover)",
+                    border: "1px solid var(--color-border)",
+                    borderRadius: 12,
+                  }}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="schemes"
+                  stroke="var(--color-chart-1)"
+                  fill="url(#a1)"
+                  strokeWidth={2}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="voice"
+                  stroke="var(--color-chart-2)"
+                  fill="url(#a2)"
+                  strokeWidth={2}
+                />
               </AreaChart>
             </ResponsiveContainer>
           </CardContent>
@@ -90,11 +139,39 @@ function Analytics() {
           <CardContent>
             <ResponsiveContainer width="100%" height={280}>
               <LineChart data={satisfaction}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
-                <XAxis dataKey="m" stroke="var(--color-muted-foreground)" fontSize={12} tickLine={false} axisLine={false} />
-                <YAxis domain={[60, 100]} stroke="var(--color-muted-foreground)" fontSize={12} tickLine={false} axisLine={false} />
-                <Tooltip contentStyle={{ background: "var(--color-popover)", border: "1px solid var(--color-border)", borderRadius: 12 }} />
-                <Line type="monotone" dataKey="v" stroke="var(--color-chart-3)" strokeWidth={3} dot={{ r: 3 }} />
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="var(--color-border)"
+                  vertical={false}
+                />
+                <XAxis
+                  dataKey="m"
+                  stroke="var(--color-muted-foreground)"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <YAxis
+                  domain={[60, 100]}
+                  stroke="var(--color-muted-foreground)"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <Tooltip
+                  contentStyle={{
+                    background: "var(--color-popover)",
+                    border: "1px solid var(--color-border)",
+                    borderRadius: 12,
+                  }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="v"
+                  stroke="var(--color-chart-3)"
+                  strokeWidth={3}
+                  dot={{ r: 3 }}
+                />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
@@ -107,9 +184,18 @@ function Analytics() {
           <CardTitle>AI Insights</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2 text-sm text-muted-foreground">
-          <p>• Grievance volume in Ward 3 is projected to rise 18% next month — pre-allocate staff.</p>
-          <p>• Voice assistant adoption grew 33% QoQ, led by Hindi and Telugu speakers.</p>
-          <p>• PM-KISAN enrollment gaps detected in 12 rural blocks — targeted outreach recommended.</p>
+          <p>
+            • Grievance volume in Ward 3 is projected to rise 18% next month —
+            pre-allocate staff.
+          </p>
+          <p>
+            • Voice assistant adoption grew 33% QoQ, led by Hindi and Telugu
+            speakers.
+          </p>
+          <p>
+            • PM-KISAN enrollment gaps detected in 12 rural blocks — targeted
+            outreach recommended.
+          </p>
         </CardContent>
       </Card>
     </div>

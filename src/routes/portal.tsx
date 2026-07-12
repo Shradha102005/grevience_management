@@ -5,7 +5,11 @@ export const Route = createFileRoute("/portal")({
   head: () => ({
     meta: [
       { title: "Governance Portal — CIVICOS AI" },
-      { name: "description", content: "Unified enterprise governance dashboard for citizen services." },
+      {
+        name: "description",
+        content:
+          "Unified enterprise governance dashboard for citizen services.",
+      },
     ],
   }),
   beforeLoad: () => {
