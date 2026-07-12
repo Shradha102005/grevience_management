@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/table";
 
 export const Route = createFileRoute("/portal/citizens")({
-  head: () => ({ meta: [{ title: "Citizen Directory — CIVICOS AI" }] }),
+  head: () => ({ meta: [{ title: "Citizen Directory — CivicSaathi" }] }),
   component: Citizens,
 });
 

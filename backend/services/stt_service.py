@@ -1,5 +1,5 @@
 """
-STT Service — CIVICOS AI Helpline Voice Pipeline
+STT Service — CivicSaathi Helpline Voice Pipeline
 Wraps faster-whisper for Indic multilingual transcription.
 Falls back gracefully if faster-whisper is not installed.
 """

@@ -248,7 +248,7 @@ function BotBubble({
           fontSize: "10px", fontWeight: 700,
           color: isBot ? "rgba(56,189,248,0.75)" : "rgba(167,139,250,0.85)",
         }}>
-          {isBot ? "CivicOS AI" : (userName || "You")}
+          {isBot ? "CivicSaathi" : (userName || "You")}
         </span>
         <span style={{ fontSize: "9px", color: "rgba(100,116,139,0.5)" }}>{timeStr}</span>
         {msg.isVoice && !isBot && (
@@ -347,7 +347,7 @@ function TypingIndicator() {
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: "4px" }}>
       <span style={{ fontSize: "10px", fontWeight: 700, color: "rgba(56,189,248,0.6)", paddingLeft: "36px" }}>
-        CivicOS AI
+        CivicSaathi
       </span>
       <div style={{ display: "flex", gap: "8px", alignItems: "flex-end" }}>
         <div style={{
@@ -1679,7 +1679,7 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
             </div>
 
             <div>
-              <p style={{ fontSize: "14px", fontWeight: 800, color: "white", margin: 0, letterSpacing: "-0.01em" }}>CivicOS AI</p>
+              <p style={{ fontSize: "14px", fontWeight: 800, color: "white", margin: 0, letterSpacing: "-0.01em" }}>CivicSaathi</p>
               <p style={{ fontSize: "10px", color: "rgba(34,197,94,0.85)", fontWeight: 600, margin: 0, display: "flex", alignItems: "center", gap: "3px" }}>
                 <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#22c55e", display: "inline-block" }} />
                 We're online · {sttEngine ? `STT: ${sttEngine}` : lang.label}

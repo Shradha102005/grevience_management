@@ -13,7 +13,7 @@ export function SiteFooter() {
         <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div className="max-w-sm">
             <div className="font-display text-lg font-extrabold tracking-tight">
-              CIVICOS <span className="text-accent">AI</span>
+              CivicSaathi <span className="text-accent">AI</span>
             </div>
             <p className="mt-3 text-sm text-muted-foreground">
               The unified AI-powered platform for citizen governance — schemes, grievances,
@@ -42,7 +42,7 @@ export function SiteFooter() {
           ))}
         </div>
         <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-border pt-6 text-xs text-muted-foreground sm:flex-row">
-          <p>© {new Date().getFullYear()} CIVICOS AI. Government technology, reimagined.</p>
+          <p>© {new Date().getFullYear()} CivicSaathi. Government technology, reimagined.</p>
           <p>Built for public-sector scale · ISO-aligned · Multilingual</p>
         </div>
       </div>

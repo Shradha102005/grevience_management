@@ -27,8 +27,8 @@ import { useAuth } from "@/lib/auth-context";
 export const Route = createFileRoute("/signup")({
   head: () => ({
     meta: [
-      { title: "Create Account — CIVICOS AI" },
-      { name: "description", content: "Create your CIVICOS AI governance account." },
+      { title: "Create Account — CivicSaathi" },
+      { name: "description", content: "Create your CivicSaathi governance account." },
     ],
   }),
   component: SignupPage,
@@ -101,7 +101,7 @@ function SignupPage() {
     setIsLoading(true);
     try {
       await registerUser(values.name, values.email, values.password, values.role);
-      toast.success("Welcome to CIVICOS!");
+      toast.success("Welcome to CivicSaathi!");
       await navigate({ to: "/portal" });
     } catch (err: unknown) {
       const message =
@@ -146,12 +146,12 @@ function SignupPage() {
               <line x1="160" y1="160" x2="45" y2="95" stroke="#818CF8" strokeWidth="1" strokeDasharray="3 3" />
             </svg>
 
-            {/* Central CIVICOS Shield Circle */}
+            {/* Central CivicSaathi Shield Circle */}
             <div className="relative z-10 flex h-[110px] w-[110px] items-center justify-center rounded-full border border-[#4F46E5]/30 bg-[#0F0A1F] shadow-[0_0_50px_rgba(79,70,229,0.2)]">
               <div className="absolute inset-1.5 rounded-full border border-[#4F46E5]/15" />
               <div className="flex flex-col items-center gap-1">
                 <ShieldCheck className="h-6 w-6 text-[#818CF8]" />
-                <span className="text-[11px] font-bold tracking-widest text-white">CIVICOS</span>
+                <span className="text-[11px] font-bold tracking-widest text-white">CivicSaathi</span>
               </div>
             </div>
 
@@ -197,7 +197,7 @@ function SignupPage() {
             Join <span className="text-[#38BDF8]">9 Modules</span> of AI Governance
           </h2>
           <p className="mt-3 text-center text-xs text-white/55 leading-relaxed max-w-sm">
-            From rural development to smart city management, CIVICOS connects every citizen service under one roof.
+            From rural development to smart city management, CivicSaathi connects every citizen service under one roof.
           </p>
 
           {/* Icon Badges */}

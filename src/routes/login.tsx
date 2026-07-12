@@ -29,8 +29,8 @@ import { Logo } from "@/components/logo";
 export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
-      { title: "Sign In — CIVICOS AI" },
-      { name: "description", content: "Sign in to the CIVICOS AI governance platform." },
+      { title: "Sign In — CivicSaathi" },
+      { name: "description", content: "Sign in to the CivicSaathi governance platform." },
     ],
   }),
   component: LoginPage,
@@ -127,7 +127,7 @@ function LoginPage() {
               <div className="relative z-10 flex flex-col items-center justify-center gap-2">
                 <ShieldCheck className="h-10 w-10 text-white" />
                 <div className="text-center">
-                  <h2 className="font-display text-xl font-bold tracking-widest text-white">CIVICOS</h2>
+                  <h2 className="font-display text-xl font-bold tracking-widest text-white">CivicSaathi</h2>
                   <p className="text-[10px] font-medium tracking-widest text-[#818CF8] mt-1">OS V2.0</p>
                 </div>
               </div>
@@ -295,7 +295,7 @@ function LoginPage() {
           {/* Divider */}
           <div className="my-8 flex items-center gap-4">
             <div className="h-px flex-1 bg-[#E2E8F0]" />
-            <span className="text-[10px] font-bold tracking-widest text-[#94A3B8] uppercase">New to CIVICOS?</span>
+            <span className="text-[10px] font-bold tracking-widest text-[#94A3B8] uppercase">New to CivicSaathi?</span>
             <div className="h-px flex-1 bg-[#E2E8F0]" />
           </div>
 

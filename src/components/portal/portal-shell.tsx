@@ -103,7 +103,7 @@ export function PortalShell({ children }: { children: ReactNode }) {
             <div className="h-8 w-8 rounded-lg bg-indigo-600 flex items-center justify-center shadow-md shadow-indigo-600/20">
               <Grip className="h-4 w-4 text-white" />
             </div>
-            <span className="font-extrabold text-lg tracking-tight text-slate-900">CIVICOS<span className="text-indigo-600">OS</span></span>
+            <span className="font-extrabold text-lg tracking-tight text-slate-900">CivicSaathi<span className="text-indigo-600">OS</span></span>
           </Link>
         </div>
 
@@ -221,7 +221,7 @@ export function PortalShell({ children }: { children: ReactNode }) {
             <aside className="absolute inset-y-0 left-0 w-72 bg-white border-r border-slate-200 shadow-2xl flex flex-col">
               <div className="flex items-center justify-between p-5 border-b border-slate-100">
                 <Link to="/" onClick={() => setMobileOpen(false)} className="hover:opacity-80 transition-opacity">
-                  <span className="font-extrabold text-lg tracking-tight text-slate-900">CIVICOS<span className="text-indigo-600">OS</span></span>
+                  <span className="font-extrabold text-lg tracking-tight text-slate-900">CivicSaathi<span className="text-indigo-600">OS</span></span>
                 </Link>
                 <Button variant="ghost" size="icon" className="h-9 w-9 bg-slate-50 rounded-xl" onClick={() => setMobileOpen(false)}>
                   <X className="h-5 w-5" />

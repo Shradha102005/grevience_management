@@ -16,7 +16,7 @@ import { StatCard } from "@/components/portal/stat-card";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const Route = createFileRoute("/portal/analytics")({
-  head: () => ({ meta: [{ title: "Analytics Center — CIVICOS AI" }] }),
+  head: () => ({ meta: [{ title: "Analytics Center — CivicSaathi" }] }),
   component: Analytics,
 });
 

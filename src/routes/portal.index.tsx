@@ -89,14 +89,14 @@ function BentoDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-black text-slate-900 tracking-tight">System Core</h1>
-              <p className="text-sm font-bold text-slate-500 tracking-wide mt-1">CIVICOS AI Command Hub</p>
+              <p className="text-sm font-bold text-slate-500 tracking-wide mt-1">CivicSaathi Command Hub</p>
             </div>
           </div>
 
           {/* ── Bento Grid ── */}
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 flex-1 min-h-0">
             
-            {/* 1. The Civicos Brain (Hero Left) */}
+            {/* 1. The CivicSaathi Brain (Hero Left) */}
             <div className="lg:col-span-1 bg-white/70 backdrop-blur-2xl border border-white shadow-2xl shadow-slate-300/60 rounded-[2.5rem] p-8 flex flex-col relative overflow-hidden group">
               <div className="absolute inset-0 bg-gradient-to-b from-indigo-50/50 to-transparent pointer-events-none" />
               

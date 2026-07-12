@@ -4,7 +4,7 @@ import { PortalShell } from "@/components/portal/portal-shell";
 export const Route = createFileRoute("/portal")({
   head: () => ({
     meta: [
-      { title: "Governance Portal — CIVICOS AI" },
+      { title: "Governance Portal — CivicSaathi" },
       { name: "description", content: "Unified enterprise governance dashboard for citizen services." },
     ],
   }),

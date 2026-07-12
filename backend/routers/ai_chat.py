@@ -1,5 +1,5 @@
 """
-AI Chat Router — CIVICOS AI
+AI Chat Router — CivicSaathi
 Serves all 6 bot modules via a single Groq-powered endpoint.
 Modules: scheme, helpline, smart-city, rural, agriculture, voice
 """
@@ -117,7 +117,7 @@ MODULE_PROMPTS: dict[str, str] = {
         "Mention when to consult the local Krishi Vigyan Kendra."
     ),
     "voice": (
-        "You are the CIVICOS AI Digital Governance Voice Interface — a unified assistant for all citizen services. "
+        "You are the CivicSaathi Digital Governance Voice Interface — a unified assistant for all citizen services. "
         "You can navigate between modules: scheme discovery, grievance filing, helpline queries, "
         "city services, rural development, agriculture advisory, disaster alerts, and election info. "
         "Understand natural language commands like 'register a complaint about road damage', "

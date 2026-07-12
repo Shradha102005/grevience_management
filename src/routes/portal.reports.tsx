@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/portal/reports")({
-  head: () => ({ meta: [{ title: "Reports — CIVICOS AI" }] }),
+  head: () => ({ meta: [{ title: "Reports — CivicSaathi" }] }),
   component: Reports,
 });
 

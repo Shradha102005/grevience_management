@@ -223,7 +223,7 @@ def launch_outreach(
     sms_text = (
         f"Campaign Message from {session.candidate_name}:\n"
         f"{speech_preview}\n"
-        f"Theme: {session.theme} | CIVICOS Campaign Platform"
+        f"Theme: {session.theme} | CivicSaathi Campaign Platform"
     )
     call_text = (
         f"Hello, this is a campaign message from {session.candidate_name}. "

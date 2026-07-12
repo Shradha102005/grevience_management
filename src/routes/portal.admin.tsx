@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
 export const Route = createFileRoute("/portal/admin")({
-  head: () => ({ meta: [{ title: "Admin Console — CIVICOS AI" }] }),
+  head: () => ({ meta: [{ title: "Admin Console — CivicSaathi" }] }),
   component: Admin,
 });
 

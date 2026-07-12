@@ -1,5 +1,5 @@
 """
-Voice Router — CIVICOS AI
+Voice Router — CivicSaathi
 STT via Groq Whisper (server-side, key never exposed to browser)
 TTS via edge-tts (free, no key needed) with browser speechSynthesis fallback
 """

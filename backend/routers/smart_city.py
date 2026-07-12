@@ -1,5 +1,5 @@
 """
-Smart City Router — CIVICOS AI
+Smart City Router — CivicSaathi
 Nation-wide city information hub.
 City is passed as a query param (e.g. ?city=Hyderabad) for all read endpoints.
 """

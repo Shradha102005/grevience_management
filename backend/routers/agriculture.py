@@ -1,5 +1,5 @@
 """
-Agriculture Router — CIVICOS AI
+Agriculture Router — CivicSaathi
 Live mandi prices via data.gov.in (Agmarknet), crop diagnostics via Groq AI.
 """
 

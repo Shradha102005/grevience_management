@@ -121,10 +121,10 @@ def broadcast_alert(
     sms_message = (
         f"ALERT [{severity.upper()}] - {alert_title}\n"
         f"{alert_description}\n"
-        "Issued by: CIVICOS Emergency Services. Stay safe and follow official instructions."
+        "Issued by: CivicSaathi Emergency Services. Stay safe and follow official instructions."
     )
     call_message = (
-        f"This is an emergency alert from CIVICOS. {severity} severity. "
+        f"This is an emergency alert from CivicSaathi. {severity} severity. "
         f"{alert_title}. {alert_description}. "
         "Please follow instructions from official authorities and move to safety immediately."
     )

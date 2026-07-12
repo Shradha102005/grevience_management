@@ -10,7 +10,7 @@ import { LanguageDropdown } from "@/components/portal/language-selector";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/portal/rural")({
-  head: () => ({ meta: [{ title: "Rural Development — CIVICOS AI" }] }),
+  head: () => ({ meta: [{ title: "Rural Development — CivicSaathi" }] }),
   component: Rural,
 });
 

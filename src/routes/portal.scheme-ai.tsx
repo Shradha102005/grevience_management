@@ -12,7 +12,7 @@ import { toast } from "sonner";
 import { ChatPanel } from "@/components/portal/chat-panel";
 
 export const Route = createFileRoute("/portal/scheme-ai")({
-  head: () => ({ meta: [{ title: "Scheme Finder — CIVICOS AI" }] }),
+  head: () => ({ meta: [{ title: "Scheme Finder — CivicSaathi" }] }),
   component: SchemeAI,
 });
 

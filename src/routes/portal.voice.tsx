@@ -145,7 +145,7 @@ function VoiceAssistant() {
         ];
       } else {
         // General fallback
-        intent = "CIVICOS Unified Assistant";
+        intent = "CivicSaathi Unified Assistant";
         actions = [
           { label: "Explore Portal Dashboard", route: "/portal", icon: LayoutDashboard, color: "#6366f1" },
           { label: "Ask Helpline", route: "/portal/helpline", icon: PhoneCall, color: "#ec4899" }

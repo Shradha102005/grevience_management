@@ -1,5 +1,5 @@
 /**
- * ChatPanel — CIVICOS AI
+ * ChatPanel — CivicSaathi
  * Fully live: Groq AI backend + Web Speech API voice input + Speech Synthesis output
  * Supports 8 Indian languages.
  */

@@ -16,7 +16,7 @@ import { useAuth } from "@/lib/auth-context";
 import api from "@/lib/api";
 
 export const Route = createFileRoute("/portal/grievances")({
-  head: () => ({ meta: [{ title: "Grievances — CIVICOS AI" }] }),
+  head: () => ({ meta: [{ title: "Grievances — CivicSaathi" }] }),
   component: Grievances,
 });
 
