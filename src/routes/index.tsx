@@ -1463,12 +1463,8 @@ function LightLanding3D() {
             </h2>
 
             <p className="text-lg md:text-xl text-slate-500 font-medium mb-10 max-w-2xl leading-relaxed">
-<<<<<<< HEAD
               Step into the control center. Integrate your municipality's data
-              and unleash the intelligence of CIVICOS OS.
-=======
-              Step into the control center. Integrate your municipality's data and unleash the intelligence of CivicSaathi.
->>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
+              and unleash the intelligence of CivicSaathi.
             </p>
 
             <Button

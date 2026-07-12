@@ -1,24 +1,12 @@
-/**
- * ChatPanel — CivicSaathi
+﻿/**
+ * ChatPanel ΓÇö CivicSaathi
  * Real-time streaming: tokens streamed via SSE from Groq backend
  * Voice input:  Sarvam AI saaras:v3 (server-side STT via /voice/stt)
  * Voice output: Sarvam AI bulbul:v3 (server-side TTS via /voice/tts, with browser fallback)
  * Supports 8 Indian languages.
  */
 import { useState, useRef, useEffect, useCallback } from "react";
-<<<<<<< HEAD
-import {
-  Mic,
-  MicOff,
-  Send,
-  Sparkles,
-  Volume2,
-  VolumeX,
-  Loader2,
-} from "lucide-react";
-=======
 import { Mic, MicOff, Send, Sparkles, Volume2, VolumeX, Loader2, Square } from "lucide-react";
->>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -58,9 +46,7 @@ export function ChatPanel({
   module?: string;
   showLanguageSelector?: boolean;
 }) {
-  const [messages, setMessages] = useState<Msg[]>([
-    { role: "bot", text: greeting },
-  ]);
+  const [messages, setMessages] = useState<Msg[]>([{ role: "bot", text: greeting }]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [language, setLanguage] = useState("en");
@@ -71,18 +57,11 @@ export function ChatPanel({
   const [isStreaming, setIsStreaming] = useState(false);
 
   const scrollRef = useRef<HTMLDivElement>(null);
-<<<<<<< HEAD
-  const recognitionRef = useRef<InstanceType<typeof SpeechRecognition> | null>(
-    null,
-  );
-  const synthRef = useRef<SpeechSynthesisUtterance | null>(null);
-=======
   const recognitionRef = useRef<any>(null);
   const ttsQueue = useRef<string[]>([]);
   const isPlayingTTS = useRef<boolean>(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
->>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
   const historyRef = useRef<{ role: string; content: string }[]>([]);
   const currentAudioRef = useRef<HTMLAudioElement | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -90,10 +69,7 @@ export function ChatPanel({
 
   // Auto-scroll
   useEffect(() => {
-    scrollRef.current?.scrollTo({
-      top: scrollRef.current.scrollHeight,
-      behavior: "smooth",
-    });
+    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, loading]);
 
   // Keep history ref in sync (skip streaming messages)
@@ -106,27 +82,8 @@ export function ChatPanel({
       }));
   }, [messages]);
 
-  // ── Server-side TTS via Sarvam AI ─────────────────────────────────────────
+  // ΓöÇΓöÇ Server-side TTS via Sarvam AI ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
   const speakText = useCallback(
-<<<<<<< HEAD
-    (text: string) => {
-      if (
-        !voiceEnabled ||
-        typeof window === "undefined" ||
-        !window.speechSynthesis
-      )
-        return;
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = SPEECH_LANG_MAP[language] ?? "en-IN";
-      utterance.rate = 0.95;
-      utterance.pitch = 1;
-      utterance.onstart = () => setIsSpeaking(true);
-      utterance.onend = () => setIsSpeaking(false);
-      utterance.onerror = () => setIsSpeaking(false);
-      synthRef.current = utterance;
-      window.speechSynthesis.speak(utterance);
-=======
     async (text: string) => {
       if (!voiceEnabled || !text.trim()) return;
 
@@ -189,7 +146,6 @@ export function ChatPanel({
           window.speechSynthesis.speak(utterance);
         }
       }
->>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
     },
     [voiceEnabled, language],
   );
@@ -237,7 +193,7 @@ export function ChatPanel({
     setIsSpeaking(false);
   }, []);
 
-  // ── Streaming SSE chat ────────────────────────────────────────────────────
+  // ΓöÇΓöÇ Streaming SSE chat ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
   const sendMessage = useCallback(
     async (text: string) => {
       const q = text.trim();
@@ -332,7 +288,7 @@ export function ChatPanel({
         }
       } catch (err: any) {
         if (err.name === "AbortError") {
-          // User stopped — finalize whatever we have
+          // User stopped ΓÇö finalize whatever we have
           setMessages((m) =>
             m.map((msg, i) =>
               i === streamingIndexRef.current ? { ...msg, streaming: false } : msg,
@@ -348,7 +304,7 @@ export function ChatPanel({
                 : msg,
             ),
           );
-          setError("Connection error — using offline response.");
+          setError("Connection error ΓÇö using offline response.");
         }
       } finally {
         setLoading(false);
@@ -363,16 +319,9 @@ export function ChatPanel({
     abortControllerRef.current?.abort();
   }, []);
 
-<<<<<<< HEAD
-    if (!SR) {
-      setError(
-        "Voice input not supported in this browser. Please use Chrome or Edge.",
-      );
-=======
   const startListening = useCallback(async () => {
     if (!navigator.mediaDevices?.getUserMedia) {
       setError("Microphone not available in this browser.");
->>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
       return;
     }
 
@@ -419,7 +368,7 @@ export function ChatPanel({
 
         const blob = new Blob(audioChunksRef.current, { type: mimeType });
         if (blob.size < 1000) {
-          setError("Too short — please hold and speak clearly.");
+          setError("Too short ΓÇö please hold and speak clearly.");
           return;
         }
 
@@ -441,7 +390,7 @@ export function ChatPanel({
             setInput(transcript);
             sendMessage(transcript);
           } else {
-            setError("Could not understand — please try again.");
+            setError("Could not understand ΓÇö please try again.");
           }
         } catch (err) {
           console.warn("Sarvam STT failed, trying browser fallback:", err);
@@ -507,17 +456,11 @@ export function ChatPanel({
         <div className="flex items-center gap-2">
           <Sparkles className="h-4 w-4 text-accent" />
           <span className="font-display text-sm font-bold">{title}</span>
-          {loading && (
-            <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
-          )}
+          {loading && <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />}
         </div>
         <div className="flex items-center gap-2">
           {showLanguageSelector && (
-            <LanguageDropdown
-              value={language}
-              onChange={setLanguage}
-              className="h-8 text-xs"
-            />
+            <LanguageDropdown value={language} onChange={setLanguage} className="h-8 text-xs" />
           )}
           <Button
             variant="ghost"
@@ -527,12 +470,7 @@ export function ChatPanel({
             title={voiceEnabled ? "Mute voice output" : "Enable voice output"}
           >
             {voiceEnabled ? (
-              <Volume2
-                className={cn(
-                  "h-4 w-4",
-                  isSpeaking && "text-accent animate-pulse",
-                )}
-              />
+              <Volume2 className={cn("h-4 w-4", isSpeaking && "text-accent animate-pulse")} />
             ) : (
               <VolumeX className="h-4 w-4 text-muted-foreground" />
             )}
@@ -543,13 +481,7 @@ export function ChatPanel({
       {/* Messages */}
       <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto p-4">
         {messages.map((m, i) => (
-          <div
-            key={i}
-            className={cn(
-              "flex",
-              m.role === "user" ? "justify-end" : "justify-start",
-            )}
-          >
+          <div key={i} className={cn("flex", m.role === "user" ? "justify-end" : "justify-start")}>
             <div
               className={cn(
                 "max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed",
@@ -613,34 +545,15 @@ export function ChatPanel({
           aria-label={isListening ? "Stop listening" : "Start voice input"}
           disabled={loading && !isListening}
         >
-          {isListening ? (
-            <MicOff className="h-4 w-4" />
-          ) : (
-            <Mic className="h-4 w-4" />
-          )}
+          {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
         </Button>
         <Input
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder={isListening ? "Listening… release to send" : "Type or use voice…"}
+          placeholder={isListening ? "ListeningΓÇª release to send" : "Type or use voiceΓÇª"}
           className="h-9"
           disabled={loading || isListening}
         />
-<<<<<<< HEAD
-        <Button
-          type="submit"
-          size="icon"
-          className="h-9 w-9 shrink-0"
-          disabled={loading || !input.trim()}
-          aria-label="Send message"
-        >
-          {loading ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <Send className="h-4 w-4" />
-          )}
-        </Button>
-=======
         {isStreaming ? (
           <Button
             type="button"
@@ -664,7 +577,6 @@ export function ChatPanel({
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
           </Button>
         )}
->>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
       </form>
     </Card>
   );

@@ -1,4 +1,4 @@
-import { useState, useEffect, type ReactNode } from "react";
+﻿import { useState, useEffect, type ReactNode } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   Search,
@@ -67,17 +67,6 @@ const GOVERNANCE: NavItem[] = [
 
 export function PortalShell({ children }: { children: ReactNode }) {
   const { user, logout } = useAuth();
-<<<<<<< HEAD
-
-  const allNavItems = [...MODULES, ...GOVERNANCE];
-  const activeItem = allNavItems.find((item) =>
-    item.to === "/portal"
-      ? pathname === "/portal"
-      : pathname.startsWith(item.to),
-  ) || { label: "Portal Workspace" };
-
-=======
->>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
   const [mounted, setMounted] = useState(false);
   const [launchpadOpen, setLaunchpadOpen] = useState(false);
   
@@ -91,54 +80,14 @@ export function PortalShell({ children }: { children: ReactNode }) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-<<<<<<< HEAD
-  const initials = user?.name
-    ? user.name
-        .split(" ")
-        .map((w) => w[0])
-        .join("")
-        .toUpperCase()
-        .slice(0, 2)
-    : "?";
-
-=======
->>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
   const roleLabel =
-    user?.role === "admin"
-      ? "Administrator"
-      : user?.role === "officer"
-        ? "Government Officer"
-        : "Citizen";
+    user?.role === "admin" ? "Administrator"
+      : user?.role === "officer" ? "Government Officer" : "Citizen";
 
   return (
-<<<<<<< HEAD
-    <div className="flex h-screen w-full flex-col overflow-hidden bg-slate-50 font-sans text-slate-900">
-      {/* Top App Bar (Light Theme Premium) */}
-      <header className="flex h-14 shrink-0 items-center gap-4 border-b border-slate-200 bg-white px-6 shadow-sm z-30">
-        <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-9 w-9 text-slate-600 hover:bg-slate-100 lg:hidden"
-            onClick={() => setMobileOpen(true)}
-          >
-            <Menu className="h-5 w-5" />
-          </Button>
-          <Link
-            to="/"
-            className="flex items-center gap-2.5 hover:opacity-80 transition-opacity"
-          >
-            <div className="h-8 w-8 rounded-lg bg-indigo-600 flex items-center justify-center shadow-md shadow-indigo-600/20">
-              <Grip className="h-4 w-4 text-white" />
-            </div>
-            <span className="font-extrabold text-lg tracking-tight text-slate-900">
-              CIVICOS<span className="text-indigo-600">OS</span>
-            </span>
-          </Link>
-=======
     <div className="flex h-screen w-full flex-col overflow-hidden bg-[#FAFBFF] dark:bg-[#0B0F19] font-sans text-slate-900 dark:text-slate-50 relative">
       
-      {/* ── Global Ambient Mesh Background ── */}
+      {/* ΓöÇΓöÇ Global Ambient Mesh Background ΓöÇΓöÇ */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-indigo-400/20 dark:bg-indigo-900/30 blur-[120px] animate-pulse" style={{ animationDuration: '8s' }} />
         <div className="absolute top-[20%] -right-[10%] w-[40%] h-[60%] rounded-full bg-purple-400/15 dark:bg-purple-900/20 blur-[100px] animate-pulse" style={{ animationDuration: '12s', animationDelay: '2s' }} />
@@ -158,7 +107,6 @@ export function PortalShell({ children }: { children: ReactNode }) {
             <Grip className="h-5 w-5" />
           </button>
           <Logo variant="dark" /> 
->>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
         </div>
 
         {/* Center: Search Bar */}
@@ -170,22 +118,9 @@ export function PortalShell({ children }: { children: ReactNode }) {
               placeholder="Search services, schemes, or ask AI..."
             />
             <kbd className="hidden sm:inline-flex h-5 items-center gap-1 rounded border border-slate-200/60 dark:border-white/10 bg-white/60 dark:bg-white/5 px-1.5 font-sans text-[10px] font-bold text-slate-400 shadow-sm">
-              ⌘K
+              ΓîÿK
             </kbd>
           </div>
-<<<<<<< HEAD
-
-          <div className="flex items-center gap-1 border-l border-slate-200 pl-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="relative h-9 w-9 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-xl"
-            >
-              <Bell className="h-4 w-4" />
-              <span className="absolute right-2.5 top-2.5 h-1.5 w-1.5 rounded-full bg-rose-500 ring-2 ring-white" />
-            </Button>
-          </div>
-=======
         </div>
 
         {/* Right: Notifications & Profile */}
@@ -196,7 +131,6 @@ export function PortalShell({ children }: { children: ReactNode }) {
             <Bell className="h-5 w-5" />
             <span className="absolute top-1.5 right-1.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-rose-500 text-[8px] font-bold text-white ring-2 ring-white dark:ring-black shadow-sm shadow-rose-500/40">3</span>
           </button>
->>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -213,40 +147,6 @@ export function PortalShell({ children }: { children: ReactNode }) {
                 <ChevronDown className="h-4 w-4 text-slate-400" />
               </button>
             </DropdownMenuTrigger>
-<<<<<<< HEAD
-            <DropdownMenuContent
-              align="end"
-              className="w-56 rounded-xl border-slate-100 shadow-xl bg-white/90 backdrop-blur-xl"
-            >
-              <DropdownMenuLabel className="py-3 px-4 bg-slate-50/50">
-                <div className="text-sm font-bold text-slate-900">
-                  {user?.name ?? "Guest"}
-                </div>
-                <div className="text-xs font-semibold text-slate-500 mt-0.5">
-                  {roleLabel}
-                </div>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator className="bg-slate-100" />
-              <DropdownMenuItem
-                asChild
-                className="text-sm font-semibold cursor-pointer"
-              >
-                <Link to="/portal/settings">Preferences</Link>
-              </DropdownMenuItem>
-              {user?.role === "admin" && (
-                <DropdownMenuItem
-                  asChild
-                  className="text-sm font-semibold cursor-pointer"
-                >
-                  <Link to="/portal/admin">System Admin</Link>
-                </DropdownMenuItem>
-              )}
-              <DropdownMenuSeparator className="bg-slate-100" />
-              <DropdownMenuItem
-                onClick={() => logout()}
-                className="text-sm font-bold text-rose-600 focus:text-rose-700 cursor-pointer"
-              >
-=======
             <DropdownMenuContent align="end" className="w-56 rounded-2xl border-white/60 dark:border-slate-800 shadow-2xl shadow-slate-300/50 bg-white/90 backdrop-blur-xl dark:bg-[#1A1F2E] p-2">
               <DropdownMenuLabel className="py-2 px-3">
                 <div className="text-sm font-bold text-slate-900 dark:text-white">Shradha</div>
@@ -263,7 +163,6 @@ export function PortalShell({ children }: { children: ReactNode }) {
               )}
               <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800" />
               <DropdownMenuItem onClick={() => logout()} className="text-sm font-bold text-rose-600 focus:text-rose-700 focus:bg-rose-50 dark:focus:bg-rose-500/10 cursor-pointer rounded-xl py-2 px-3 transition-colors">
->>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                 <LogOut className="mr-2 h-4 w-4" />
                 Sign out
               </DropdownMenuItem>
@@ -272,126 +171,6 @@ export function PortalShell({ children }: { children: ReactNode }) {
         </div>
       </header>
 
-<<<<<<< HEAD
-      <div className="flex flex-1 overflow-hidden">
-        {/* Left Sidebar (Premium Light Theme) */}
-        <aside className="hidden w-64 flex-col border-r border-slate-200 bg-white lg:flex py-6 overflow-y-auto shadow-[4px_0_24px_rgba(0,0,0,0.02)] z-20">
-          <div className="px-6 pb-3 text-[11px] font-black uppercase tracking-widest text-slate-400">
-            Workspace
-          </div>
-          <div className="flex w-full flex-col gap-1 px-3">
-            {MODULES.map((item) => {
-              const active =
-                item.to === "/portal"
-                  ? pathname === "/portal"
-                  : pathname.startsWith(item.to);
-              return (
-                <Link
-                  key={item.to}
-                  to={item.to}
-                  className={cn(
-                    "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all duration-200",
-                    active
-                      ? "bg-indigo-50 text-indigo-700 font-bold shadow-sm border border-indigo-100/50"
-                      : "text-slate-600 font-semibold hover:bg-slate-50 hover:text-slate-900",
-                  )}
-                >
-                  <item.icon
-                    className="h-[18px] w-[18px]"
-                    strokeWidth={active ? 2.5 : 2}
-                  />
-                  {item.label}
-                </Link>
-              );
-            })}
-          </div>
-
-          <div className="px-6 pt-8 pb-3 text-[11px] font-black uppercase tracking-widest text-slate-400">
-            Governance
-          </div>
-          <div className="flex w-full flex-col gap-1 px-3">
-            {GOVERNANCE.map((item) => {
-              const active = pathname.startsWith(item.to);
-              return (
-                <Link
-                  key={item.to}
-                  to={item.to}
-                  className={cn(
-                    "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all duration-200",
-                    active
-                      ? "bg-indigo-50 text-indigo-700 font-bold shadow-sm border border-indigo-100/50"
-                      : "text-slate-600 font-semibold hover:bg-slate-50 hover:text-slate-900",
-                  )}
-                >
-                  <item.icon
-                    className="h-[18px] w-[18px]"
-                    strokeWidth={active ? 2.5 : 2}
-                  />
-                  {item.label}
-                </Link>
-              );
-            })}
-          </div>
-        </aside>
-
-        {/* Mobile sidebar overlay */}
-        {mobileOpen && (
-          <div className="fixed inset-0 z-50 lg:hidden">
-            <div
-              className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
-              onClick={() => setMobileOpen(false)}
-            />
-            <aside className="absolute inset-y-0 left-0 w-72 bg-white border-r border-slate-200 shadow-2xl flex flex-col">
-              <div className="flex items-center justify-between p-5 border-b border-slate-100">
-                <Link
-                  to="/"
-                  onClick={() => setMobileOpen(false)}
-                  className="hover:opacity-80 transition-opacity"
-                >
-                  <span className="font-extrabold text-lg tracking-tight text-slate-900">
-                    CIVICOS<span className="text-indigo-600">OS</span>
-                  </span>
-                </Link>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-9 w-9 bg-slate-50 rounded-xl"
-                  onClick={() => setMobileOpen(false)}
-                >
-                  <X className="h-5 w-5" />
-                </Button>
-              </div>
-              <div className="flex-1 overflow-y-auto py-4">
-                <div className="px-6 pb-3 text-[11px] font-black uppercase tracking-widest text-slate-400">
-                  Workspace
-                </div>
-                <div className="flex flex-col gap-1 px-3">
-                  {MODULES.map((item) => (
-                    <Link
-                      key={item.to}
-                      to={item.to}
-                      onClick={() => setMobileOpen(false)}
-                      className="flex items-center gap-3 px-4 py-3 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl"
-                    >
-                      <item.icon className="h-5 w-5" /> {item.label}
-                    </Link>
-                  ))}
-                </div>
-                <div className="px-6 pt-6 pb-3 text-[11px] font-black uppercase tracking-widest text-slate-400">
-                  Governance
-                </div>
-                <div className="flex flex-col gap-1 px-3">
-                  {GOVERNANCE.map((item) => (
-                    <Link
-                      key={item.to}
-                      to={item.to}
-                      onClick={() => setMobileOpen(false)}
-                      className="flex items-center gap-3 px-4 py-3 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl"
-                    >
-                      <item.icon className="h-5 w-5" /> {item.label}
-                    </Link>
-                  ))}
-=======
       {/* Mac-style Launchpad Overlay */}
       {launchpadOpen && (
         <div className="fixed inset-0 z-[100] flex flex-col items-center pt-24 pb-12 px-6 bg-white/70 dark:bg-[#0B0F19]/80 backdrop-blur-[40px] animate-in fade-in zoom-in-95 duration-200 overflow-y-auto">
@@ -420,55 +199,10 @@ export function PortalShell({ children }: { children: ReactNode }) {
                     placeholder="Search modules..."
                     autoFocus
                   />
->>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
                 </div>
               </div>
             </div>
 
-<<<<<<< HEAD
-        {/* Main Content Area */}
-        <main className="flex-1 overflow-y-auto bg-slate-100/50 p-6 lg:p-8 relative">
-          <div className="mx-auto w-full max-w-[1600px] h-full">{children}</div>
-        </main>
-      </div>
-    </div>
-  );
-}
-
-export function PageHeader({
-  title,
-  description,
-  actions,
-  icon: Icon,
-}: {
-  title: string;
-  description?: string;
-  actions?: ReactNode;
-  icon?: LucideIcon;
-}) {
-  return (
-    <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between border-b border-slate-200 pb-4">
-      <div className="flex items-center gap-4">
-        {Icon && (
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600 border border-indigo-100 shadow-sm">
-            <Icon className="h-6 w-6" />
-          </div>
-        )}
-        <div>
-          <h1 className="text-2xl font-black tracking-tight text-slate-900">
-            {title}
-          </h1>
-          {description && (
-            <p className="text-sm font-semibold text-slate-500 mt-1">
-              {description}
-            </p>
-          )}
-        </div>
-      </div>
-      {actions && (
-        <div className="flex shrink-0 items-center gap-2">{actions}</div>
-      )}
-=======
             <div className="space-y-8">
               <h3 className="text-center text-sm font-bold tracking-widest text-slate-400 uppercase">Workspace Modules</h3>
               <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-x-6 gap-y-12">
@@ -498,7 +232,6 @@ export function PageHeader({
       <main className="flex-1 overflow-y-auto relative w-full flex flex-col z-10">
         {children}
       </main>
->>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
     </div>
   );
 }

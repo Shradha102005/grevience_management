@@ -1,18 +1,9 @@
-import { Link } from "@tanstack/react-router";
+﻿import { Link } from "@tanstack/react-router";
 
 const COLUMNS = [
-  {
-    title: "Platform",
-    links: ["Services", "Departments", "Modules", "Voice Interface"],
-  },
-  {
-    title: "Resources",
-    links: ["Help Center", "Documentation", "API Status", "Changelog"],
-  },
-  {
-    title: "Legal",
-    links: ["Privacy Policy", "Terms", "Security", "Accessibility"],
-  },
+  { title: "Platform", links: ["Services", "Departments", "Modules", "Voice Interface"] },
+  { title: "Resources", links: ["Help Center", "Documentation", "API Status", "Changelog"] },
+  { title: "Legal", links: ["Privacy Policy", "Terms", "Security", "Accessibility"] },
 ];
 
 export function SiteFooter() {
@@ -25,15 +16,14 @@ export function SiteFooter() {
               CivicSaathi <span className="text-accent">AI</span>
             </div>
             <p className="mt-3 text-sm text-muted-foreground">
-              The unified AI-powered platform for citizen governance — schemes,
-              grievances, emergency response and municipal services in one
-              secure system.
+              The unified AI-powered platform for citizen governance ΓÇö schemes, grievances,
+              emergency response and municipal services in one secure system.
             </p>
             <Link
               to="/portal"
               className="mt-5 inline-flex text-sm font-semibold text-primary hover:underline"
             >
-              Enter the governance portal →
+              Enter the governance portal ΓåÆ
             </Link>
           </div>
           {COLUMNS.map((c) => (
@@ -42,10 +32,7 @@ export function SiteFooter() {
               <ul className="mt-4 space-y-3">
                 {c.links.map((l) => (
                   <li key={l}>
-                    <a
-                      href="#"
-                      className="text-sm text-muted-foreground hover:text-foreground"
-                    >
+                    <a href="#" className="text-sm text-muted-foreground hover:text-foreground">
                       {l}
                     </a>
                   </li>
@@ -55,15 +42,8 @@ export function SiteFooter() {
           ))}
         </div>
         <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-border pt-6 text-xs text-muted-foreground sm:flex-row">
-<<<<<<< HEAD
-          <p>
-            © {new Date().getFullYear()} CIVICOS AI. Government technology,
-            reimagined.
-          </p>
-=======
-          <p>© {new Date().getFullYear()} CivicSaathi. Government technology, reimagined.</p>
->>>>>>> 4b6b11d5b8430477f7a10a0fb94cf381a9b34171
-          <p>Built for public-sector scale · ISO-aligned · Multilingual</p>
+          <p>┬⌐ {new Date().getFullYear()} CivicSaathi. Government technology, reimagined.</p>
+          <p>Built for public-sector scale ┬╖ ISO-aligned ┬╖ Multilingual</p>
         </div>
       </div>
     </footer>
