@@ -35,7 +35,7 @@ from schemas import (
     MessageResponse,
 )
 from dependencies import get_current_user
-from routers.twilio_service import send_sms, make_call, is_mock as twilio_is_mock
+from routers.twilio_service import send_sms, make_call, make_conversational_call, is_mock as twilio_is_mock
 
 logger = logging.getLogger(__name__)
 
@@ -235,7 +235,20 @@ def launch_outreach(
 
     for phone in body.phones:
         sms_res = send_sms(phone, sms_text) if body.send_sms else None
-        call_res = make_call(phone, call_text) if body.send_call else None
+        # Use conversational call (STT→AI→TTS loop) when call base URL is configured,
+        # otherwise fall back to the one-way static read-back call.
+        if body.send_call:
+            call_res = make_conversational_call(
+                to=phone,
+                session_id=str(session.id),
+                opening_message=(
+                    f"Hello, this is a campaign call on behalf of {session.candidate_name}. "
+                    f"{session.generated_speech[:400]} "
+                    f"Feel free to ask me any questions about the campaign."
+                ),
+            )
+        else:
+            call_res = None
 
         delivery = CampaignDelivery(
             session_id=session.id,

@@ -24,6 +24,7 @@ from routers import schemes as schemes_router
 from routers import voice as voice_router
 from routers import agriculture as agriculture_router
 from routers import smart_city as smart_city_router
+from routers import voice_call as voice_call_router
 
 
 @asynccontextmanager
@@ -73,6 +74,7 @@ app.include_router(schemes_router.router)
 app.include_router(voice_router.router)
 app.include_router(agriculture_router.router)
 app.include_router(smart_city_router.router)
+app.include_router(voice_call_router.router, prefix="/api/voice")
 
 
 # ── Health Check ──────────────────────────────────────────────────────────────

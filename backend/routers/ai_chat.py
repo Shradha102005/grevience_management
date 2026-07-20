@@ -347,6 +347,8 @@ async def chat(req: ChatRequest) -> ChatResponse:
             from models import HelplineTicket as HelplineTicketORM
 
             tid = ticket_match.group(0).upper()
+            if SessionLocal is None:
+                return ChatResponse(reply="Helpline database unavailable.", is_mock=True, resolved=False)
             db = SessionLocal()
             try:
                 ticket = db.get(HelplineTicketORM, tid)
@@ -641,22 +643,24 @@ def helpline_stats() -> dict:
     import re as _re
     from collections import Counter
 
+    if SessionLocal is None:
+        return {"error": "Database unavailable"}
     db = SessionLocal()
     try:
         now = datetime.now(timezone.utc)
         today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
         week_start  = today_start - timedelta(days=7)
 
-        total_tickets     = db.query(func.count(HelplineTicket.id)).scalar() or 0
-        open_tickets      = db.query(func.count(HelplineTicket.id)).filter(HelplineTicket.status == "Open").scalar() or 0
-        pending_tickets   = db.query(func.count(HelplineTicket.id)).filter(HelplineTicket.status == "Pending").scalar() or 0
-        resolved_tickets  = db.query(func.count(HelplineTicket.id)).filter(HelplineTicket.status == "Resolved").scalar() or 0
-        today_tickets     = db.query(func.count(HelplineTicket.id)).filter(HelplineTicket.created_at >= today_start).scalar() or 0
-        week_tickets      = db.query(func.count(HelplineTicket.id)).filter(HelplineTicket.created_at >= week_start).scalar() or 0
+        total_tickets     = db.query(func.count(HelplineTicket.ticket_id)).scalar() or 0
+        open_tickets      = db.query(func.count(HelplineTicket.ticket_id)).filter(HelplineTicket.status == "Open").scalar() or 0
+        pending_tickets   = db.query(func.count(HelplineTicket.ticket_id)).filter(HelplineTicket.status == "Pending").scalar() or 0
+        resolved_tickets  = db.query(func.count(HelplineTicket.ticket_id)).filter(HelplineTicket.status == "Resolved").scalar() or 0
+        today_tickets     = db.query(func.count(HelplineTicket.ticket_id)).filter(HelplineTicket.created_at >= today_start).scalar() or 0
+        week_tickets      = db.query(func.count(HelplineTicket.ticket_id)).filter(HelplineTicket.created_at >= week_start).scalar() or 0
 
         # Channel breakdown
         channel_rows = (
-            db.query(HelplineTicket.channel, func.count(HelplineTicket.id))
+            db.query(HelplineTicket.channel, func.count(HelplineTicket.ticket_id))
             .group_by(HelplineTicket.channel)
             .all()
         )
@@ -664,7 +668,7 @@ def helpline_stats() -> dict:
 
         # Priority breakdown
         priority_rows = (
-            db.query(HelplineTicket.priority, func.count(HelplineTicket.id))
+            db.query(HelplineTicket.priority, func.count(HelplineTicket.ticket_id))
             .group_by(HelplineTicket.priority)
             .all()
         )

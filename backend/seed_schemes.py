@@ -90,6 +90,10 @@ def save_to_db(schemes: list[dict]) -> int:
     if not schemes:
         return 0
 
+    if SessionLocal is None:
+        logger.warning("Database unavailable. Cannot save schemes.")
+        return 0
+
     db = SessionLocal()
     saved = 0
     now = datetime.now(timezone.utc)

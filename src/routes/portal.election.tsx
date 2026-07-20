@@ -48,12 +48,12 @@ function timeAgo(iso: string) {
 function ChatBubble({ role, children, avatar }: { role: "user" | "bot"; children: React.ReactNode; avatar?: React.ReactNode }) {
   const isUser = role === "user";
   return (
-    <div style={{ display: "flex", gap: "16px", padding: "16px 20px", flexDirection: isUser ? "row-reverse" : "row", animation: "slideUp 0.3s ease-out" }}>
-      <div style={{ width: "36px", height: "36px", borderRadius: "12px", background: isUser ? "var(--color-card)" : "linear-gradient(135deg, #8b5cf6, #6d28d9)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, border: isUser ? "1px solid var(--color-border)" : "none", boxShadow: isUser ? "none" : "0 4px 12px rgba(139,92,246,0.3)" }}>
-        {avatar ? avatar : isUser ? <User style={{ width: 18, height: 18, color: "var(--color-muted-foreground)" }} /> : <Sparkles style={{ width: 18, height: 18, color: "white" }} />}
+    <div style={{ display: "flex", gap: "14px", padding: "10px 24px", flexDirection: isUser ? "row-reverse" : "row", animation: "slideUp 0.3s ease-out" }}>
+      <div style={{ width: "38px", height: "38px", borderRadius: "14px", background: isUser ? "linear-gradient(135deg,#e0d9ff,#c9b8ff)" : "linear-gradient(135deg, #8b5cf6, #6d28d9)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, boxShadow: isUser ? "0 2px 8px rgba(139,92,246,0.2)" : "0 4px 14px rgba(109,40,217,0.35)" }}>
+        {avatar ? avatar : isUser ? <User style={{ width: 17, height: 17, color: "#6d28d9" }} /> : <Sparkles style={{ width: 17, height: 17, color: "white" }} />}
       </div>
-      <div style={{ display: "flex", flexDirection: "column", alignItems: isUser ? "flex-end" : "flex-start", maxWidth: "80%" }}>
-        <span style={{ fontSize: "14px", fontWeight: 700, color: "var(--color-muted-foreground)", marginBottom: "6px", padding: "0 4px" }}>{isUser ? "You" : "Campaign Architect AI"}</span>
+      <div style={{ display: "flex", flexDirection: "column", alignItems: isUser ? "flex-end" : "flex-start", maxWidth: "82%" }}>
+        <span style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: isUser ? "#8b5cf6" : "var(--color-muted-foreground)", marginBottom: "6px", padding: "0 4px" }}>{isUser ? "You" : "Campaign Architect AI"}</span>
         {children}
       </div>
     </div>
@@ -250,9 +250,9 @@ function Election() {
               
               {/* Introduction message */}
               <ChatBubble role="bot">
-                <div style={{ background: "rgba(139,92,246,0.06)", border: "1px solid rgba(139,92,246,0.15)", borderRadius: "0 16px 16px 16px", padding: "16px 20px", color: "var(--color-foreground)", fontSize: "14px", lineHeight: 1.5 }}>
-                  {selectedCampaign 
-                    ? `Welcome back! I've pulled up the records for the campaign targeting **${AUDIENCE_OPTIONS.find(a => a.value === selectedCampaign.audience)?.label}**.` 
+                <div style={{ background: "linear-gradient(135deg, rgba(139,92,246,0.08), rgba(109,40,217,0.04))", border: "1px solid rgba(139,92,246,0.18)", borderRadius: "4px 18px 18px 18px", padding: "14px 18px", color: "var(--color-foreground)", fontSize: "14px", lineHeight: 1.6 }}>
+                  {selectedCampaign
+                    ? <span>Welcome back! I&apos;ve pulled up the records for the campaign targeting <strong style={{ color: "#7c3aed" }}>{AUDIENCE_OPTIONS.find(a => a.value === selectedCampaign.audience)?.label}</strong>.</span>
                     : "Hello! I am your AI Campaign Architect. I can draft powerful political speeches and manage automated SMS and voice outreach. Let's start by defining your campaign strategy."}
                 </div>
               </ChatBubble>
@@ -268,23 +268,23 @@ function Election() {
                         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
                           <div>
                             <label style={{ fontSize: "14px", fontWeight: 700, color: "var(--color-muted-foreground)", textTransform: "uppercase", marginBottom: "6px", display: "block" }}>Candidate Name</label>
-                            <input value={newCampForm.candidate_name} onChange={e => setNewCampForm(f => ({ ...f, candidate_name: e.target.value }))} style={{ width: "100%", height: "36px", padding: "0 12px", borderRadius: "8px", background: "var(--color-background)", border: "1px solid var(--color-border)", color: "var(--color-foreground)", fontSize: "14px", outline: "none" }} onFocus={e => e.target.style.borderColor = "#8b5cf6"} onBlur={e => e.target.style.borderColor = "var(--color-border)"} />
+                            <input value={newCampForm.candidate_name} onChange={e => setNewCampForm(f => ({ ...f, candidate_name: e.target.value }))} style={{ width: "100%", height: "36px", padding: "0 12px", borderRadius: "8px", background: "var(--color-secondary)", border: "1px solid var(--color-border)", color: "var(--color-foreground)", fontSize: "14px", outline: "none" }} onFocus={e => e.target.style.borderColor = "#8b5cf6"} onBlur={e => e.target.style.borderColor = "var(--color-border)"} />
                           </div>
                           <div>
                             <label style={{ fontSize: "14px", fontWeight: 700, color: "var(--color-muted-foreground)", textTransform: "uppercase", marginBottom: "6px", display: "block" }}>Audience</label>
                             <Select value={newCampForm.audience} onValueChange={v => setNewCampForm(f => ({ ...f, audience: v }))}>
-                              <SelectTrigger className="h-9 text-sm bg-background border-border"><SelectValue /></SelectTrigger>
+                              <SelectTrigger className="h-9 text-sm bg-secondary border-border"><SelectValue /></SelectTrigger>
                               <SelectContent>{AUDIENCE_OPTIONS.map(a => <SelectItem key={a.value} value={a.value} className="text-sm">{a.icon} {a.label}</SelectItem>)}</SelectContent>
                             </Select>
                           </div>
                         </div>
                         <div>
                           <label style={{ fontSize: "14px", fontWeight: 700, color: "var(--color-muted-foreground)", textTransform: "uppercase", marginBottom: "6px", display: "block" }}>Campaign Theme</label>
-                          <input placeholder="e.g. Agricultural Reform" value={newCampForm.theme} onChange={e => setNewCampForm(f => ({ ...f, theme: e.target.value }))} style={{ width: "100%", height: "36px", padding: "0 12px", borderRadius: "8px", background: "var(--color-background)", border: "1px solid var(--color-border)", color: "var(--color-foreground)", fontSize: "14px", outline: "none" }} onFocus={e => e.target.style.borderColor = "#8b5cf6"} onBlur={e => e.target.style.borderColor = "var(--color-border)"} />
+                          <input placeholder="e.g. Agricultural Reform" value={newCampForm.theme} onChange={e => setNewCampForm(f => ({ ...f, theme: e.target.value }))} style={{ width: "100%", height: "36px", padding: "0 12px", borderRadius: "8px", background: "var(--color-secondary)", border: "1px solid var(--color-border)", color: "var(--color-foreground)", fontSize: "14px", outline: "none" }} onFocus={e => e.target.style.borderColor = "#8b5cf6"} onBlur={e => e.target.style.borderColor = "var(--color-border)"} />
                         </div>
                         <div>
                           <label style={{ fontSize: "14px", fontWeight: 700, color: "var(--color-muted-foreground)", textTransform: "uppercase", marginBottom: "6px", display: "block" }}>Key Talking Points</label>
-                          <textarea placeholder="List main promises..." value={newCampForm.key_points} onChange={e => setNewCampForm(f => ({ ...f, key_points: e.target.value }))} style={{ width: "100%", height: "70px", padding: "10px 12px", borderRadius: "8px", background: "var(--color-background)", border: "1px solid var(--color-border)", color: "var(--color-foreground)", fontSize: "14px", outline: "none", resize: "none" }} onFocus={e => e.target.style.borderColor = "#8b5cf6"} onBlur={e => e.target.style.borderColor = "var(--color-border)"} />
+                          <textarea placeholder="List main promises..." value={newCampForm.key_points} onChange={e => setNewCampForm(f => ({ ...f, key_points: e.target.value }))} style={{ width: "100%", height: "70px", padding: "10px 12px", borderRadius: "8px", background: "var(--color-secondary)", border: "1px solid var(--color-border)", color: "var(--color-foreground)", fontSize: "14px", outline: "none", resize: "none" }} onFocus={e => e.target.style.borderColor = "#8b5cf6"} onBlur={e => e.target.style.borderColor = "var(--color-border)"} />
                         </div>
                         <button onClick={handleGenerate} disabled={generating} style={{ height: "40px", borderRadius: "8px", background: generating ? "rgba(139,92,246,0.15)" : "linear-gradient(135deg,#8b5cf6,#6d28d9)", border: "none", color: generating ? "#8b5cf6" : "white", fontSize: "14px", fontWeight: 700, cursor: generating ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", boxShadow: generating ? "none" : "0 4px 12px rgba(139,92,246,0.25)" }}>
                           {generating ? <><Loader2 style={{ width: 14, height: 14 }} className="animate-spin" />Building Assets…</> : <><Sparkles style={{ width: 14, height: 14 }} />Generate Campaign</>}
@@ -299,46 +299,52 @@ function Election() {
               {selectedCampaign && (
                 <>
                   <ChatBubble role="user">
-                    <div style={{ background: "white", border: "1px solid var(--color-border)", borderRadius: "16px 0 16px 16px", padding: "16px 20px", color: "var(--color-foreground)", fontSize: "14px", lineHeight: 1.5, boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
-                      Generate a campaign for <strong>{selectedCampaign.candidate_name}</strong> focused on <strong>{selectedCampaign.theme}</strong>, targeting <strong>{AUDIENCE_OPTIONS.find(a => a.value === selectedCampaign.audience)?.label}</strong>.
+                    <div style={{ background: "linear-gradient(135deg, #ede9fe, #ddd6fe)", border: "1px solid rgba(139,92,246,0.2)", borderRadius: "18px 4px 18px 18px", padding: "14px 18px", color: "#3b0764", fontSize: "14px", lineHeight: 1.6, fontWeight: 500 }}>
+                      Generate a campaign for <strong style={{ color: "#6d28d9" }}>{selectedCampaign.candidate_name}</strong> focused on <strong style={{ color: "#6d28d9" }}>{selectedCampaign.theme}</strong>, targeting <strong style={{ color: "#6d28d9" }}>{AUDIENCE_OPTIONS.find(a => a.value === selectedCampaign.audience)?.label}</strong>.
                     </div>
                   </ChatBubble>
  
                   <ChatBubble role="bot">
-                    <div style={{ background: "white", border: "1px solid var(--color-border)", borderRadius: "0 16px 16px 16px", padding: "24px", color: "var(--color-foreground)", fontSize: "14px", width: "100%", maxWidth: "600px", boxShadow: "0 4px 24px rgba(139,92,246,0.06)" }}>
-                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
-                        <span style={{ fontSize: "14px", fontWeight: 800, color: "#8b5cf6", textTransform: "uppercase", letterSpacing: "0.1em", display: "flex", alignItems: "center", gap: "6px" }}><Sparkles style={{ width: 14, height: 14 }} /> Final Transcript</span>
-                        <button onClick={() => { navigator.clipboard.writeText(selectedCampaign.generated_speech); toast.success("Copied!"); }} style={{ display: "flex", alignItems: "center", gap: "4px", background: "none", border: "none", color: "var(--color-muted-foreground)", fontSize: "14px", cursor: "pointer", fontWeight: 600 }}><Copy style={{ width: 12, height: 12 }} /> Copy</button>
+                    <div style={{ background: "white", border: "1px solid rgba(139,92,246,0.15)", borderRadius: "4px 18px 18px 18px", padding: "24px", color: "var(--color-foreground)", fontSize: "14px", width: "100%", maxWidth: "620px", boxShadow: "0 8px 32px rgba(139,92,246,0.08)" }}>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px", paddingBottom: "12px", borderBottom: "1px solid rgba(139,92,246,0.12)" }}>
+                        <span style={{ fontSize: "11px", fontWeight: 800, color: "#7c3aed", textTransform: "uppercase", letterSpacing: "0.1em", display: "flex", alignItems: "center", gap: "6px" }}><Sparkles style={{ width: 13, height: 13 }} /> Final Transcript</span>
+                        <button onClick={() => { navigator.clipboard.writeText(selectedCampaign.generated_speech); toast.success("Copied!"); }} style={{ display: "flex", alignItems: "center", gap: "5px", background: "rgba(139,92,246,0.08)", border: "1px solid rgba(139,92,246,0.2)", borderRadius: "6px", padding: "4px 10px", color: "#7c3aed", fontSize: "12px", cursor: "pointer", fontWeight: 700, transition: "all 0.15s" }}><Copy style={{ width: 11, height: 11 }} /> Copy</button>
                       </div>
-                      <div style={{ fontSize: "14px", lineHeight: 1.7, color: "var(--color-foreground)", fontFamily: "var(--font-serif)", whiteSpace: "pre-wrap", background: "var(--color-background)", padding: "20px", borderRadius: "12px", border: "1px solid var(--color-border)" }}>
+                      <div style={{ fontSize: "14px", lineHeight: 1.8, color: "#1e1b4b", whiteSpace: "pre-wrap", background: "linear-gradient(135deg, #faf5ff, #f5f3ff)", padding: "18px 20px", borderRadius: "10px", border: "1px solid rgba(139,92,246,0.1)", fontFamily: "Georgia, serif" }}>
                         {selectedCampaign.generated_speech}
                       </div>
                     </div>
                   </ChatBubble>
  
                   <ChatBubble role="bot">
-                    <div style={{ background: "white", border: "1px solid var(--color-border)", borderRadius: "0 16px 16px 16px", padding: "24px", width: "100%", maxWidth: "500px", boxShadow: "0 4px 20px rgba(0,0,0,0.04)" }}>
-                      <h3 style={{ fontSize: "14px", fontWeight: 800, color: "var(--color-foreground)", marginBottom: "6px", display: "flex", alignItems: "center", gap: "8px" }}><Send style={{ width: 16, height: 16, color: "#10b981" }} /> Launch Outreach</h3>
-                      <p style={{ fontSize: "14px", color: "var(--color-muted-foreground)", marginBottom: "20px" }}>The transcript is ready. Enter target phone numbers and select the delivery channels.</p>
-                      
-                      <div style={{ marginBottom: "16px" }}>
-                        <textarea placeholder="+919876543210&#10;+918765432100" value={phonesInput} onChange={e => setPhonesInput(e.target.value)} style={{ width: "100%", height: "80px", padding: "12px", borderRadius: "8px", background: "var(--color-background)", border: "1px solid var(--color-border)", color: "var(--color-foreground)", fontSize: "14px", fontFamily: "monospace", resize: "none", outline: "none" }} onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "var(--color-border)"} />
+                    <div style={{ background: "white", border: "1px solid rgba(16,185,129,0.18)", borderRadius: "4px 18px 18px 18px", padding: "24px", width: "100%", maxWidth: "500px", boxShadow: "0 8px 28px rgba(16,185,129,0.06)" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
+                        <div style={{ width: "28px", height: "28px", borderRadius: "8px", background: "linear-gradient(135deg,#10b981,#059669)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 8px rgba(16,185,129,0.3)" }}>
+                          <Send style={{ width: 13, height: 13, color: "white" }} />
+                        </div>
+                        <h3 style={{ fontSize: "15px", fontWeight: 800, color: "var(--color-foreground)", margin: 0 }}>Launch Outreach</h3>
                       </div>
- 
-                      <div style={{ marginBottom: "20px", display: "flex", gap: "12px" }}>
+                      <p style={{ fontSize: "13px", color: "var(--color-muted-foreground)", marginBottom: "20px", marginTop: "8px", paddingLeft: "36px" }}>The transcript is ready. Enter phone numbers and select delivery channels below.</p>
+
+                      <div style={{ marginBottom: "14px" }}>
+                        <label style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--color-muted-foreground)", marginBottom: "6px", display: "block" }}>Phone Numbers</label>
+                        <textarea placeholder="+919876543210&#10;+918765432100" value={phonesInput} onChange={e => setPhonesInput(e.target.value)} style={{ width: "100%", height: "80px", padding: "12px", borderRadius: "8px", background: "var(--color-secondary)", border: "1px solid var(--color-border)", color: "var(--color-foreground)", fontSize: "13px", fontFamily: "monospace", resize: "none", outline: "none" }} onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "var(--color-border)"} />
+                      </div>
+
+                      <div style={{ marginBottom: "20px", display: "flex", gap: "10px" }}>
                         {[
                           { key: 'sms', label: "SMS", icon: MessageSquare, checked: sendSms, setter: setSendSms },
                           { key: 'call', label: "Voice Call", icon: Phone, checked: sendCall, setter: setSendCall }
                         ].map(c => (
-                          <label key={c.key} style={{ flex: 1, display: "flex", alignItems: "center", gap: "8px", padding: "10px", borderRadius: "8px", cursor: "pointer", border: `1px solid ${c.checked ? "rgba(16,185,129,0.4)" : "var(--color-border)"}`, background: c.checked ? "rgba(16,185,129,0.08)" : "var(--color-background)" }}>
+                          <label key={c.key} style={{ flex: 1, display: "flex", alignItems: "center", gap: "8px", padding: "10px 12px", borderRadius: "10px", cursor: "pointer", border: `1px solid ${c.checked ? "rgba(16,185,129,0.4)" : "var(--color-border)"}`, background: c.checked ? "rgba(16,185,129,0.07)" : "var(--color-secondary)", transition: "all 0.15s" }}>
                             <Checkbox checked={c.checked} onCheckedChange={(val) => c.setter(!!val)} />
                             <c.icon style={{ width: 14, height: 14, color: c.checked ? "#10b981" : "var(--color-muted-foreground)" }} />
-                            <span style={{ fontSize: "14px", fontWeight: 600, color: c.checked ? "var(--color-foreground)" : "var(--color-muted-foreground)" }}>{c.label}</span>
+                            <span style={{ fontSize: "13px", fontWeight: 600, color: c.checked ? "#065f46" : "var(--color-muted-foreground)" }}>{c.label}</span>
                           </label>
                         ))}
                       </div>
- 
-                      <button onClick={handleLaunchOutreach} disabled={launching} style={{ width: "100%", height: "40px", borderRadius: "8px", background: launching ? "rgba(16,185,129,0.15)" : "linear-gradient(135deg,#10b981,#059669)", border: "none", color: launching ? "#10b981" : "white", fontSize: "14px", fontWeight: 700, cursor: launching ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", boxShadow: launching ? "none" : "0 4px 12px rgba(16,185,129,0.25)" }}>
+
+                      <button onClick={handleLaunchOutreach} disabled={launching} style={{ width: "100%", height: "42px", borderRadius: "10px", background: launching ? "rgba(16,185,129,0.12)" : "linear-gradient(135deg,#10b981,#059669)", border: "none", color: launching ? "#10b981" : "white", fontSize: "14px", fontWeight: 700, cursor: launching ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", boxShadow: launching ? "none" : "0 4px 14px rgba(16,185,129,0.3)", letterSpacing: "0.02em" }}>
                         {launching ? <><Loader2 style={{ width: 14, height: 14 }} className="animate-spin" />Executing…</> : <><Play style={{ width: 14, height: 14 }} />Execute Outreach</>}
                       </button>
                     </div>

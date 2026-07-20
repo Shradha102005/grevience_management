@@ -10,7 +10,7 @@ import os
 import json
 import logging
 import time
-from typing import Optional
+from typing import Optional, Any
 
 import httpx
 from fastapi import APIRouter, Query, HTTPException, UploadFile, File, Form
@@ -311,7 +311,7 @@ async def analyze_chat(req: ChatRequest):
     try:
         client = Groq(api_key=GROQ_API_KEY)
         # Format conversation history
-        messages = [{"role": "system", "content": f"You are an expert Indian agricultural scientist. You just diagnosed a farmer's crop with the following context: {req.diagnosis_context}. Answer the farmer's follow-up questions concisely and practically."}]
+        messages: list[Any] = [{"role": "system", "content": f"You are an expert Indian agricultural scientist. You just diagnosed a farmer's crop with the following context: {req.diagnosis_context}. Answer the farmer's follow-up questions concisely and practically."}]
         for m in req.messages:
             messages.append({"role": m.role, "content": m.content})
             

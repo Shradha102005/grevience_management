@@ -106,7 +106,54 @@ def make_call(to: str, message: str) -> dict:
         return {"sid": None, "status": "failed", "error": str(exc)}
 
 
+
+BASE_URL: str = os.getenv("TWILIO_CALL_BASE_URL", "").rstrip("/")
+
+
+def make_conversational_call(to: str, session_id: str, opening_message: str) -> dict:
+    """
+    Start an interactive AI voice call.
+
+    Instead of reading a static script and hanging up, Twilio will call back
+    your webhook (voice_call.py) at each turn, enabling a real STT → Groq AI
+    → TTS conversation loop.
+
+    Returns:
+      { "sid": str | None, "status": "sent" | "mock" | "failed", "error": str | None }
+    """
+    if _MOCK_MODE:
+        logger.info("[MOCK CONV CALL] To: %s | session: %s", to, session_id)
+        return {"sid": None, "status": "mock", "error": None}
+
+    if not BASE_URL:
+        logger.warning("TWILIO_CALL_BASE_URL not set — falling back to static call")
+        return make_call(to, opening_message)
+
+    import urllib.parse
+    params = urllib.parse.urlencode({
+        "session_id": session_id,
+        "opening_message": opening_message,
+    })
+    start_url = f"{BASE_URL}/api/voice/call/start?{params}"
+    status_url = f"{BASE_URL}/api/voice/call/status"
+
+    try:
+        call = _twilio.calls.create(  # type: ignore[union-attr]
+            url=start_url,             # Twilio GETs this when call is answered
+            status_callback=status_url,
+            from_=FROM_NUMBER,
+            to=to,
+            method="GET",
+        )
+        logger.info("Conversational call initiated to %s — SID: %s", to, call.sid)
+        return {"sid": call.sid, "status": "sent", "error": None}
+    except Exception as exc:
+        logger.error("Conversational call failed to %s: %s", to, exc)
+        return {"sid": None, "status": "failed", "error": str(exc)}
+
+
 def broadcast_alert(
+
     alert_title: str,
     alert_description: str,
     severity: str,

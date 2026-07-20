@@ -402,7 +402,7 @@ def all_grievances(
                 "old_status": h.old_status,
                 "new_status": h.new_status,
                 "note": h.note,
-                "changed_by_name": h.changed_by_user.name if h.changed_by_user else None,
+                "changed_by_name": h.changed_by_user.name if h.changed_by_user is not None else None,
                 "changed_at": h.changed_at.isoformat(),
             }
             for h in c.status_history
@@ -419,7 +419,7 @@ def all_grievances(
             "status": c.status,
             "priority": c.priority,
             "progress": c.progress,
-            "submitter_name": c.submitter.name if c.submitter else None,
+            "submitter_name": c.submitter.name if c.submitter is not None else None,
             "submitted_by": str(c.submitted_by),
             "officer_notes": c.officer_notes,
             "created_at": c.created_at.isoformat(),
