@@ -135,20 +135,20 @@ export function PortalShell({ children }: { children: ReactNode }) {
             <DropdownMenuTrigger asChild>
               <button className="flex items-center gap-2 outline-none hover:bg-white/80 dark:hover:bg-white/5 px-2 py-1 rounded-full transition-all border border-transparent hover:border-white/60 shadow-sm hover:shadow-md">
                 <Avatar className="h-8 w-8 shadow-sm border-2 border-white">
-                  <AvatarImage src="https://ui-avatars.com/api/?name=Shradha&background=random" />
+                  <AvatarImage src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name ?? 'User')}&background=random`} />
                   <AvatarFallback className="bg-indigo-100 text-indigo-700 text-sm font-bold">
-                    {mounted ? "S" : "?"}
+                    {mounted ? (user?.name?.[0]?.toUpperCase() ?? "?") : "?"}
                   </AvatarFallback>
                 </Avatar>
                 <span className="text-sm font-bold text-slate-700 dark:text-slate-200 hidden sm:block">
-                  Hello, Shradha
+                  Hello, {user?.name ?? "User"}
                 </span>
                 <ChevronDown className="h-4 w-4 text-slate-400" />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 rounded-2xl border-white/60 dark:border-slate-800 shadow-2xl shadow-slate-300/50 bg-white/90 backdrop-blur-xl dark:bg-[#1A1F2E] p-2">
               <DropdownMenuLabel className="py-2 px-3">
-                <div className="text-sm font-bold text-slate-900 dark:text-white">Shradha</div>
+                <div className="text-sm font-bold text-slate-900 dark:text-white">{user?.name ?? "User"}</div>
                 <div className="text-sm font-semibold text-slate-500 mt-0.5">{roleLabel}</div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800" />

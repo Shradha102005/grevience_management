@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   Search, Filter, MessageSquareWarning, X, ArrowLeft, CheckCircle2,
   AlertCircle, ArrowUpCircle, ArrowDownCircle, MinusCircle,
   MapPin, Clock, Building2, Activity, Pencil, RefreshCw, ChevronRight,
-  TrendingUp, TrendingDown, Zap
+  TrendingUp, TrendingDown, Zap, Headphones, Globe, Phone, Mail
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -40,7 +40,7 @@ interface Grievance {
   progress: number;
   created_at: string;
   updated_at: string;
-  // Full response fields (staff)
+  source?: "Municipal" | "Helpline"; // which module it came from
   description?: string;
   submitter_name?: string;
   submitted_by?: string;
@@ -90,6 +90,18 @@ function timeAgo(iso: string) {
   return `${Math.floor(h / 24)}d ago`;
 }
 
+// For Helpline tickets, show native status labels instead of mapped Municipal ones
+const HELPLINE_STATUS_DISPLAY: Record<string, string> = {
+  "Submitted": "Open",
+  "Under Review": "Pending",
+  "Resolved": "Resolved",
+  "Closed": "Resolved",
+};
+function displayStatus(g: { source?: string; status: string }) {
+  if (g.source === "Helpline") return HELPLINE_STATUS_DISPLAY[g.status] ?? g.status;
+  return g.status;
+}
+
 function Grievances() {
   const { user } = useAuth();
   const isStaff = user?.role === "admin" || user?.role === "officer";
@@ -102,8 +114,16 @@ function Grievances() {
   const [q, setQ] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [activeItem, setActiveItem] = useState<Grievance | null>(null);
+  const activeItemRef = useRef<Grievance | null>(null);
   const [updateStatus, setUpdateStatus] = useState("");
   const [updating, setUpdating] = useState(false);
+
+  // Keep ref in sync with state so fetchGrievances can access latest value
+  // without needing activeItem in its dependency array
+  const setActive = useCallback((item: Grievance | null) => {
+    activeItemRef.current = item;
+    setActiveItem(item);
+  }, []);
 
   const fetchGrievances = useCallback(async () => {
     try {
@@ -111,19 +131,19 @@ function Grievances() {
       if (statusFilter !== "all") params.status = statusFilter;
       if (q.trim()) params.search = q.trim();
 
-      // Staff can see all complaints; citizens see only public
-      const endpoint = isStaff
-        ? "/api/municipal/complaints"
-        : "/api/municipal/complaints/public";
-
-      const { data } = await api.get<Grievance[]>(endpoint, { params });
+      // Single unified endpoint: Municipal + Helpline, filtered by role on the backend
+      const { data } = await api.get<Grievance[]>("/api/municipal/grievances/all", { params });
       setGrievances(data);
       setLastUpdated(new Date());
 
-      // Keep activeItem in sync
-      if (activeItem) {
-        const updated = data.find((g) => g.id === activeItem.id);
-        if (updated) setActiveItem(updated);
+      // Keep activeItem in sync using ref (avoids adding activeItem to deps)
+      const current = activeItemRef.current;
+      if (current) {
+        const updated = data.find((g) => g.id === current.id);
+        if (updated) {
+          activeItemRef.current = updated;
+          setActiveItem(updated);
+        }
       }
 
       // Fetch stats for staff
@@ -140,7 +160,7 @@ function Grievances() {
     } finally {
       setLoading(false);
     }
-  }, [statusFilter, q, isStaff, activeItem]);
+  }, [statusFilter, q, isStaff]);
 
   useEffect(() => {
     fetchGrievances();
@@ -152,12 +172,18 @@ function Grievances() {
     if (!activeItem) return;
     setUpdating(true);
     try {
-      await api.put(`/api/municipal/complaints/${activeItem.id}/status`, {
-        new_status: newStatus,
-        priority: activeItem.priority,
-        progress: activeItem.progress,
-      });
-      toast.success(`Status updated to "${newStatus}"`);
+      if (activeItem.source === "Helpline") {
+        // Use native helpline status values directly — no mapping needed
+        await api.patch(`/live/helpline/ticket/${activeItem.id}/status`, { status: newStatus });
+        toast.success(`Status updated to "${newStatus}"`);
+      } else {
+        await api.put(`/api/municipal/complaints/${activeItem.id}/status`, {
+          new_status: newStatus,
+          priority: activeItem.priority,
+          progress: activeItem.progress,
+        });
+        toast.success(`Status updated to "${newStatus}"`);
+      }
       setUpdateStatus(newStatus);
       await fetchGrievances();
     } catch {
@@ -169,45 +195,85 @@ function Grievances() {
 
   // Compute dynamic KPIs
   const total = stats?.total ?? grievances.length;
-  const resolvedCount = stats ? stats.resolved + stats.closed : grievances.filter(g => g.status === "Resolved" || g.status === "Closed").length;
+  const resolvedCount = stats
+    ? stats.resolved + stats.closed
+    : grievances.filter(g => g.status === "Resolved" || g.status === "Closed").length;
   const resolutionRate = stats?.resolution_rate ?? (total > 0 ? Math.round((resolvedCount / total) * 1000) / 10 : 0);
   const avgHours = stats?.avg_resolution_hours;
-  const escalated = grievances.filter(g => (g.priority === "High" || g.priority === "Critical") && g.status !== "Resolved" && g.status !== "Closed").length;
+  const escalated = grievances.filter(
+    g => (g.priority === "High" || g.priority === "Critical") && g.status !== "Resolved" && g.status !== "Closed"
+  ).length;
+  const inProgress = grievances.filter(g => g.status === "In Progress" || g.status === "Assigned" || g.status === "Under Review").length;
 
-  const kpis = [
-    {
-      label: "Total Grievances",
-      value: total.toLocaleString(),
-      delta: isStaff && stats ? `${stats.in_progress} active` : `${grievances.length} loaded`,
-      trend: "up" as const,
-      color: "text-blue-600",
-      bg: "from-blue-50 to-blue-100/50",
-    },
-    {
-      label: "Resolved",
-      value: resolvedCount.toLocaleString(),
-      delta: `${resolutionRate}% rate`,
-      trend: "up" as const,
-      color: "text-emerald-600",
-      bg: "from-emerald-50 to-emerald-100/50",
-    },
-    {
-      label: "Avg. Resolution",
-      value: avgHours != null ? `${avgHours}h` : "—",
-      delta: avgHours != null ? (avgHours < 24 ? "< 1 day" : `${Math.round(avgHours / 24)}d`) : "No data",
-      trend: "down" as const,
-      color: "text-amber-600",
-      bg: "from-amber-50 to-amber-100/50",
-    },
-    {
-      label: "High Priority",
-      value: escalated.toString(),
-      delta: "unresolved",
-      trend: "up" as const,
-      color: "text-rose-600",
-      bg: "from-rose-50 to-rose-100/50",
-    },
-  ];
+  const kpis = isStaff
+    ? [
+        {
+          label: "Total Grievances",
+          value: total.toLocaleString(),
+          delta: stats ? `${stats.in_progress} active` : `${grievances.length} loaded`,
+          trend: "up" as const,
+          color: "text-blue-600",
+          bg: "from-blue-50 to-blue-100/50",
+        },
+        {
+          label: "Resolved",
+          value: resolvedCount.toLocaleString(),
+          delta: `${resolutionRate}% rate`,
+          trend: "up" as const,
+          color: "text-emerald-600",
+          bg: "from-emerald-50 to-emerald-100/50",
+        },
+        {
+          label: "Avg. Resolution",
+          value: avgHours != null ? `${avgHours}h` : "—",
+          delta: avgHours != null ? (avgHours < 24 ? "< 1 day" : `${Math.round(avgHours / 24)}d`) : "No data",
+          trend: "down" as const,
+          color: "text-amber-600",
+          bg: "from-amber-50 to-amber-100/50",
+        },
+        {
+          label: "High Priority",
+          value: escalated.toString(),
+          delta: "unresolved",
+          trend: "up" as const,
+          color: "text-rose-600",
+          bg: "from-rose-50 to-rose-100/50",
+        },
+      ]
+    : [
+        {
+          label: "My Grievances",
+          value: grievances.length.toLocaleString(),
+          delta: `${inProgress} in progress`,
+          trend: "up" as const,
+          color: "text-blue-600",
+          bg: "from-blue-50 to-blue-100/50",
+        },
+        {
+          label: "Resolved",
+          value: resolvedCount.toLocaleString(),
+          delta: `${resolutionRate}% of mine`,
+          trend: "up" as const,
+          color: "text-emerald-600",
+          bg: "from-emerald-50 to-emerald-100/50",
+        },
+        {
+          label: "Pending Action",
+          value: grievances.filter(g => g.status === "Submitted").length.toString(),
+          delta: "awaiting review",
+          trend: "down" as const,
+          color: "text-amber-600",
+          bg: "from-amber-50 to-amber-100/50",
+        },
+        {
+          label: "High Priority",
+          value: escalated.toString(),
+          delta: "of my issues",
+          trend: "up" as const,
+          color: "text-rose-600",
+          bg: "from-rose-50 to-rose-100/50",
+        },
+      ];
 
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)] relative overflow-hidden font-sans bg-transparent">
@@ -233,7 +299,7 @@ function Grievances() {
               Citizen Grievances
             </h1>
             <p className="text-sm text-slate-500 font-semibold tracking-wide flex items-center gap-2">
-              Public Resolution Network
+              {isStaff ? "All Citizens · Public Resolution Network" : "My Complaints · Track your submissions"}
               {lastUpdated && (
                 <span className="inline-flex items-center gap-1 text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100 font-bold text-sm">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse inline-block" />
@@ -330,7 +396,23 @@ function Grievances() {
                 grievances.map((r, i) => (
                   <div
                     key={r.id}
-                    onClick={() => { setActiveItem(r); setUpdateStatus(r.status); }}
+                    onClick={() => {
+                      setActive(r);
+                      if (r.source === "Helpline") {
+                        // Reverse-map display status → native helpline status for the dropdown
+                        const displayToHelpline: Record<string, string> = {
+                          "Submitted": "Open",
+                          "Under Review": "Pending",
+                          "Assigned": "Pending",
+                          "In Progress": "Pending",
+                          "Resolved": "Resolved",
+                          "Closed": "Resolved",
+                        };
+                        setUpdateStatus(displayToHelpline[r.status] ?? "Open");
+                      } else {
+                        setUpdateStatus(r.status);
+                      }
+                    }}
                     className="group bg-white/60 backdrop-blur-3xl border border-white/60 shadow-xl shadow-slate-200/40 hover:shadow-2xl hover:bg-white/80 rounded-[2rem] p-6 cursor-pointer transition-all hover:-translate-y-1 flex items-center gap-6 relative overflow-hidden"
                     style={{ animation: `slideIn 0.3s cubic-bezier(0.16,1,0.3,1) ${i * 0.04}s both` }}
                   >
@@ -341,8 +423,12 @@ function Grievances() {
                       <div className="flex items-center gap-3 mb-3">
                         <span className="text-sm text-slate-500 font-mono font-bold bg-white/80 px-2.5 py-1 rounded-md border border-white shadow-sm">{r.complaint_number}</span>
                         <span className={`text-sm font-extrabold uppercase tracking-widest px-3 py-1 rounded-md border shadow-sm ${statusColors[r.status] || 'bg-slate-100 text-slate-600 border-slate-200'}`}>
-                          {r.status}
+                          {displayStatus(r)}
                         </span>
+                        {r.source === "Helpline"
+                          ? <span className="text-xs font-extrabold uppercase tracking-widest px-2.5 py-1 rounded-md border shadow-sm bg-teal-50 text-teal-600 border-teal-200 flex items-center gap-1"><Headphones className="h-3 w-3" /> Helpline</span>
+                          : <span className="text-xs font-extrabold uppercase tracking-widest px-2.5 py-1 rounded-md border shadow-sm bg-rose-50 text-rose-600 border-rose-200 flex items-center gap-1"><Building2 className="h-3 w-3" /> Municipal</span>
+                        }
                         <span className="text-sm text-slate-400 font-bold ml-auto">{timeAgo(r.created_at)}</span>
                       </div>
                       <h4 className="font-extrabold text-slate-800 text-base leading-tight truncate group-hover:text-rose-600 transition-colors">{r.title}</h4>
@@ -379,15 +465,19 @@ function Grievances() {
             {/* HUD Header */}
             <div className="px-10 py-8 border-b border-white/50 bg-white/40 flex justify-between items-start">
               <div className="flex items-start gap-6">
-                <Button variant="ghost" size="icon" onClick={() => setActiveItem(null)} className="h-12 w-12 bg-white hover:bg-slate-50 border border-slate-100 text-slate-600 rounded-full shadow-sm shrink-0 transition-transform hover:scale-105">
+                <Button variant="ghost" size="icon" onClick={() => setActive(null)} className="h-12 w-12 bg-white hover:bg-slate-50 border border-slate-100 text-slate-600 rounded-full shadow-sm shrink-0 transition-transform hover:scale-105">
                   <ArrowLeft className="h-5 w-5" />
                 </Button>
                 <div>
                   <div className="flex items-center gap-3 mb-3">
                     <span className="bg-slate-800 text-white font-mono text-sm px-3 py-1 rounded-md font-bold shadow-md">{activeItem.complaint_number}</span>
                     <span className={`text-sm font-extrabold uppercase tracking-widest px-3 py-1 rounded-md border shadow-sm ${statusColors[activeItem.status] || 'bg-slate-100 text-slate-600 border-slate-200'}`}>
-                      {activeItem.status}
+                      {displayStatus(activeItem)}
                     </span>
+                    {activeItem.source === "Helpline"
+                      ? <span className="text-xs font-extrabold uppercase tracking-widest px-2.5 py-1 rounded-md border shadow-sm bg-teal-50 text-teal-600 border-teal-200 flex items-center gap-1"><Headphones className="h-3 w-3" /> Helpline</span>
+                      : <span className="text-xs font-extrabold uppercase tracking-widest px-2.5 py-1 rounded-md border shadow-sm bg-rose-50 text-rose-600 border-rose-200 flex items-center gap-1"><Building2 className="h-3 w-3" /> Municipal</span>
+                    }
                   </div>
                   <h2 className="text-3xl font-black text-slate-900 tracking-tight leading-tight">{activeItem.title}</h2>
                   {activeItem.submitter_name && (
@@ -398,7 +488,7 @@ function Grievances() {
                 </div>
               </div>
 
-              {isStaff && (
+              {isStaff && activeItem.source !== "Helpline" && (
                 <div className="flex flex-col items-end gap-2 bg-white p-3 rounded-2xl border border-slate-100 shadow-sm">
                   <Label className="text-sm font-bold text-slate-400 uppercase tracking-wider">Update Status</Label>
                   <Select
@@ -411,6 +501,25 @@ function Grievances() {
                     </SelectTrigger>
                     <SelectContent className="bg-white rounded-xl shadow-xl border-slate-100">
                       {STATUSES.map(s => <SelectItem key={s} value={s} className="font-bold">{s}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+              {isStaff && activeItem.source === "Helpline" && (
+                <div className="flex flex-col items-end gap-2 bg-white p-3 rounded-2xl border border-slate-100 shadow-sm">
+                  <Label className="text-sm font-bold text-slate-400 uppercase tracking-wider">Update Status</Label>
+                  <Select
+                    value={updateStatus}
+                    onValueChange={(v) => { handleUpdateStatus(v); }}
+                    disabled={updating}
+                  >
+                    <SelectTrigger className="h-10 text-sm font-bold bg-slate-50 border-transparent w-[200px] text-slate-800 rounded-xl focus:ring-4 focus:ring-rose-500/10">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white rounded-xl shadow-xl border-slate-100">
+                      <SelectItem value="Open" className="font-bold">Open</SelectItem>
+                      <SelectItem value="Pending" className="font-bold">Pending</SelectItem>
+                      <SelectItem value="Resolved" className="font-bold">Resolved</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -476,12 +585,25 @@ function Grievances() {
 
                 {/* Right Column */}
                 <div className="space-y-8">
-                  {/* Location */}
+                  {/* Location / Channel */}
                   <div className="bg-white rounded-3xl border border-white shadow-xl shadow-slate-200/40 overflow-hidden relative h-[200px] flex items-center justify-center">
                     <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "radial-gradient(#64748b 2px, transparent 2px)", backgroundSize: "24px 24px" }} />
                     <div className="z-10 flex flex-col items-center p-6 text-center bg-white/60 backdrop-blur-md rounded-2xl m-6 border border-white">
-                      <MapPin className="h-8 w-8 text-rose-600 mb-2 drop-shadow-lg" />
-                      <p className="text-sm font-black text-slate-900 leading-tight">{activeItem.location}</p>
+                      {activeItem.source === "Helpline" ? (
+                        <>
+                          {activeItem.location?.toLowerCase() === "email" && <Mail className="h-8 w-8 text-teal-600 mb-2 drop-shadow-lg" />}
+                          {activeItem.location?.toLowerCase() === "web" && <Globe className="h-8 w-8 text-teal-600 mb-2 drop-shadow-lg" />}
+                          {activeItem.location?.toLowerCase() === "phone" && <Phone className="h-8 w-8 text-teal-600 mb-2 drop-shadow-lg" />}
+                          {!(["email","web","phone"].includes(activeItem.location?.toLowerCase() ?? "")) && <Headphones className="h-8 w-8 text-teal-600 mb-2 drop-shadow-lg" />}
+                          <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Channel</p>
+                          <p className="text-sm font-black text-slate-900 leading-tight">{activeItem.location}</p>
+                        </>
+                      ) : (
+                        <>
+                          <MapPin className="h-8 w-8 text-rose-600 mb-2 drop-shadow-lg" />
+                          <p className="text-sm font-black text-slate-900 leading-tight">{activeItem.location}</p>
+                        </>
+                      )}
                     </div>
                   </div>
 

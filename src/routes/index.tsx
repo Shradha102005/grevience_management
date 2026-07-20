@@ -48,17 +48,14 @@ function LightLanding3D() {
   if (!mounted) return null;
 
   return (
-    <div
-      className="min-h-screen bg-slate-50 font-sans overflow-hidden text-slate-900 selection:bg-indigo-500/30"
-      onMouseMove={handleMouseMove}
-    >
-      {/* Light Theme Header */}
-      <div className="absolute top-0 w-full z-50 bg-white/50 backdrop-blur-md border-b border-slate-200">
+      <div
+        className="min-h-screen bg-slate-50 font-sans overflow-hidden text-slate-900 selection:bg-indigo-500/30 pt-[64px]"
+        onMouseMove={handleMouseMove}
+      >
         <SiteHeader />
-      </div>
 
       {/* ── 3D HERO SECTION ── */}
-      <section className="relative min-h-screen flex items-center pt-20 overflow-hidden perspective-[2000px]">
+      <section className="relative min-h-screen flex items-center overflow-hidden perspective-[2000px]">
         {/* Ambient Grid */}
         <div
           className="absolute inset-0 bg-[linear-gradient(rgba(99,102,241,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(99,102,241,0.05)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_80%_80%_at_50%_50%,black,transparent)] pointer-events-none z-0"

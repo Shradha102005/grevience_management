@@ -380,6 +380,7 @@ class ComplaintPublicResponse(BaseModel):
     id: uuid.UUID
     complaint_number: str
     title: str
+    description: Optional[str] = None
     category: str
     location: str
     department: str

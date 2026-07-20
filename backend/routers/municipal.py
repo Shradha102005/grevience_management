@@ -12,13 +12,13 @@ from __future__ import annotations
 
 import uuid
 from datetime import datetime, timezone
-from typing import List, Optional
+from typing import List, Optional, Any, Dict
 
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 
 from database import get_db
-from models import MunicipalComplaint, ComplaintStatusHistory, User, CATEGORY_DEPT_MAP
+from models import MunicipalComplaint, ComplaintStatusHistory, User, HelplineTicket, CATEGORY_DEPT_MAP
 from schemas import (
     ComplaintCreate,
     ComplaintStatusUpdate,
@@ -91,6 +91,7 @@ def _build_public(complaint: MunicipalComplaint) -> ComplaintPublicResponse:
         id=complaint.id,
         complaint_number=complaint.complaint_number,
         title=complaint.title,
+        description=complaint.description,
         category=complaint.category,
         location=complaint.location,
         department=complaint.department,
@@ -179,15 +180,26 @@ def submit_complaint(
 
 @router.get("/complaints/mine", response_model=List[ComplaintResponse])
 def my_complaints(
+    status_filter: Optional[str] = Query(None, alias="status"),
+    search: Optional[str] = Query(None),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    complaints = (
+    """Returns all complaints submitted by the logged-in citizen, with optional filtering."""
+    q = (
         db.query(MunicipalComplaint)
         .filter(MunicipalComplaint.submitted_by == current_user.id)
-        .order_by(MunicipalComplaint.created_at.desc())
-        .all()
     )
+    if status_filter and status_filter in COMPLAINT_STATUSES:
+        q = q.filter(MunicipalComplaint.status == status_filter)
+    if search:
+        term = f"%{search.lower()}%"
+        q = q.filter(
+            MunicipalComplaint.title.ilike(term)
+            | MunicipalComplaint.location.ilike(term)
+            | MunicipalComplaint.complaint_number.ilike(term)
+        )
+    complaints = q.order_by(MunicipalComplaint.created_at.desc()).all()
     return [_build_response(c) for c in complaints]
 
 
@@ -351,3 +363,125 @@ def get_stats(
 @router.get("/categories", response_model=List[str])
 def list_categories():
     return MUNICIPAL_CATEGORIES
+
+
+# ── GET /grievances/all — unified view: Municipal + Helpline ──────────────────
+
+@router.get("/grievances/all", response_model=List[Dict])
+def all_grievances(
+    status_filter: Optional[str] = Query(None, alias="status"),
+    search: Optional[str] = Query(None),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Returns Municipal complaints + Helpline tickets merged and sorted by created_at.
+    - Citizens: only their own records across both modules.
+    - Admin/Officer: all records from all users across both modules.
+    """
+    is_staff = current_user.role in ("admin", "officer")
+
+    # ── 1. Municipal Complaints ──────────────────────────────────────────────
+    mq = db.query(MunicipalComplaint)
+    if not is_staff:
+        mq = mq.filter(MunicipalComplaint.submitted_by == current_user.id)
+    if status_filter and status_filter in COMPLAINT_STATUSES:
+        mq = mq.filter(MunicipalComplaint.status == status_filter)
+    if search:
+        term = f"%{search.lower()}%"
+        mq = mq.filter(
+            MunicipalComplaint.title.ilike(term)
+            | MunicipalComplaint.location.ilike(term)
+            | MunicipalComplaint.complaint_number.ilike(term)
+        )
+    municipal_items = mq.all()
+
+    def _to_unified_municipal(c: MunicipalComplaint) -> dict:
+        history = [
+            {
+                "old_status": h.old_status,
+                "new_status": h.new_status,
+                "note": h.note,
+                "changed_by_name": h.changed_by_user.name if h.changed_by_user else None,
+                "changed_at": h.changed_at.isoformat(),
+            }
+            for h in c.status_history
+        ]
+        return {
+            "source": "Municipal",
+            "id": str(c.id),
+            "complaint_number": c.complaint_number,
+            "title": c.title,
+            "description": c.description,
+            "category": c.category,
+            "location": c.location,
+            "department": c.department,
+            "status": c.status,
+            "priority": c.priority,
+            "progress": c.progress,
+            "submitter_name": c.submitter.name if c.submitter else None,
+            "submitted_by": str(c.submitted_by),
+            "officer_notes": c.officer_notes,
+            "created_at": c.created_at.isoformat(),
+            "updated_at": c.updated_at.isoformat(),
+            "history": history,
+        }
+
+    # ── 2. Helpline Tickets ──────────────────────────────────────────────────
+    hq = db.query(HelplineTicket)
+    if not is_staff:
+        hq = hq.filter(HelplineTicket.submitted_by == str(current_user.id))
+    helpline_items = hq.all()
+
+    # Apply search/status filter to helpline too
+    if status_filter and status_filter.lower() != "all":
+        # Map helpline statuses: Open → Submitted, Pending → Under Review, Resolved → Resolved
+        status_map_h = {
+            "Submitted": "Open",
+            "Under Review": "Pending",
+            "Resolved": "Resolved",
+            "Closed": "Resolved",
+        }
+        allowed = status_map_h.get(status_filter)
+        if allowed:
+            helpline_items = [t for t in helpline_items if t.status == allowed]
+        else:
+            helpline_items = []  # no match for other statuses
+    if search:
+        term = search.lower()
+        helpline_items = [
+            t for t in helpline_items
+            if term in t.subject.lower() or term in (t.query or "").lower() or term in t.ticket_id.lower()
+        ]
+
+    def _map_helpline_status(s: str) -> str:
+        return {"Open": "Submitted", "Pending": "Under Review", "Resolved": "Resolved"}.get(s, s)
+
+    def _to_unified_helpline(t: HelplineTicket) -> dict:
+        return {
+            "source": "Helpline",
+            "id": t.ticket_id,
+            "complaint_number": t.ticket_id,
+            "title": t.subject,
+            "description": t.query,
+            "category": "Helpline Support",
+            "location": t.channel,
+            "department": "Helpline",
+            "status": _map_helpline_status(t.status),
+            "priority": t.priority,
+            "progress": 100 if t.status == "Resolved" else 0,
+            "submitter_name": t.requester_name,
+            "submitted_by": t.submitted_by,
+            "officer_notes": None,
+            "created_at": t.created_at.isoformat(),
+            "updated_at": t.updated_at.isoformat(),
+            "history": [],
+        }
+
+    # ── 3. Merge and sort ───────────────────────────────────────────────────
+    all_items = (
+        [_to_unified_municipal(c) for c in municipal_items]
+        + [_to_unified_helpline(t) for t in helpline_items]
+    )
+    all_items.sort(key=lambda x: x["created_at"], reverse=True)
+    return all_items

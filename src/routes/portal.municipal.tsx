@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   Building2, MapPin, RefreshCw, Plus, Search, Filter, Pencil, 
   Clock, CheckCircle2, AlertCircle, ArrowUpCircle, ArrowDownCircle, 
@@ -33,6 +33,10 @@ interface PublicComplaint {
   created_at: string;
   updated_at: string;
   description?: string;
+  // Full fields returned by /mine and staff /complaints endpoints
+  submitter_name?: string;
+  submitted_by?: string;
+  officer_notes?: string;
 }
 
 const CATEGORIES = ["Road Damage", "Street Lights", "Garbage", "Water Leakage", "Drainage", "Traffic Signals", "Public Safety", "Parks", "Other"];
@@ -72,6 +76,14 @@ function Municipal() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [activeItem, setActiveItem] = useState<PublicComplaint | null>(null);
+  const activeItemRef = useRef<PublicComplaint | null>(null);
+
+  // Keep ref in sync with state so fetchIssues can read the latest value
+  // without needing activeItem in its dependency array (avoids infinite loop)
+  const setActive = useCallback((item: PublicComplaint | null) => {
+    activeItemRef.current = item;
+    setActiveItem(item);
+  }, []);
 
   // New Issue State
   const [newIssueOpen, setNewIssueOpen] = useState(false);
@@ -88,18 +100,29 @@ function Municipal() {
       const params: Record<string, string> = {};
       if (statusFilter !== "all") params.status = statusFilter;
       if (search.trim()) params.search = search.trim();
-      const { data } = await api.get<PublicComplaint[]>("/api/municipal/complaints/public", { params });
+
+      // Staff sees ALL complaints; citizens see only THEIR OWN
+      const endpoint = isStaff
+        ? "/api/municipal/complaints"
+        : "/api/municipal/complaints/mine";
+
+      const { data } = await api.get<PublicComplaint[]>(endpoint, { params });
       setComplaints(data);
-      if (activeItem) {
-        const updatedActive = data.find(c => c.id === activeItem.id);
-        if (updatedActive) setActiveItem(updatedActive);
+      // Use ref to sync activeItem without adding it to deps (prevents infinite loop)
+      const current = activeItemRef.current;
+      if (current) {
+        const updatedActive = data.find(c => c.id === current.id);
+        if (updatedActive) {
+          activeItemRef.current = updatedActive;
+          setActiveItem(updatedActive);
+        }
       }
     } catch {
       toast.error("Failed to sync issue tracker.");
     } finally {
       setLoading(false);
     }
-  }, [statusFilter, search, activeItem]);
+  }, [statusFilter, search, isStaff]);
 
   useEffect(() => {
     fetchIssues();
@@ -156,7 +179,9 @@ function Municipal() {
                   <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">Live</span>
                 </div>
               </h1>
-              <p className="text-slate-500/80 dark:text-slate-400 mt-2 font-medium text-sm md:text-base">Live Operations Console</p>
+              <p className="text-slate-500/80 dark:text-slate-400 mt-2 font-medium text-sm md:text-base">
+                {isStaff ? "All Citizens · Live Operations Console" : "My Issues · Track your reported complaints"}
+              </p>
             </div>
           </div>
           
@@ -205,8 +230,12 @@ function Municipal() {
         {!activeItem && (
           <div className="w-full max-w-7xl h-full flex flex-col">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-extrabold text-slate-800 tracking-tight">Active Operations</h2>
-              <Badge className="bg-white text-blue-700 border-white shadow-sm px-4 py-1.5 text-sm font-bold rounded-full">Monitoring {complaints.length} tickets</Badge>
+              <h2 className="text-2xl font-extrabold text-slate-800 tracking-tight">
+                {isStaff ? "Active Operations" : "My Reported Issues"}
+              </h2>
+              <Badge className="bg-white text-blue-700 border-white shadow-sm px-4 py-1.5 text-sm font-bold rounded-full">
+                {isStaff ? `Monitoring ${complaints.length} tickets` : `${complaints.length} issue${complaints.length !== 1 ? "s" : ""} submitted`}
+              </Badge>
             </div>
             
             <div className="flex-1 overflow-y-auto space-y-4 pr-2 pb-10" style={{ scrollbarWidth: 'none' }}>
@@ -219,7 +248,7 @@ function Municipal() {
                 complaints.map((c, i) => (
                   <div 
                     key={c.id} 
-                    onClick={() => { setActiveItem(c); setUpdateStatus(c.status); }}
+                    onClick={() => { setActive(c); setUpdateStatus(c.status); }}
                     className="group bg-white/60 backdrop-blur-xl border border-white shadow-lg shadow-slate-200/50 hover:shadow-xl hover:bg-white/80 rounded-2xl p-6 cursor-pointer transition-all hover:-translate-y-1 flex items-center gap-6"
                     style={{ animation: `slideIn 0.3s cubic-bezier(0.16,1,0.3,1) ${i * 0.05}s both` }}
                   >
@@ -262,7 +291,7 @@ function Municipal() {
             {/* HUD Header */}
             <div className="px-10 py-8 border-b border-white/50 bg-white/40 flex justify-between items-start">
               <div className="flex items-start gap-6">
-                <Button variant="ghost" size="icon" onClick={() => setActiveItem(null)} className="h-12 w-12 bg-white hover:bg-slate-50 border border-slate-100 text-slate-600 rounded-full shadow-sm shrink-0 transition-transform hover:scale-105">
+                <Button variant="ghost" size="icon" onClick={() => setActive(null)} className="h-12 w-12 bg-white hover:bg-slate-50 border border-slate-100 text-slate-600 rounded-full shadow-sm shrink-0 transition-transform hover:scale-105">
                   <ArrowLeft className="h-5 w-5" />
                 </Button>
                 <div>

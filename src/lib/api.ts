@@ -41,7 +41,13 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // Skip refresh logic for auth endpoints — a 401 on login/register/refresh
+    // should surface directly to the caller, not trigger a token refresh loop.
+    const isAuthEndpoint = originalRequest.url?.includes("/api/auth/login") ||
+      originalRequest.url?.includes("/api/auth/register") ||
+      originalRequest.url?.includes("/api/auth/refresh");
+
+    if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });

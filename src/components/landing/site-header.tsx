@@ -10,28 +10,33 @@ const NAV = [
 
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl">
-      <div className="mx-auto flex py-2 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+    <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-2xl">
+      <div className="mx-auto flex py-3 max-w-7xl items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
+
+        {/* Left — Logo */}
         <Logo />
-        <nav className="hidden items-center gap-8 md:flex">
+
+        {/* Center — Glassmorphic Nav Pill */}
+        <nav className="hidden md:flex items-center gap-1 rounded-full border border-white/30 bg-white/20 dark:bg-white/5 dark:border-white/10 backdrop-blur-xl shadow-lg shadow-black/5 px-2 py-1.5">
           {NAV.map((n) => (
             <a
               key={n.label}
               href={n.href}
-              className="text-sm font-semibold text-slate-900 hover:text-indigo-600 transition-colors"
+              className="px-4 py-1.5 rounded-full text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-white/60 dark:hover:bg-white/10 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200"
             >
               {n.label}
             </a>
           ))}
         </nav>
-        <div className="flex items-center gap-2">
-          <Button
-            asChild
-            className="rounded-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6"
-          >
-            <Link to="/portal">Enter Portal</Link>
-          </Button>
-        </div>
+
+        {/* Right — CTA */}
+        <Button
+          asChild
+          className="rounded-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 shadow-md shadow-indigo-500/30 transition-all hover:scale-105"
+        >
+          <Link to="/portal">Enter Portal</Link>
+        </Button>
+
       </div>
     </header>
   );

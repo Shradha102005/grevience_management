@@ -37,6 +37,7 @@ function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
 
   const {
     register,
@@ -58,6 +59,7 @@ function LoginPage() {
 
   const onSubmit = async (values: LoginForm) => {
     setIsLoading(true);
+    setAuthError(null);
     try {
       await login(values.email, values.password);
       if (rememberMe) {
@@ -70,8 +72,8 @@ function LoginPage() {
     } catch (err: unknown) {
       const message =
         (err as { response?: { data?: { detail?: string } } })?.response?.data
-          ?.detail ?? "Invalid email or password";
-      toast.error(message);
+          ?.detail ?? "Wrong email or password. Please try again.";
+      setAuthError(message);
     } finally {
       setIsLoading(false);
     }
@@ -114,6 +116,15 @@ function LoginPage() {
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
+
+              {/* Auth Error Banner */}
+              {authError && (
+                <div className="flex items-start gap-2.5 rounded-lg border border-rose-200 bg-rose-50 dark:border-rose-500/20 dark:bg-rose-500/10 px-4 py-3 text-sm text-rose-700 dark:text-rose-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mt-0.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  <span className="font-semibold">{authError}</span>
+                </div>
+              )}
+
               {/* Email */}
               <div className="space-y-1">
                 <Label

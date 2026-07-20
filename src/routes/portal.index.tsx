@@ -24,6 +24,7 @@ import {
   ChevronRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/lib/auth-context";
 
 export const Route = createFileRoute("/portal/")({
   component: MockupDashboard,
@@ -131,6 +132,8 @@ const METRICS = [
 ];
 
 function MockupDashboard() {
+  const { user } = useAuth();
+  const firstName = user?.name?.split(" ")[0] ?? "there";
   return (
     <div className="mx-auto w-full max-w-[1400px] p-6 lg:p-10 flex flex-col gap-10 pb-10 animate-in fade-in duration-500">
       
@@ -139,7 +142,7 @@ function MockupDashboard() {
         <div>
           <h1 className="text-2xl font-extrabold tracking-tight flex items-center gap-3">
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 animate-gradient-x">
-              Welcome back, Shradha!
+              Welcome back, {firstName}!
             </span>
             <span className="text-3xl animate-bounce" style={{ animationDuration: '2s' }}>👋</span>
           </h1>
@@ -221,7 +224,7 @@ function MockupDashboard() {
               <div className="w-10 h-10 rounded-[1rem] bg-white shadow-sm border border-indigo-100 flex items-center justify-center">
                 <Sparkles className="h-5 w-5 text-indigo-500 animate-pulse" />
               </div>
-              <h3 className="text-base font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-700 to-purple-600">Hi Shradha!</h3>
+              <h3 className="text-base font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-700 to-purple-600">Hi {firstName}!</h3>
             </div>
             <p className="relative z-10 text-sm text-indigo-800/80 dark:text-indigo-300/80 font-bold mb-6">
               I'm your AI Assistant. How can I help you today?
