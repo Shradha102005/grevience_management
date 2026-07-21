@@ -11,6 +11,7 @@ import {
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import Chart from "react-apexcharts";
+import { ChatPanel } from "@/components/portal/chat-panel";
 
 export const Route = createFileRoute("/portal/agriculture")({
   component: Agriculture,
@@ -103,102 +104,21 @@ function WeatherDrawer({ weather, loading, onClose }: { weather: WeatherResponse
   );
 }
 
-//  Agri Chat Modal 
-function AgriChatModal({ onClose }: { onClose: () => void; }) {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const endRef = useRef<HTMLDivElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, loading]);
-
-  const renderDiagnosis = (d: Diagnosis) => {
-    const c = d.confidence > 80 ? "emerald" : d.confidence > 60 ? "amber" : "rose";
-    return (
-      <div className="flex flex-col gap-3 w-full max-w-sm">
-        <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
-          <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-2">Diagnosed</p>
-          <div className="flex items-center justify-between"><h3 className="text-base font-bold text-slate-800">{d.diagnosis}</h3><Badge className={`bg-${c}-100 text-${c}-700 border-none text-sm font-black`}>{d.confidence}%</Badge></div>
-        </div>
-        <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
-          <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-2">Treatment</p>
-          {d.treatment.map((t, i) => <div key={i} className="flex gap-2 items-start mb-2"><span className={`w-4 h-4 rounded-full bg-${c}-100 text-${c}-600 flex items-center justify-center text-sm font-black shrink-0`}>{i+1}</span><p className="text-sm text-slate-600">{t}</p></div>)}
-        </div>
-      </div>
-    );
-  };
-
-  const handleSend = async () => {
-    if ((!input.trim() && !imageFile) || loading) return;
-    const newMsg: ChatMessage = { role: "user", content: input, imageUrl: imageUrl || undefined };
-    setMessages(prev => [...prev, newMsg]);
-    const curInput = input; const curFile = imageFile;
-    setInput(""); setImageFile(null); setImageUrl(null); setLoading(true);
-    try {
-      if (curFile) {
-        const fd = new FormData(); fd.append("image", curFile); fd.append("description", curInput || "Analyze this crop"); fd.append("language", "en");
-        const r = await fetch(`${API_BASE}/agriculture/analyze`, { method: "POST", body: fd });
-        const d: Diagnosis = await r.json();
-        setMessages(prev => [...prev, { role: "assistant", content: renderDiagnosis(d) }]);
-      } else {
-        const res = await fetch(`${API_BASE}/agriculture/analyze-chat`, {
-          method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ messages: messages.map(m => ({ role: m.role, content: typeof m.content === "string" ? m.content : "Shared crop data." })).concat([{ role: "user", content: curInput }]), diagnosis_context: "General agricultural inquiry." })
-        });
-        const d = await res.json();
-        setMessages(prev => [...prev, { role: "assistant", content: d.reply }]);
-      }
-    } catch {
-      toast.error("Connection error."); setMessages(prev => [...prev, { role: "assistant", content: "I'm offline right now. Please try again." }]);
-    } finally { setLoading(false); }
-  };
-
+//  Agri Chat Modal — Voice Enabled
+function AgriChatModal({ onClose }: { onClose: () => void }) {
   if (typeof document === "undefined") return null;
   return createPortal(
     <>
-      <div onClick={onClose} className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 animate-in fade-in" />
-      <div className="fixed inset-4 md:inset-x-20 md:inset-y-10 lg:left-[50%] lg:-translate-x-[50%] lg:inset-y-8 lg:w-[760px] bg-white shadow-2xl rounded-[2.5rem] z-50 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
-        <div className="absolute top-0 inset-x-0 h-32 bg-gradient-to-b from-indigo-50/80 to-transparent pointer-events-none" />
-        <div className="px-8 py-5 flex items-center justify-between border-b border-slate-100 bg-white/80 backdrop-blur-md z-10 shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center"><Sparkles className="w-4 h-4" /></div>
-            <div><h3 className="text-base font-bold text-slate-900">AI Agri-Expert</h3><p className="text-sm text-slate-400 font-bold">Upload a crop photo for instant diagnosis</p></div>
-          </div>
-          <button onClick={onClose} className="h-10 w-10 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400"><X className="h-5 w-5" /></button>
-        </div>
-
-        <div className="flex-1 overflow-y-auto px-8 pt-4 pb-8 flex flex-col gap-6">
-          <div className="flex gap-4">
-            <div className="w-8 h-8 rounded-full bg-indigo-100 flex-shrink-0 flex items-center justify-center text-indigo-600"><Sparkles className="w-4 h-4" /></div>
-            <div className="bg-slate-100 text-slate-800 rounded-2xl rounded-tl-sm px-5 py-4 text-sm font-medium shadow-sm max-w-[85%]">Hello! I'm your AI Agri-Expert. Ask me anything about crops, pest control, irrigation, or <b>upload a photo</b> using the paperclip for instant disease diagnosis!</div>
-          </div>
-          {messages.map((msg, i) => (
-            <div key={i} className={`flex gap-4 ${msg.role === "user" ? "flex-row-reverse" : ""}`}>
-              <div className={`w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center ${msg.role === "user" ? "bg-emerald-100 text-emerald-600" : "bg-indigo-100 text-indigo-600"}`}>
-                {msg.role === "user" ? <CheckCircle2 className="w-4 h-4" /> : <Sparkles className="w-4 h-4" />}
-              </div>
-              <div className={`flex flex-col gap-2 max-w-[85%] ${msg.role === "user" ? "items-end" : "items-start"}`}>
-                {msg.imageUrl && <img src={msg.imageUrl} alt="Uploaded" className="w-40 h-40 object-cover rounded-2xl border-4 border-white shadow-md" />}
-                {msg.content && <div className={`${msg.role === "user" ? "bg-indigo-600 text-white rounded-2xl rounded-tr-sm" : "bg-slate-100 text-slate-800 rounded-2xl rounded-tl-sm"} px-5 py-4 text-sm font-medium shadow-sm whitespace-pre-wrap`}>{msg.content}</div>}
-              </div>
-            </div>
-          ))}
-          {loading && <div className="flex gap-4"><div className="w-8 h-8 rounded-full bg-indigo-100 flex-shrink-0 flex items-center justify-center text-indigo-600"><Sparkles className="w-4 h-4" /></div><div className="bg-slate-100 rounded-2xl rounded-tl-sm px-5 py-4 shadow-sm flex gap-1 items-center"><span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" style={{animationDelay:"0ms"}} /><span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" style={{animationDelay:"150ms"}} /><span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" style={{animationDelay:"300ms"}} /></div></div>}
-          <div ref={endRef} />
-        </div>
-
-        <div className="p-5 bg-white border-t border-slate-100 z-10 shrink-0">
-          {imageUrl && <div className="mb-3 relative inline-block"><img src={imageUrl} alt="Preview" className="h-14 w-14 object-cover rounded-xl border-2 border-indigo-100 shadow-sm" /><button onClick={() => { setImageFile(null); setImageUrl(null); }} className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-slate-800 text-white flex items-center justify-center hover:bg-rose-500 transition-colors"><X className="w-3 h-3" /></button></div>}
-          <form onSubmit={e => { e.preventDefault(); handleSend(); }} className="relative flex items-center">
-            <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={e => { const f = e.target.files?.[0]; if (f) { setImageFile(f); setImageUrl(URL.createObjectURL(f)); }}} />
-            <button type="button" onClick={() => fileInputRef.current?.click()} className="absolute left-2 w-10 h-10 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-indigo-600 transition-colors"><Paperclip className="w-4 h-4" /></button>
-            <input type="text" value={input} onChange={e => setInput(e.target.value)} placeholder={imageUrl ? "Describe symptoms or ask..." : "Ask about crops, upload a photo..."} className="w-full bg-slate-50 border border-slate-200 rounded-full py-3.5 pl-12 pr-14 text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent shadow-inner" />
-            <button type="submit" disabled={(!input.trim() && !imageFile) || loading} className="absolute right-2 w-10 h-10 rounded-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 text-white flex items-center justify-center transition-colors shadow-md"><Send className="w-4 h-4 ml-0.5" /></button>
-          </form>
-        </div>
+      <div onClick={onClose} className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 animate-in fade-in" />
+      <div className="fixed inset-4 md:inset-x-[10%] md:inset-y-[6%] lg:left-[50%] lg:-translate-x-[50%] lg:inset-y-[5%] lg:w-[700px] bg-white dark:bg-slate-900 shadow-2xl rounded-[2rem] z-50 overflow-hidden animate-in zoom-in-95 duration-200">
+        <ChatPanel
+          module="agriculture"
+          title="AI Agri-Expert"
+          greeting="Hello! I'm your AI Agricultural Expert. Ask me anything about crops, pests, irrigation, market prices, or government schemes for farmers. You can also speak to me!"
+          suggestions={["Best crops for kharif season?", "How to treat wheat rust?", "PM-KISAN eligibility", "Current MSP for paddy"]}
+          showLanguageSelector={true}
+          onClose={onClose}
+        />
       </div>
     </>,
     document.body

@@ -6,7 +6,7 @@
  * Supports 8 Indian languages.
  */
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Mic, MicOff, Send, Sparkles, Volume2, VolumeX, Loader2, Square } from "lucide-react";
+import { Mic, MicOff, Send, Sparkles, Volume2, VolumeX, Loader2, Square, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -39,12 +39,14 @@ export function ChatPanel({
   suggestions = [],
   module = "voice",
   showLanguageSelector = true,
+  onClose,
 }: {
   title?: string;
   greeting?: string;
   suggestions?: string[];
   module?: string;
   showLanguageSelector?: boolean;
+  onClose?: () => void;
 }) {
   const [messages, setMessages] = useState<Msg[]>([{ role: "bot", text: greeting }]);
   const [input, setInput] = useState("");
@@ -450,7 +452,7 @@ export function ChatPanel({
   };
 
   return (
-    <Card className="flex h-[560px] flex-col shadow-card">
+    <Card className="flex h-full flex-col shadow-card rounded-none border-0">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-border px-5 py-3">
         <div className="flex items-center gap-2">
@@ -458,14 +460,14 @@ export function ChatPanel({
           <span className="font-display text-sm font-bold">{title}</span>
           {loading && <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           {showLanguageSelector && (
             <LanguageDropdown value={language} onChange={setLanguage} className="h-8 text-xs" />
           )}
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8"
+            className="h-8 w-8 shrink-0"
             onClick={toggleVoice}
             title={voiceEnabled ? "Mute voice output" : "Enable voice output"}
           >
@@ -475,6 +477,17 @@ export function ChatPanel({
               <VolumeX className="h-4 w-4 text-muted-foreground" />
             )}
           </Button>
+          {onClose && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 shrink-0"
+              onClick={onClose}
+              aria-label="Close"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       </div>
 

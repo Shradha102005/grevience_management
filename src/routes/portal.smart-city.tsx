@@ -15,6 +15,7 @@ import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar, Cell,
 } from "recharts";
+import { ChatPanel } from "@/components/portal/chat-panel";
 
 export const Route = createFileRoute("/portal/smart-city")({
   component: SmartCity,
@@ -142,112 +143,27 @@ function CitySelectorModal({ onSelect, lockedCity }: { onSelect: (city: string) 
   );
 }
 
-//  AI Chat Panel 
+//  AI Chat Panel — Voice Enabled
 function AIChatPanel({ city, userRole, onClose }: { city: string; userRole: string; onClose: () => void }) {
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    { role: "assistant", content: `Hi! I'm your Smart City assistant for **${city}**. Ask me about traffic, transport, weather, nearby services, or any city-related query! 🏙️` }
-  ]);
-  const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [language, setLanguage] = useState("en");
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
-
-  const sendMessage = async (text?: string) => {
-    const msg = (text ?? input).trim();
-    if (!msg || loading) return;
-    setInput("");
-    setMessages(prev => [...prev, { role: "user", content: msg }]);
-    setLoading(true);
-    try {
-      const res = await fetch(`${API_BASE}/smart-city/chat`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ city, message: msg, language, history: messages.slice(-8).map(m => ({ role: m.role, content: m.content })) }),
-      });
-      const data = await res.json();
-      setMessages(prev => [...prev, { role: "assistant", content: data.reply }]);
-    } catch {
-      setMessages(prev => [...prev, { role: "assistant", content: "Sorry, I'm having trouble connecting. Please try again." }]);
-    } finally { setLoading(false); }
-  };
-
-  const quickReplies = ["Traffic update", "Weather today", "Nearest hospital", "Bus routes", "Parking nearby"];
-
   return (
     <>
-      <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 49 }} />
-      <div style={{ position: "fixed", bottom: "90px", right: "24px", width: "min(400px, calc(100vw - 48px))", height: "500px", background: "var(--color-background)", borderRadius: "20px", border: "1px solid rgba(139,92,246,0.2)", boxShadow: "0 24px 80px rgba(0,0,0,0.3)", zIndex: 50, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-        {/* Header */}
-        <div style={{ padding: "14px 16px", borderBottom: "1px solid rgba(139,92,246,0.1)", background: "linear-gradient(135deg,rgba(139,92,246,0.08),rgba(6,182,212,0.04))", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <div style={{ width: "34px", height: "34px", borderRadius: "10px", background: "linear-gradient(135deg,#8b5cf6,#06b6d4)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <Bot style={{ width: 16, height: 16, color: "white" }} />
-            </div>
-            <div>
-              <p style={{ fontSize: "14px", fontWeight: 800, color: "var(--color-foreground)", margin: 0 }}>City AI Assistant</p>
-              <p style={{ fontSize: "14px", color: "#a78bfa", margin: 0 }}>{city} · {LANGUAGES.find(l => l.code === language)?.label}</p>
-            </div>
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            {/* Language selector */}
-            <select value={language} onChange={e => setLanguage(e.target.value)}
-              style={{ fontSize: "14px", borderRadius: "8px", border: "1px solid rgba(139,92,246,0.2)", background: "rgba(139,92,246,0.08)", color: "var(--color-foreground)", padding: "4px 8px", cursor: "pointer", outline: "none" }}>
-              {LANGUAGES.map(l => <option key={l.code} value={l.code}>{l.flag} {l.label}</option>)}
-            </select>
-            <button onClick={onClose} style={{ width: "28px", height: "28px", borderRadius: "8px", border: "1px solid rgba(139,92,246,0.15)", background: "rgba(139,92,246,0.06)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <X style={{ width: 13, height: 13, color: "var(--color-muted-foreground)" }} />
-            </button>
-          </div>
-        </div>
-
-        {/* Messages */}
-        <div style={{ flex: 1, overflowY: "auto", padding: "14px 16px", display: "flex", flexDirection: "column", gap: "10px" }}>
-          {messages.map((m, i) => (
-            <div key={i} style={{ display: "flex", justifyContent: m.role === "user" ? "flex-end" : "flex-start" }}>
-              <div style={{
-                maxWidth: "85%", padding: "10px 13px", borderRadius: m.role === "user" ? "14px 14px 4px 14px" : "14px 14px 14px 4px",
-                background: m.role === "user" ? "linear-gradient(135deg,#8b5cf6,#7c3aed)" : "var(--color-card)",
-                border: m.role === "user" ? "none" : "1px solid rgba(139,92,246,0.1)",
-                color: m.role === "user" ? "white" : "var(--color-foreground)",
-                fontSize: "14px", lineHeight: 1.5, whiteSpace: "pre-wrap",
-              }}>
-                {m.content.replace(/\*\*(.*?)\*\*/g, "$1")}
-              </div>
-            </div>
-          ))}
-          {loading && (
-            <div style={{ display: "flex", gap: "4px", padding: "10px 13px", background: "rgba(255,255,255,0.6)", backdropFilter: "blur(24px)", borderRadius: "16px", boxShadow: "0 20px 25px -5px rgba(226, 232, 240, 0.4)", border: "1px solid rgba(255,255,255,0.6)", width: "fit-content" }}>
-              {[0,1,2].map(i => <div key={i} style={{ width: 6, height: 6, borderRadius: "50%", background: "#a78bfa", animation: `bounce 0.8s ${i * 0.15}s infinite` }} />)}
-            </div>
-          )}
-          <div ref={messagesEndRef} />
-        </div>
-
-        {/* Quick replies */}
-        <div style={{ padding: "8px 12px", display: "flex", gap: "6px", flexWrap: "wrap", flexShrink: 0, borderTop: "1px solid rgba(139,92,246,0.06)" }}>
-          {quickReplies.map(qr => (
-            <button key={qr} onClick={() => sendMessage(qr)}
-              style={{ fontSize: "14px", padding: "5px 10px", borderRadius: "20px", border: "1px solid rgba(139,92,246,0.2)", background: "rgba(139,92,246,0.06)", color: "#a78bfa", cursor: "pointer", fontWeight: 600 }}>
-              {qr}
-            </button>
-          ))}
-        </div>
-
-        {/* Input */}
-        <div style={{ padding: "12px 14px", borderTop: "1px solid rgba(139,92,246,0.1)", display: "flex", gap: "8px", flexShrink: 0 }}>
-          <input
-            value={input} onChange={e => setInput(e.target.value)}
-            onKeyDown={e => e.key === "Enter" && !e.shiftKey && sendMessage()}
-            placeholder="Ask about traffic, weather, services..."
-            style={{ flex: 1, padding: "10px 14px", borderRadius: "12px", border: "1px solid rgba(139,92,246,0.2)", background: "rgba(139,92,246,0.04)", color: "var(--color-foreground)", fontSize: "14px", outline: "none" }}
-          />
-          <button onClick={() => sendMessage()} disabled={loading || !input.trim()}
-            style={{ width: "40px", height: "40px", borderRadius: "12px", background: input.trim() ? "linear-gradient(135deg,#8b5cf6,#06b6d4)" : "rgba(139,92,246,0.1)", border: "none", cursor: input.trim() ? "pointer" : "default", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-            <Send style={{ width: 15, height: 15, color: input.trim() ? "white" : "#a78bfa" }} />
-          </button>
-        </div>
+      <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.35)", zIndex: 49 }} />
+      <div style={{
+        position: "fixed", bottom: "90px", right: "24px",
+        width: "min(440px, calc(100vw - 48px))", height: "560px",
+        background: "var(--color-background, #ffffff)",
+        borderRadius: "20px", border: "1px solid rgba(139,92,246,0.2)",
+        boxShadow: "0 24px 80px rgba(0,0,0,0.3)", zIndex: 50,
+        overflow: "hidden",
+      }}>
+        <ChatPanel
+          module="smart-city"
+          title={`City AI — ${city}`}
+          greeting={`Hi! I'm your Smart City assistant for ${city}. Ask me about traffic, transport, weather, nearby services, or any city query!`}
+          suggestions={["Traffic update", "Weather today", "Nearest hospital", "Bus routes", "Parking nearby"]}
+          showLanguageSelector={true}
+          onClose={onClose}
+        />
       </div>
     </>
   );
