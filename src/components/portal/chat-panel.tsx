@@ -185,8 +185,20 @@ export function ChatPanel({
     playNextTTSChunk();
   }, [voiceEnabled, playNextTTSChunk]);
 
-  // Stop ongoing TTS
+  // Stop ongoing TTS (soft — keeps queue)
   const stopSpeaking = useCallback(() => {
+    if (currentAudioRef.current) {
+      currentAudioRef.current.pause();
+      currentAudioRef.current = null;
+    }
+    window.speechSynthesis?.cancel();
+    setIsSpeaking(false);
+  }, []);
+
+  // Hard stop — clears queue too (used on interruption)
+  const stopSpeakingImmediately = useCallback(() => {
+    ttsQueue.current = [];
+    isPlayingTTS.current = false;
     if (currentAudioRef.current) {
       currentAudioRef.current.pause();
       currentAudioRef.current = null;
@@ -200,6 +212,10 @@ export function ChatPanel({
     async (text: string) => {
       const q = text.trim();
       if (!q || loading) return;
+
+      // ── Interrupt any ongoing TTS before starting a new answer ──
+      stopSpeakingImmediately();
+
       setError(null);
       setMessages((m) => [...m, { role: "user", text: q }]);
       setInput("");
@@ -314,7 +330,7 @@ export function ChatPanel({
         abortControllerRef.current = null;
       }
     },
-    [loading, module, language, speakText],
+    [loading, module, language, speakText, stopSpeakingImmediately],
   );
 
   const stopStreaming = useCallback(() => {
@@ -322,6 +338,9 @@ export function ChatPanel({
   }, []);
 
   const startListening = useCallback(async () => {
+    // Stop any bot speech when user starts talking
+    stopSpeakingImmediately();
+
     if (!navigator.mediaDevices?.getUserMedia) {
       setError("Microphone not available in this browser.");
       return;
@@ -411,7 +430,7 @@ export function ChatPanel({
       setError("Microphone access denied. Please allow it in browser settings.");
       setIsListening(false);
     }
-  }, [language, sendMessage]);
+  }, [language, sendMessage, stopSpeakingImmediately]);
 
   const startBrowserSpeechFallback = useCallback(() => {
     const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;

@@ -64,69 +64,59 @@ LANGUAGE_MAP: dict[str, str] = {
 }
 
 # ── Module system prompts ─────────────────────────────────────────────────────
+# Shared brevity rule injected into every prompt
+_BREVITY_RULE = (
+    " CRITICAL BREVITY RULE: Give a SHORT answer — exactly 2 complete sentences maximum. "
+    "Each sentence MUST end with a proper punctuation mark (. ? !). "
+    "NEVER stop mid-sentence. Finish every sentence before stopping. "
+    "No bullet lists, no markdown, no headers — plain prose only."
+)
+
 MODULE_PROMPTS: dict[str, str] = {
     "scheme": (
         "You are a Government Scheme Awareness Assistant for India. "
         "Help citizens discover and understand central and state government welfare schemes. "
         "Cover PM-KISAN, Ayushman Bharat, PM Awas Yojana, MGNREGA, Kisan Credit Card, "
         "PM Fasal Bima, National Scholarships, PM Ujjwala, Sukanya Samriddhi, and similar schemes. "
-        "When asked, check eligibility based on the user's age, income, occupation, state, and family size. "
-        "Explain how to apply, required documents, and expected benefits. "
-        "Always be accurate about Indian government schemes and policies. "
-        "If unsure about specific amounts, mention the official portal (myscheme.gov.in). "
-        "Keep responses concise, friendly, and helpful."
+        "When asked, check eligibility based on the user's profile. "
+        "Explain how to apply and expected benefits briefly. "
+        "If unsure about specific amounts, mention myscheme.gov.in."
+        + _BREVITY_RULE
     ),
     "helpline": (
         "You are a Public Information Helpline Assistant for Indian government services. "
         "Answer questions about government procedures, documentation, certificates, and services. "
-        "Cover areas like: birth/death certificates, ration cards, driving licenses, passports, "
-        "property tax, water/electricity bills, pension, PAN/Aadhaar, voter ID, and more. "
-        "Only share department contact details (phone numbers, emails, addresses) that appear "
-        "verbatim in the reference information provided — never guess or recall from memory. "
-        "Route users to the right department. Generate a query tracking reference when asked. "
-        "Be patient, clear, and accessible to all citizen types. "
+        "Only share contact details (phone, email, address) that appear verbatim in the reference data — never guess. "
+        "Route users to the right department. "
         "IMPORTANT: At the very end of your response, append a JSON tag on its own line: "
         "[STATUS:resolved] if the user's issue is fully resolved, or [STATUS:unresolved] if not. "
         "This tag is used by the system and must always be present. Do not explain it."
+        + _BREVITY_RULE
     ),
     "smart-city": (
         "You are a Smart City Citizen Assistant. "
-        "Help citizens with city services including traffic updates, water supply, power outages, "
-        "public transport schedules, parking, waste management, and civic complaints. "
-        "Provide real-time guidance on city infrastructure. "
-        "Help register and track service complaints. "
-        "Give updates on city development projects and citizen notifications. "
-        "Be concise and service-oriented."
+        "Help citizens with city services: traffic, water, power, transport, waste management, civic complaints. "
+        "Help register and track service complaints. Be direct and helpful."
+        + _BREVITY_RULE
     ),
     "rural": (
         "You are a Rural Development Information Assistant for Indian villages. "
-        "Help rural citizens understand programs like MGNREGA (work days, wages, rights), "
-        "PMGSY (road connectivity), PM Awas Gramin (housing), Jal Jeevan Mission (drinking water), "
-        "PMJDY (banking), PM SVANidhi, SHG (self-help group) loans, skill development programs, "
-        "and village panchayat services. "
-        "Use simple, clear language. Explain processes step by step. "
-        "Mention required documents and where to apply (Block office, Gram Panchayat, CSC centre). "
-        "Be especially supportive to first-time users of government services."
+        "Help rural citizens understand MGNREGA, PMGSY, PM Awas Gramin, Jal Jeevan Mission, PMJDY, SHG loans, "
+        "and panchayat services. Use simple language. Mention where to apply (Block office, Gram Panchayat, CSC). "
+        "Be warm and supportive."
+        + _BREVITY_RULE
     ),
     "agriculture": (
         "You are an Agriculture Advisory Assistant for Indian farmers. "
-        "Provide expert guidance on: crop selection by season and soil type, fertilizer and pesticide use, "
-        "irrigation scheduling, pest and disease identification and treatment, weather-based farming decisions, "
-        "soil health management, organic farming, market prices (MSP), and agricultural government schemes "
-        "(PM-KISAN, PM Fasal Bima, Kisan Credit Card, soil health card). "
-        "When a farmer describes crop symptoms, diagnose the likely disease or deficiency and recommend treatment. "
-        "Be practical and use local crop names where possible. "
-        "Mention when to consult the local Krishi Vigyan Kendra."
+        "Give expert guidance on crops, fertilizers, irrigation, pest control, weather, soil, MSP, and agri schemes. "
+        "When a farmer describes symptoms, diagnose the issue and recommend treatment briefly."
+        + _BREVITY_RULE
     ),
     "voice": (
         "You are the CivicSaathi Digital Governance Voice Interface — a unified assistant for all citizen services. "
-        "You can navigate between modules: scheme discovery, grievance filing, helpline queries, "
-        "city services, rural development, agriculture advisory, disaster alerts, and election info. "
-        "Understand natural language commands like 'register a complaint about road damage', "
-        "'find farming schemes for me', 'check my grievance status', 'what schemes am I eligible for'. "
-        "Provide direct answers or guide the user to the right section of the app. "
-        "Be conversational, efficient, and handle multi-step requests. "
-        "When a user asks to navigate, provide the path and a summary of what they'll find there."
+        "Understand commands like filing complaints, checking scheme eligibility, or status queries. "
+        "Provide a direct, conversational answer or guide the user to the right section."
+        + _BREVITY_RULE
     ),
 }
 
@@ -231,7 +221,25 @@ def _make_suggestions(reply: str, module: str) -> list[str]:
     return _FALLBACK_SUGGESTIONS[:3]
 
 
-def _call_groq(messages: list[dict[str, str]], max_tokens: int = 512) -> str:
+# ── Token budget ─────────────────────────────────────────────────────────────
+# Indic scripts require 3-5x more tokens per word than English due to Unicode.
+# We give non-English languages a much larger budget so sentences are never cut.
+# English uses a tighter budget to enforce brevity; stop_sequences handle the rest.
+_INDIC_LANGUAGES = {"hi", "te", "ta", "kn", "ml", "mr", "bn", "gu", "pa"}
+
+def _get_max_tokens(lang_code: str, detected_code: str = "") -> int:
+    """Return an appropriate token budget based on script complexity."""
+    effective = detected_code.strip() if detected_code.strip() else lang_code
+    # Indic: 500 tokens — enough for 2 full sentences without hitting the hard cap.
+    # English: 160 tokens — 2 short sentences fit comfortably under this budget.
+    return 500 if effective in _INDIC_LANGUAGES else 160
+
+
+# Sentence-ending stop sequences — generation halts at a clean sentence boundary.
+# This prevents the hard token-limit from cutting a sentence in half.
+_STOP_SEQUENCES = ["\n\n", "\n- ", "\n* ", "\n1."]  # stop at double-newline / list starts
+
+def _call_groq(messages: list[dict[str, str]], max_tokens: int = 300) -> str:
     """Call Groq API and return the assistant reply string."""
     if _MOCK_AI or _groq is None:
         raise RuntimeError("Mock mode")
@@ -239,7 +247,8 @@ def _call_groq(messages: list[dict[str, str]], max_tokens: int = 512) -> str:
         model="llama-3.1-8b-instant",
         messages=messages,  # type: ignore[arg-type]
         max_tokens=max_tokens,
-        temperature=0.7,
+        temperature=0.6,
+        stop=_STOP_SEQUENCES,
     )
     return resp.choices[0].message.content or ""
 
@@ -252,17 +261,19 @@ def _build_language_instruction(lang_code: str, detected_code: str = "") -> str:
     if effective == "en":
         return (
             "\n\nLANGUAGE: Respond in clear, simple English. "
-            "Keep answers concise (2-4 sentences for simple queries, up to 8 for complex ones). "
-            "Do NOT use markdown like **bold** or bullet lists — write plain prose sentences."
+            "Write exactly 2 short, COMPLETE sentences — never cut a sentence mid-way. "
+            "Do NOT use markdown, bullet lists, or headers — plain prose only."
         )
     return (
         f"\n\nLANGUAGE RULE — THIS IS MANDATORY:\n"
         f"The user spoke in {lang_name} (code: {effective}). "
         f"You MUST reply ENTIRELY in {lang_name} script and grammar. "
-        f"Do NOT include any English words, translations, or mixed-language sentences. "
+        f"Do NOT include any English words, translations, or mixed-language text. "
         f"Write the way a native {lang_name} speaker would naturally speak. "
         f"Do NOT use markdown formatting (no **, no *, no #, no bullet dashes). "
-        f"Keep the reply conversational and under 5 sentences unless the question needs detail."
+        f"NUMBERS: Write ALL numbers, amounts, and quantities as words in {lang_name} script. "
+        f"Write exactly 2 SHORT, COMPLETE sentences. Each sentence MUST end with a proper full stop in {lang_name}. "
+        f"NEVER stop mid-sentence — always finish the sentence before stopping."
     )
 
 
@@ -405,7 +416,9 @@ async def chat(req: ChatRequest) -> ChatResponse:
             messages.append({"role": h.role, "content": h.content})
         messages.append({"role": "user", "content": req.message})
 
-        raw_reply = _call_groq(messages)
+        # Use a language-aware token budget (Indic scripts need more tokens)
+        token_budget = _get_max_tokens(req.language, req.detected_language)
+        raw_reply = _call_groq(messages, max_tokens=token_budget)
 
         # Extract [STATUS:resolved/unresolved] tag appended by helpline prompt
         resolved = True
@@ -479,11 +492,14 @@ async def chat_stream(req: ChatRequest) -> StreamingResponse:
                 messages.append({"role": h.role, "content": h.content})
             messages.append({"role": "user", "content": req.message})
 
+            # Use a language-aware token budget (Indic scripts need more tokens)
+            token_budget = _get_max_tokens(req.language, req.detected_language)
             stream = _groq.chat.completions.create(  # pyrefly: ignore
                 model="llama-3.1-8b-instant",
                 messages=messages,  # type: ignore[arg-type]
-                max_tokens=512,
-                temperature=0.7,
+                max_tokens=token_budget,
+                temperature=0.6,
+                stop=_STOP_SEQUENCES,
                 stream=True,
             )
 

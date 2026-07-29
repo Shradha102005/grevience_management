@@ -912,7 +912,34 @@ class SmartCityChat(BaseModel):
     language: str = "en"
     history: list[dict] = []
 
-LANGUAGE_NAMES = {"en": "English", "hi": "Hindi", "te": "Telugu", "ta": "Tamil"}
+LANGUAGE_NAMES = {
+    "en": "English", "hi": "Hindi", "te": "Telugu", "ta": "Tamil",
+    "kn": "Kannada", "ml": "Malayalam", "mr": "Marathi", "bn": "Bengali",
+    "gu": "Gujarati", "pa": "Punjabi",
+}
+
+_INDIC_LANGS = {"hi", "te", "ta", "kn", "ml", "mr", "bn", "gu", "pa"}
+
+def _smart_city_language_block(lang: str, lang_name: str) -> str:
+    """Build language + number-in-words instruction for smart-city chat."""
+    if lang == "en":
+        return (
+            f"LANGUAGE: Respond in clear, simple English. "
+            f"Write 2-3 COMPLETE sentences — never cut a sentence mid-way. "
+            f"No markdown, no bullet lists, no bold text. Plain prose only."
+        )
+    return (
+        f"LANGUAGE RULE — THIS IS MANDATORY: "
+        f"Respond ENTIRELY in {lang_name} script and grammar. "
+        f"Do NOT include any English words or mixed-language text. "
+        f"Write the way a native {lang_name} speaker naturally speaks. "
+        f"NUMBERS: Write ALL numbers, amounts, distances, and quantities as words in "
+        f"{lang_name} script. Do NOT use Arabic digits like '6000' or '₹6,000' — "
+        f"spell them out fully in {lang_name}. "
+        f"Write exactly 2 COMPLETE sentences that end with a proper full stop. "
+        f"NEVER stop mid-sentence. Finish your thought before stopping. "
+        f"No markdown formatting, no bullet points."
+    )
 
 @router.post("/chat")
 async def smart_city_chat(body: SmartCityChat) -> dict:
@@ -922,6 +949,7 @@ async def smart_city_chat(body: SmartCityChat) -> dict:
     """
     lang_name = LANGUAGE_NAMES.get(body.language, "English")
     city = body.city or "your city"
+    lang_block = _smart_city_language_block(body.language, lang_name)
 
     system_prompt = (
         f"You are a Smart City Citizen Assistant for {city}, India. "
@@ -933,8 +961,11 @@ async def smart_city_chat(body: SmartCityChat) -> dict:
         f"city events, marathons, road closures, and public announcements in {city}. "
         f"Provide accurate, helpful, and concise answers. "
         f"When you don't know specific real-time data, guide the user to the right authority or helpline. "
-        f"IMPORTANT: Respond entirely in {lang_name}. Use simple, clear language accessible to all citizens."
+        f"{lang_block}"
     )
+
+    # Indic scripts need more tokens (3-5x per word due to Unicode)
+    max_tokens = 400 if body.language in _INDIC_LANGS else 200
 
     mock_responses = {
         "en": f"I'm your Smart City assistant for {city}! I can help you with traffic updates, public transport, nearby services, weather, parking, and city events. What would you like to know?",
@@ -955,7 +986,7 @@ async def smart_city_chat(body: SmartCityChat) -> dict:
         messages.append({"role": "user", "content": body.message})
 
         resp = client.chat.completions.create(
-            model="llama3-8b-8192", messages=messages, max_tokens=512, temperature=0.7,
+            model="llama3-8b-8192", messages=messages, max_tokens=max_tokens, temperature=0.7,
         )
         reply = resp.choices[0].message.content.strip() if resp.choices[0].message.content else ""
         return {"reply": reply, "is_mock": False}

@@ -6,7 +6,7 @@ import {
   Phone, Globe, Mail, Smartphone, Zap, AlertCircle,
   Headphones, Sparkles, MessageSquare, ArrowRight,
   Mic, MicOff, Trash2, TicketIcon, ChevronDown,
-  Volume2, StopCircle, TrendingUp, BarChart3, Users, Activity,
+  Volume2, VolumeX, StopCircle, TrendingUp, BarChart3, Users, Activity,
 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
@@ -1178,6 +1178,7 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
   const [showTicketModal, setShowTicketModal] = useState(false);
   const [ticketPrefill, setTicketPrefill] = useState("");
   const [showLangMenu, setShowLangMenu] = useState(false);
+  const [ttsEnabled, setTtsEnabled]     = useState(true);    // mute/unmute TTS
 
   //  Voice state 
   const [voiceMode, setVoiceMode] = useState(false);      // continuous voice loop on/off
@@ -1358,15 +1359,15 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
       }
 
       //  TTS playback 
-      if (voiceModeRef.current) {
+      if (ttsEnabled) {
         await speakText(reply, effectiveLang);   // speak in same language user spoke
         // Echo-guard: 700ms gap after TTS ends so mic doesn't pick up speakers
         await new Promise(r => setTimeout(r, 700));
-        // Restart listening loop if voice mode still on
-        if (voiceModeRef.current && !loopActiveRef.current) {
-          startListeningLoop();
-        }
-      } else {
+      }
+      // Restart listening loop if voice mode still on
+      if (voiceModeRef.current && !loopActiveRef.current) {
+        startListeningLoop();
+      } else if (!ttsEnabled) {
         setTimeout(() => setOrbState("idle"), 2000);
       }
 
@@ -1380,7 +1381,7 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
       }]);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messages, lang, orbState, speakText, escalationOffered, autoEscalated]);
+  }, [messages, lang, orbState, speakText, escalationOffered, autoEscalated, ttsEnabled]);
 
   //  Auto-create ticket from conversation 
   const autoCreateTicket = useCallback(async (lastQuery: string, lastReply: string) => {
@@ -1723,6 +1724,23 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
                 </div>
               )}
             </div>
+
+            {/* Volume / mute button */}
+            <button
+              onClick={() => setTtsEnabled(v => !v)}
+              title={ttsEnabled ? "Mute voice" : "Enable voice"}
+              style={{
+                width: "30px", height: "30px", borderRadius: "8px",
+                background: ttsEnabled ? "rgba(56,189,248,0.12)" : "rgba(255,255,255,0.04)",
+                border: ttsEnabled ? "1px solid rgba(56,189,248,0.3)" : "1px solid rgba(255,255,255,0.08)",
+                cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                transition: "all 0.2s",
+              }}
+            >
+              {ttsEnabled
+                ? <Volume2 style={{ width: 13, height: 13, color: "#38bdf8" }} />
+                : <VolumeX style={{ width: 13, height: 13, color: "rgba(255,255,255,0.35)" }} />}
+            </button>
 
             {/* Clear chat */}
             <button onClick={clearChat} title="Clear chat"
