@@ -986,11 +986,7 @@ async def smart_city_chat(body: SmartCityChat) -> dict:
         messages.append({"role": "user", "content": body.message})
 
         resp = client.chat.completions.create(
-<<<<<<< HEAD
-            model="llama3-8b-8192", messages=messages, max_tokens=max_tokens, temperature=0.7,
-=======
-            model="openai/gpt-oss-20b", messages=messages, max_tokens=512, temperature=0.7,
->>>>>>> db0d92ec (Enhanced Voice Bot)
+            model="groq/compound-mini", messages=messages, max_tokens=512, temperature=0.7,
         )
         reply = resp.choices[0].message.content.strip() if resp.choices[0].message.content else ""
         return {"reply": reply, "is_mock": False}

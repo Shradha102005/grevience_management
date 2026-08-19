@@ -108,18 +108,10 @@ export function ChatPanel({
 
         const contentType = resp.headers.get("content-type") || "";
 
-        // Fallback: server told us to use browser TTS
+        // Fallback: server told us to use browser TTS — stay silent (consistent voice)
         if (contentType.includes("application/json")) {
-          const data = await resp.json();
-          if (data.fallback && typeof window !== "undefined" && window.speechSynthesis) {
-            const utterance = new SpeechSynthesisUtterance(data.text ?? text);
-            utterance.lang = SPEECH_LANG_MAP[language] ?? "en-IN";
-            utterance.rate = 0.95;
-            utterance.onend = () => setIsSpeaking(false);
-            utterance.onerror = () => setIsSpeaking(false);
-            window.speechSynthesis.speak(utterance);
-            return;
-          }
+          setIsSpeaking(false);
+          return;
         }
 
         // Play Sarvam audio blob
@@ -137,16 +129,9 @@ export function ChatPanel({
         };
         await audio.play();
       } catch (err) {
-        console.warn("TTS error, falling back to browser:", err);
+        console.warn("TTS error:", err);
         setIsSpeaking(false);
-        // Browser speechSynthesis as last resort
-        if (typeof window !== "undefined" && window.speechSynthesis) {
-          const utterance = new SpeechSynthesisUtterance(text);
-          utterance.lang = SPEECH_LANG_MAP[language] ?? "en-IN";
-          utterance.rate = 0.95;
-          utterance.onend = () => setIsSpeaking(false);
-          window.speechSynthesis.speak(utterance);
-        }
+        // No browser speechSynthesis fallback — avoids mixed voices
       }
     },
     [voiceEnabled, language],
@@ -208,9 +193,22 @@ export function ChatPanel({
 
   const enqueueTTSChunk = useCallback((text: string) => {
     if (!voiceEnabled || !text.trim()) return;
-    ttsQueue.current.push(text);
+    // Skip chunks with no actual word characters (punctuation/symbols only → Sarvam 400)
+    if (!/\w/.test(text)) return;
+    // Strip ALL parenthetical content and URLs (shown in text but not spoken)
+    const speakText = text
+      .replace(/\([^)]*\)/g, "")               // Remove complete ( ... ) blocks
+      .replace(/\([^)]*$/g, "")                // Remove unclosed ( ... at end of chunk
+      .replace(/^[^(]*\)/g, "")                // Remove leftover ... ) at start of chunk
+      .replace(/https?:\/\/[^\s)]+/gi, "")     // Strip full URLs (including .in / path)
+      .replace(/www\.[^\s)]+/gi, "")           // Strip www links
+      .replace(/\b[\w.-]+?\.(?:gov\.in|nic\.in|gov|in|org|com|net|edu)\b[^\s)]*/gi, "") // Strip any domain like myscheme.gov.in
+      .replace(/\s{2,}/g, " ")
+      .trim();
+    if (!speakText || !/\w/.test(speakText)) return;
+    ttsQueue.current.push(speakText);
     // Pre-fetch immediately when enqueuing so Sarvam response is ready by the time we play
-    fetchTTSBlob(text);
+    fetchTTSBlob(speakText);
     playNextTTSChunk();
   }, [voiceEnabled, playNextTTSChunk, fetchTTSBlob]);
 
@@ -282,6 +280,7 @@ export function ChatPanel({
         let accumulated = "";
         let sentenceBuffer = "";
         let buffer = "";
+        let isFirstChunk = true;
 
         while (true) {
           const { done, value } = await reader.read();
@@ -311,13 +310,32 @@ export function ChatPanel({
               if (token) {
                 accumulated += token;
                 sentenceBuffer += token;
-                
-                // Chunk boundary: sentence end, clause punctuation, OR 4+ words buffered
+
                 const wordCount = sentenceBuffer.trim().split(/\s+/).length;
-                if (/[.!?\n]/.test(token) || (/[,;:]/.test(token) && wordCount >= 3) || wordCount >= 4) {
-                  const toSpeak = sentenceBuffer.trim();
-                  if (toSpeak) enqueueTTSChunk(toSpeak);
-                  sentenceBuffer = "";
+                const isSentenceEnd = /[.!?\n]/.test(token);
+                const insideParen = (sentenceBuffer.split("(").length > sentenceBuffer.split(")").length);
+
+                // First chunk fires early (at 4 words or punctuation) for instant voice start.
+                // Subsequent chunks wait for complete sentences for natural flow.
+                const shouldTrigger = !insideParen && (
+                  (isFirstChunk && (wordCount >= 4 || isSentenceEnd || /[,;:]/.test(token))) ||
+                  (!isFirstChunk && (isSentenceEnd || wordCount >= 20))
+                );
+
+                if (shouldTrigger) {
+                  let toSpeak: string;
+                  const lastSpace = sentenceBuffer.lastIndexOf(" ");
+                  if (!isSentenceEnd && lastSpace > 0) {
+                    toSpeak = sentenceBuffer.substring(0, lastSpace).trim();
+                    sentenceBuffer = sentenceBuffer.substring(lastSpace + 1);
+                  } else {
+                    toSpeak = sentenceBuffer.trim();
+                    sentenceBuffer = "";
+                  }
+                  if (toSpeak) {
+                    enqueueTTSChunk(toSpeak);
+                    isFirstChunk = false;
+                  }
                 }
 
                 setMessages((m) =>

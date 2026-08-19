@@ -96,7 +96,7 @@ def _mock_speech(req: SpeechGenerateRequest) -> str:
 
 
 def _generate_speech_with_groq(req: SpeechGenerateRequest) -> str:
-    """Call Groq (openai/gpt-oss-20b) to generate a custom campaign speech."""
+    """Call Groq (groq/compound-mini) to generate a custom campaign speech."""
     audience_label = AUDIENCE_LABELS.get(req.audience, req.audience)
     prompt = (
         f"You are an expert Indian political speechwriter. Write a compelling, heartfelt, and "
@@ -116,7 +116,7 @@ def _generate_speech_with_groq(req: SpeechGenerateRequest) -> str:
         f"- Output only the speech text, no preamble"
     )
     chat = _groq_client.chat.completions.create(  # type: ignore[union-attr]
-        model="openai/gpt-oss-20b",
+        model="groq/compound-mini",
         messages=[
             {"role": "system", "content": "You are an expert Indian political speechwriter."},
             {"role": "user", "content": prompt},

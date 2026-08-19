@@ -264,7 +264,7 @@ async def analyze_crop(
             "4 specific treatment steps, and 3 relevant Indian government schemes."
         )
         resp = client.chat.completions.create(
-            model="openai/gpt-oss-20b",
+            model="groq/compound-mini",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user",   "content": user_msg},
@@ -316,7 +316,7 @@ async def analyze_chat(req: ChatRequest):
             messages.append({"role": m.role, "content": m.content})
             
         resp = client.chat.completions.create(
-            model="openai/gpt-oss-20b",
+            model="groq/compound-mini",
             messages=messages,
             max_tokens=500,
             temperature=0.7,
@@ -334,7 +334,7 @@ def _groq_json(system: str, user: str) -> dict:
     """Helper: call Groq and parse JSON. Raises on failure."""
     client = Groq(api_key=GROQ_API_KEY)
     resp = client.chat.completions.create(
-        model="openai/gpt-oss-20b",
+        model="groq/compound-mini",
         messages=[{"role": "system", "content": system}, {"role": "user", "content": user}],
         max_tokens=800, temperature=0.4,
         response_format={"type": "json_object"},

@@ -162,7 +162,7 @@ def _get_ai_reply(session: dict, user_text: str) -> str:
         ] + session["history"]
 
         resp = client.chat.completions.create(
-            model="openai/gpt-oss-20b",
+            model="groq/compound-mini",
             messages=messages,               # type: ignore
             max_tokens=60,                   # ← was 120 — short = fast on a call
             temperature=0.5,

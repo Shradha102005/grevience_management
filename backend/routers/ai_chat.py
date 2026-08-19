@@ -30,6 +30,66 @@ except Exception as _kb_err:
     HELPLINE_KB = []
     logger.warning(f"Could not load helpline_kb.json ({_kb_err}) — KB retrieval disabled")
 
+
+# ── Scheme DB retrieval ───────────────────────────────────────────────────────
+def _retrieve_scheme_context(query: str) -> str:
+    """
+    Search the schemes table for entries matching keywords in the user's query.
+    Returns a formatted string of up to 5 matching schemes to inject into the system prompt.
+    """
+    try:
+        from database import SessionLocal
+        from models import Scheme
+        from sqlalchemy import or_
+
+        if SessionLocal is None:
+            return ""
+
+        # Extract meaningful keywords (skip short stop-words and domain-specific noise)
+        stop = {"for", "the", "a", "an", "is", "are", "in", "of", "to", "and",
+                "me", "my", "what", "how", "tell", "about", "can", "i", "any",
+                "scheme", "schemes", "government", "govt", "india", "indian"}
+        keywords = [w for w in re.split(r"\W+", query.lower()) if len(w) > 2 and w not in stop]
+        if not keywords:
+            keywords = [query[:30]]  # fallback: use raw query fragment
+
+        db = SessionLocal()
+        try:
+            from models import Scheme
+            filters = []
+            for kw in keywords[:6]:  # use top-6 keywords
+                filters.append(Scheme.name.ilike(f"%{kw}%"))
+                filters.append(Scheme.description.ilike(f"%{kw}%"))
+                filters.append(Scheme.category.ilike(f"%{kw}%"))
+                filters.append(Scheme.ministry.ilike(f"%{kw}%"))
+
+            results = (
+                db.query(Scheme)
+                .filter(or_(*filters))
+                .limit(8)
+                .all()
+            )
+
+            if not results:
+                # Fallback: return a sample of all schemes so AI is aware of the catalogue
+                results = db.query(Scheme).limit(10).all()
+
+            lines = []
+            for s in results:
+                tags = ", ".join(s.tags or [])[:80] if s.tags else ""
+                lines.append(
+                    f"- {s.name} | Ministry: {s.ministry or 'N/A'} | "
+                    f"Category: {s.category or 'N/A'} | Tags: {tags}\n"
+                    f"  Description: {(s.description or '')[:300]}\n"
+                    f"  Apply: {s.apply_url or 'myscheme.gov.in'}"
+                )
+            return "\n".join(lines)
+        finally:
+            db.close()
+    except Exception as e:
+        logger.warning(f"Scheme DB retrieval failed: {e}")
+        return ""
+
 # ── Groq client (graceful mock fallback) ──────────────────────────────────────
 try:
     from groq import Groq  # type: ignore[import-untyped]
@@ -76,11 +136,10 @@ MODULE_PROMPTS: dict[str, str] = {
     "scheme": (
         "You are a Government Scheme Awareness Assistant for India. "
         "Help citizens discover and understand central and state government welfare schemes. "
-        "Cover PM-KISAN, Ayushman Bharat, PM Awas Yojana, MGNREGA, Kisan Credit Card, "
-        "PM Fasal Bima, National Scholarships, PM Ujjwala, Sukanya Samriddhi, and similar schemes. "
-        "When asked, check eligibility based on the user's profile. "
-        "Explain how to apply and expected benefits briefly. "
-        "If unsure about specific amounts, mention myscheme.gov.in."
+        "When mentioning a scheme, put its apply link in parentheses immediately after the scheme name. "
+        "Example format: PM-KISAN (https://pmkisan.gov.in) provides financial assistance to farmers. "
+        "If you don't know the exact link, use (myscheme.gov.in) as fallback. "
+        "Explain eligibility and benefits briefly in plain language."
         + _BREVITY_RULE
     ),
     "helpline": (
@@ -244,7 +303,7 @@ def _call_groq(messages: list[dict[str, str]], max_tokens: int = 300) -> str:
     if _MOCK_AI or _groq is None:
         raise RuntimeError("Mock mode")
     resp = _groq.chat.completions.create(  # pyrefly: ignore
-        model="openai/gpt-oss-20b",
+        model="groq/compound-mini",
         messages=messages,  # type: ignore[arg-type]
         max_tokens=max_tokens,
         temperature=0.6,
@@ -323,6 +382,23 @@ async def chat(req: ChatRequest) -> ChatResponse:
     if _MOCK_AI:
         mock_reply = MOCK_RESPONSES.get(module, "I'm here to help! (AI running in mock mode)")
         return ChatResponse(reply=mock_reply, is_mock=True, resolved=True)
+
+    # ── Scheme DB retrieval ─────────────────────────────────────────────────
+    if module == "scheme":
+        scheme_context = _retrieve_scheme_context(req.message)
+        if scheme_context:
+            system_prompt += (
+                "\n\nDATA FROM DATABASE (these are the REAL schemes stored in our system — "
+                "use ONLY these when answering):\n"
+                + scheme_context
+                + "\n\nSTRICT RULES:\n"
+                "1. Only mention schemes that appear in the DATABASE above. "
+                "Do not invent or hallucinate scheme names, amounts, or eligibility criteria.\n"
+                "2. If no relevant scheme is found in the database for the user's query, "
+                "say: 'I don't have a matching scheme in our database. You can search at myscheme.gov.in.'\n"
+                "3. Put the apply link in parentheses right after the scheme name, e.g. Scheme Name (https://example.gov.in).\n"
+                "4. Do not reference your training data — stick to the DATABASE schemes only."
+            )
 
     # ── Helpline-only pre-processing ───────────────────────────────────────
     
@@ -465,6 +541,23 @@ async def chat_stream(req: ChatRequest) -> StreamingResponse:
         + _build_personalisation(req.user_name, req.user_id)
     )
 
+    # ── Scheme DB injection ────────────────────────────────────────────────
+    if module == "scheme":
+        scheme_context = _retrieve_scheme_context(req.message)
+        if scheme_context:
+            system_prompt += (
+                "\n\nDATA FROM DATABASE (these are the REAL schemes stored in our system — "
+                "use ONLY these when answering):\n"
+                + scheme_context
+                + "\n\nSTRICT RULES:\n"
+                "1. Only mention schemes that appear in the DATABASE above. "
+                "Do not invent or hallucinate scheme names, amounts, or eligibility criteria.\n"
+                "2. If no relevant scheme is found in the database for the user's query, "
+                "say: 'I don't have a matching scheme in our database. You can search at myscheme.gov.in.'\n"
+                "3. Put the apply link in parentheses right after the scheme name, e.g. Scheme Name (https://example.gov.in).\n"
+                "4. Do not reference your training data — stick to the DATABASE schemes only."
+            )
+
     # ── Helpline-only KB injection ─────────────────────────────────────────
     if module == "helpline":
         kb_context = retrieve_helpline_context(req.message)
@@ -495,7 +588,7 @@ async def chat_stream(req: ChatRequest) -> StreamingResponse:
             # Use a language-aware token budget (Indic scripts need more tokens)
             token_budget = _get_max_tokens(req.language, req.detected_language)
             stream = _groq.chat.completions.create(  # pyrefly: ignore
-                model="openai/gpt-oss-20b",
+                model="groq/compound-mini",
                 messages=messages,  # type: ignore[arg-type]
                 max_tokens=token_budget,
                 temperature=0.6,
@@ -602,7 +695,7 @@ async def agriculture_analyze(
 
     try:
         resp = _groq.chat.completions.create(  # pyrefly: ignore
-            model="openai/gpt-oss-20b",
+            model="groq/compound-mini",
             messages=[  # type: ignore[arg-type]
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_msg},
@@ -640,7 +733,7 @@ def ai_status() -> dict:
     """Return current AI mode (live or mock)."""
     return {
         "mode": "mock" if _MOCK_AI else "live",
-        "model": "openai/gpt-oss-20b" if not _MOCK_AI else None,
+        "model": "groq/compound-mini" if not _MOCK_AI else None,
         "supported_modules": list(MODULE_PROMPTS.keys()),
         "supported_languages": LANGUAGE_MAP,
     }

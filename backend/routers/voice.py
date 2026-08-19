@@ -32,6 +32,9 @@ else:
 
 router = APIRouter(prefix="/voice", tags=["Voice"])
 
+# Persistent HTTP client — reused across requests for TCP connection pooling (~150ms saved per call)
+_http = httpx.AsyncClient(timeout=20.0, limits=httpx.Limits(max_keepalive_connections=5, keepalive_expiry=30))
+
 # ── Language maps ─────────────────────────────────────────────────────────────
 # Sarvam language codes (BCP-47 short → Sarvam full)
 SARVAM_LANG_MAP: dict[str, str] = {
@@ -105,8 +108,7 @@ async def speech_to_text(
 
     t0 = time.time()
     try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
-            resp = await client.post(
+        resp = await _http.post(
                 f"{SARVAM_BASE}/speech-to-text",
                 headers={"api-subscription-key": SARVAM_API_KEY},
                 files={"file": (f"audio.{ext}", audio_bytes, mime)},
@@ -117,6 +119,7 @@ async def speech_to_text(
                     "with_disfluencies": "false",
                 },
             )
+
         duration_ms = int((time.time() - t0) * 1000)
 
         if resp.status_code != 200:
@@ -167,30 +170,36 @@ async def text_to_speech(req: TTSRequest):
     if not text:
         raise HTTPException(status_code=400, detail="text must not be empty")
 
+    # Reject if text has no actual letter characters (punctuation/numbers only)
+    # Sarvam returns 400 for such inputs
+    import re as _re
+    if not _re.search(r'[\w\u0900-\u097F\u0C00-\u0C7F\u0B80-\u0BFF\u0D00-\u0D7F\u0A80-\u0AFF\u0B00-\u0B7F\u0A00-\u0A7F\u0980-\u09FF]', text):
+        logger.warning(f"TTS skipped — no valid characters in: {text!r}")
+        return JSONResponse({"fallback": True, "text": text})
+
     # Truncate to Sarvam's 500-char limit per request
     if len(text) > 500:
         text = text[:497] + "…"
 
     lang_code = SARVAM_LANG_MAP.get(req.language, "en-IN")
-    speaker   = req.speaker or SARVAM_SPEAKER_MAP.get(req.language, "meera")
+    speaker   = "priya"  # single consistent speaker across all chunks and languages
 
     try:
-        async with httpx.AsyncClient(timeout=20.0) as client:
-            resp = await client.post(
-                f"{SARVAM_BASE}/text-to-speech",
-                headers={
-                    "api-subscription-key": SARVAM_API_KEY,
-                    "Content-Type": "application/json",
-                },
-                json={
-                    "inputs": [text],
-                    "target_language_code": lang_code,
-                    "speaker": speaker,
-                    "model": "bulbul:v3",
-                    "pace": 1.1,
-                    "enable_preprocessing": False,  # skip preprocessing → faster response
-                },
-            )
+        resp = await _http.post(
+            f"{SARVAM_BASE}/text-to-speech",
+            headers={
+                "api-subscription-key": SARVAM_API_KEY,
+                "Content-Type": "application/json",
+            },
+            json={
+                "inputs": [text],
+                "target_language_code": lang_code,
+                "speaker": speaker,
+                "model": "bulbul:v3",
+                "pace": 1.2,
+                "enable_preprocessing": False,  # disable dynamic preprocessor variations
+            },
+        )
 
         if resp.status_code != 200:
             logger.error(f"Sarvam TTS error {resp.status_code}: {resp.text[:300]}")

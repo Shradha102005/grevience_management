@@ -634,14 +634,14 @@ function SchemeAI() {
 
       {/*  Floating AI Chat Modal  */}
       {chatOpen && (
-        <div className="fixed bottom-6 right-6 w-[28rem] z-50 bg-white/90 backdrop-blur-2xl shadow-2xl shadow-slate-300/60 rounded-3xl overflow-hidden border border-white animate-in slide-in-from-bottom-8 duration-300">
-          <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-slate-900 to-slate-800 text-white">
+        <div className="fixed bottom-6 right-6 w-[32rem] h-[620px] z-50 flex flex-col bg-white/90 backdrop-blur-2xl shadow-2xl shadow-slate-300/60 rounded-3xl overflow-hidden border border-white animate-in slide-in-from-bottom-8 duration-300">
+          <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-slate-900 to-slate-800 text-white shrink-0">
             <span className="flex items-center gap-3 font-bold text-base"><Bot className="w-4 h-4 text-indigo-400" /> Scheme Assistant</span>
             <button onClick={() => setChatOpen(false)} className="hover:bg-white/20 p-2 rounded-full transition-colors">
               <X className="w-4 h-4" />
             </button>
           </div>
-          <div className="bg-slate-50/50">
+          <div className="flex-1 overflow-hidden bg-slate-50/50">
             <ChatPanel module="schemes" />
           </div>
         </div>
