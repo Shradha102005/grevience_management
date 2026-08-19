@@ -92,21 +92,24 @@ def _retrieve_scheme_context(query: str) -> str:
 
 # ── Groq client (graceful mock fallback) ──────────────────────────────────────
 try:
-    from groq import Groq  # type: ignore[import-untyped]
+    from groq import Groq, AsyncGroq  # type: ignore[import-untyped]
     _GROQ_AVAILABLE = True
 except ImportError:
     Groq = None  # type: ignore[assignment,misc]
+    AsyncGroq = None
     _GROQ_AVAILABLE = False
     logger.warning("groq package not installed — AI running in mock mode")
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 _MOCK_AI = not (_GROQ_AVAILABLE and GROQ_API_KEY)
 
-if not _MOCK_AI and Groq is not None:
+if not _MOCK_AI and Groq is not None and AsyncGroq is not None:
     _groq = Groq(api_key=GROQ_API_KEY)
-    logger.info("Groq AI client initialised (live mode)")
+    _async_groq = AsyncGroq(api_key=GROQ_API_KEY)
+    logger.info("Groq AI client initialised (live mode, async streaming enabled)")
 else:
     _groq = None
+    _async_groq = None
     logger.info("Groq AI running in mock mode")
 
 router = APIRouter(prefix="/ai", tags=["AI Chat"])
@@ -340,11 +343,11 @@ def _build_personalisation(user_name: str, user_id: str) -> str:
     """Add a personalisation block to the system prompt."""
     parts: list[str] = []
     if user_name:
+        first_name = user_name.strip().split()[0]
         parts.append(
             f"\n\nPERSONALISATION: You are speaking with {user_name}. "
-            f"Address them by their first name occasionally (not every sentence). "
-            f"Be warm, respectful, and patient. Acknowledge their specific situation. "
-            f"If they seem frustrated, empathise before providing information."
+            f"ALWAYS greet them warmly by their first name ({first_name}) at the very beginning of your answer (e.g. 'Hi {first_name}, ...' or 'Hello {first_name}, ...'). "
+            f"Be warm, respectful, and direct."
         )
     else:
         parts.append(
@@ -572,7 +575,7 @@ async def chat_stream(req: ChatRequest) -> StreamingResponse:
         )
 
     async def token_generator():
-        """Yields SSE-formatted token chunks."""
+        """Yields SSE-formatted token chunks AND synthesized audio chunks concurrently."""
         if _MOCK_AI or _groq is None:
             mock = MOCK_RESPONSES.get(module, "I'm here to help! (AI mock mode)")
             yield f"data: {json.dumps({'token': mock})}\n\n"
@@ -580,6 +583,12 @@ async def chat_stream(req: ChatRequest) -> StreamingResponse:
             return
 
         try:
+            from .voice import synthesize_sarvam_tts_b64
+        except Exception:
+            synthesize_sarvam_tts_b64 = None
+
+        try:
+            import asyncio
             messages: list[dict] = [{"role": "system", "content": system_prompt}]
             for h in req.history[-10:]:
                 messages.append({"role": h.role, "content": h.content})
@@ -587,7 +596,14 @@ async def chat_stream(req: ChatRequest) -> StreamingResponse:
 
             # Use a language-aware token budget (Indic scripts need more tokens)
             token_budget = _get_max_tokens(req.language, req.detected_language)
-            stream = _groq.chat.completions.create(  # pyrefly: ignore
+            stream = await _async_groq.chat.completions.create(  # pyrefly: ignore
+                model="groq/compound-mini",
+                messages=messages,  # type: ignore[arg-type]
+                max_tokens=token_budget,
+                temperature=0.6,
+                stop=_STOP_SEQUENCES,
+                stream=True,
+            ) if _async_groq is not None else _groq.chat.completions.create(  # pyrefly: ignore
                 model="groq/compound-mini",
                 messages=messages,  # type: ignore[arg-type]
                 max_tokens=token_budget,
@@ -596,10 +612,74 @@ async def chat_stream(req: ChatRequest) -> StreamingResponse:
                 stream=True,
             )
 
-            for chunk in stream:
-                token = chunk.choices[0].delta.content or ""
-                if token:
-                    yield f"data: {json.dumps({'token': token})}\n\n"
+            sentence_buffer = ""
+            is_first_chunk = True
+            tts_tasks: list[asyncio.Task] = []
+
+            async def _stream_tokens():
+                if _async_groq is not None:
+                    async for chunk in stream:
+                        tok = chunk.choices[0].delta.content or ""
+                        if tok:
+                            yield tok
+                else:
+                    for chunk in stream:
+                        tok = chunk.choices[0].delta.content or ""
+                        if tok:
+                            yield tok
+
+            async for token in _stream_tokens():
+                sentence_buffer += token
+                yield f"data: {json.dumps({'token': token})}\n\n"
+
+                # Check if we should launch server-side TTS on this chunk
+                words = sentence_buffer.strip().split()
+                has_sentence_end = bool(re.search(r'[.!?\n]', token))
+                open_paren = sentence_buffer.count("(") > sentence_buffer.count(")")
+
+                if not open_paren and synthesize_sarvam_tts_b64 is not None:
+                    if is_first_chunk and len(words) >= 4:
+                        last_space = sentence_buffer.rfind(" ")
+                        if last_space > 0:
+                            chunk_text = sentence_buffer[:last_space].strip()
+                            sentence_buffer = sentence_buffer[last_space:].lstrip()
+                            if chunk_text:
+                                task = asyncio.create_task(synthesize_sarvam_tts_b64(chunk_text, req.language))
+                                tts_tasks.append(task)
+                                is_first_chunk = False
+                    elif not is_first_chunk and has_sentence_end:
+                        match = re.match(r'^([\s\S]*?[.!?\n]+)\s*([\s\S]*)$', sentence_buffer)
+                        if match:
+                            complete = match.group(1).strip()
+                            sentence_buffer = match.group(2)
+                            if complete:
+                                task = asyncio.create_task(synthesize_sarvam_tts_b64(complete, req.language))
+                                tts_tasks.append(task)
+
+                # Check if any TTS task has completed and yield its audio immediately
+                for t in list(tts_tasks):
+                    if t.done():
+                        tts_tasks.remove(t)
+                        try:
+                            audio_b64 = t.result()
+                            if audio_b64:
+                                yield f"data: {json.dumps({'audio': audio_b64})}\n\n"
+                        except Exception:
+                            pass
+
+            # Flush any remaining text in buffer to TTS
+            if sentence_buffer.strip() and synthesize_sarvam_tts_b64 is not None:
+                task = asyncio.create_task(synthesize_sarvam_tts_b64(sentence_buffer.strip(), req.language))
+                tts_tasks.append(task)
+
+            # Wait for all pending TTS tasks and yield their audio chunks
+            for task in tts_tasks:
+                try:
+                    audio_b64 = await task
+                    if audio_b64:
+                        yield f"data: {json.dumps({'audio': audio_b64})}\n\n"
+                except Exception:
+                    pass
 
             yield "data: [DONE]\n\n"
 

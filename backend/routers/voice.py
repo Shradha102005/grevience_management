@@ -56,16 +56,16 @@ SARVAM_LANG_MAP: dict[str, str] = {
 # shubh, advait, anand, tanya, tarun, sunny, mani, gokul, vijay, shruti,
 # suhani, mohit, kavitha, rehan, soham, rupali, niharika
 SARVAM_SPEAKER_MAP: dict[str, str] = {
-    "en": "priya",   # female English voice
-    "hi": "priya",   # female Hindi voice
-    "te": "priya",
-    "ta": "priya",
-    "kn": "priya",
-    "ml": "priya",
-    "mr": "priya",
-    "bn": "priya",
-    "gu": "priya",
-    "pa": "priya",
+    "en": "shreya",   # natural, crystal-clear Indian English voice
+    "hi": "shreya",   # natural Hindi voice
+    "te": "shreya",
+    "ta": "shreya",
+    "kn": "shreya",
+    "ml": "shreya",
+    "mr": "shreya",
+    "bn": "shreya",
+    "gu": "shreya",
+    "pa": "shreya",
 }
 
 
@@ -182,7 +182,7 @@ async def text_to_speech(req: TTSRequest):
         text = text[:497] + "…"
 
     lang_code = SARVAM_LANG_MAP.get(req.language, "en-IN")
-    speaker   = "priya"  # single consistent speaker across all chunks and languages
+    speaker   = req.speaker or SARVAM_SPEAKER_MAP.get(req.language, "shreya")
 
     try:
         resp = await _http.post(
@@ -196,7 +196,8 @@ async def text_to_speech(req: TTSRequest):
                 "target_language_code": lang_code,
                 "speaker": speaker,
                 "model": "bulbul:v3",
-                "pace": 1.2,
+                "pace": 1.0,
+                "speech_sample_rate": 16000,
                 "enable_preprocessing": False,  # disable dynamic preprocessor variations
             },
         )
@@ -230,24 +231,44 @@ async def text_to_speech(req: TTSRequest):
         return JSONResponse({"fallback": True, "text": req.text})
 
 
-# ── Voices list endpoint ───────────────────────────────────────────────────────
-@router.get("/voices", summary="List available Sarvam TTS voices")
-async def list_voices():
-    """Return the available speaker voices for bulbul:v3."""
-    return {
-        "model": "bulbul:v3",
-        "voices": [
-            {"speaker": "priya",   "gender": "female", "style": "warm"},
-            {"speaker": "neha",    "gender": "female", "style": "clear"},
-            {"speaker": "ritu",    "gender": "female", "style": "natural"},
-            {"speaker": "ishita",  "gender": "female", "style": "expressive"},
-            {"speaker": "shreya",  "gender": "female", "style": "professional"},
-            {"speaker": "simran",  "gender": "female", "style": "friendly"},
-            {"speaker": "pooja",   "gender": "female", "style": "calm"},
-            {"speaker": "kavya",   "gender": "female", "style": "youthful"},
-            {"speaker": "rahul",   "gender": "male",   "style": "professional"},
-            {"speaker": "aditya",  "gender": "male",   "style": "friendly"},
-            {"speaker": "rohan",   "gender": "male",   "style": "energetic"},
-            {"speaker": "amit",    "gender": "male",   "style": "warm"},
-        ],
-    }
+# ── Internal Server-side TTS Helper ──────────────────────────────────────────
+async def synthesize_sarvam_tts_b64(text: str, language: str = "en", speaker: str = "shreya") -> Optional[str]:
+    """Direct helper to synthesize Sarvam TTS and return base64 string without HTTP routing overhead."""
+    if _MOCK_VOICE or not text:
+        return None
+
+    import re as _re
+    clean = _re.sub(r'\([^)]*\)', '', text)
+    clean = _re.sub(r'https?://[^\s]+', '', clean)
+    clean = clean.strip()
+    if not clean or not _re.search(r'[\w\u0900-\u097F\u0C00-\u0C7F\u0B80-\u0BFF\u0D00-\u0D7F\u0A80-\u0AFF\u0B00-\u0B7F\u0A00-\u0A7F\u0980-\u09FF]', clean):
+        return None
+    if len(clean) > 500:
+        clean = clean[:497] + "…"
+
+    lang_code = SARVAM_LANG_MAP.get(language, "en-IN")
+    spk = speaker or SARVAM_SPEAKER_MAP.get(language, "shreya")
+
+    try:
+        resp = await _http.post(
+            f"{SARVAM_BASE}/text-to-speech",
+            headers={"api-subscription-key": SARVAM_API_KEY, "Content-Type": "application/json"},
+            json={
+                "inputs": [clean],
+                "target_language_code": lang_code,
+                "speaker": spk,
+                "model": "bulbul:v3",
+                "pace": 1.0,
+                "speech_sample_rate": 16000,
+                "enable_preprocessing": False,
+            },
+        )
+        if resp.status_code == 200:
+            data = resp.json()
+            audios = data.get("audios") or []
+            if audios:
+                return audios[0]
+    except Exception as e:
+        logger.warning(f"Server-side TTS generation failed: {e}")
+    return None
+
