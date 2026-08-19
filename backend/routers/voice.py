@@ -187,8 +187,8 @@ async def text_to_speech(req: TTSRequest):
                     "target_language_code": lang_code,
                     "speaker": speaker,
                     "model": "bulbul:v3",
-                    "pace": 1.0,
-                    "enable_preprocessing": True,
+                    "pace": 1.1,
+                    "enable_preprocessing": False,  # skip preprocessing → faster response
                 },
             )
 

@@ -152,38 +152,68 @@ export function ChatPanel({
     [voiceEnabled, language],
   );
 
+  // Pre-fetch cache: chunk text → fetched blob URL (ready to play immediately)
+  const prefetchCache = useRef<Map<string, Promise<string | null>>>(new Map());
+
+  const fetchTTSBlob = useCallback((text: string): Promise<string | null> => {
+    if (prefetchCache.current.has(text)) return prefetchCache.current.get(text)!;
+    const p = fetch(`${API_BASE}/voice/tts`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text, language }),
+    }).then(async (resp) => {
+      if (resp.ok && resp.headers.get("content-type")?.includes("audio")) {
+        const blob = await resp.blob();
+        return URL.createObjectURL(blob);
+      }
+      return null;
+    }).catch(() => null);
+    prefetchCache.current.set(text, p);
+    return p;
+  }, [language]);
+
   const playNextTTSChunk = useCallback(async () => {
     if (isPlayingTTS.current || ttsQueue.current.length === 0) return;
     isPlayingTTS.current = true;
     const chunk = ttsQueue.current.shift()!;
-    try {
-      const resp = await fetch(`${API_BASE}/voice/tts`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: chunk, language }),
-      });
-      if (resp.ok && resp.headers.get("content-type")?.includes("audio")) {
-        const audioBlob = await resp.blob();
-        const audioUrl = URL.createObjectURL(audioBlob);
-        const audio = new Audio(audioUrl);
-        currentAudioRef.current = audio;
-        audio.onended = () => { URL.revokeObjectURL(audioUrl); isPlayingTTS.current = false; playNextTTSChunk(); };
-        audio.onerror = () => { URL.revokeObjectURL(audioUrl); isPlayingTTS.current = false; playNextTTSChunk(); };
-        await audio.play();
-        return;
-      }
-    } catch (e) {
-      console.warn("Chunked TTS error:", e);
+
+    // Pre-fetch the NEXT chunk immediately so it's ready when needed
+    if (ttsQueue.current.length > 0) fetchTTSBlob(ttsQueue.current[0]);
+
+    const audioUrl = await fetchTTSBlob(chunk);
+    // Clean this entry from cache since we're consuming it
+    prefetchCache.current.delete(chunk);
+
+    if (audioUrl) {
+      const audio = new Audio(audioUrl);
+      currentAudioRef.current = audio;
+      audio.onended = () => {
+        URL.revokeObjectURL(audioUrl);
+        isPlayingTTS.current = false;
+        setIsSpeaking(ttsQueue.current.length > 0);
+        playNextTTSChunk();
+      };
+      audio.onerror = () => {
+        URL.revokeObjectURL(audioUrl);
+        isPlayingTTS.current = false;
+        playNextTTSChunk();
+      };
+      setIsSpeaking(true);
+      await audio.play().catch(() => { isPlayingTTS.current = false; });
+      return;
     }
     isPlayingTTS.current = false;
     playNextTTSChunk();
-  }, [language]);
+  }, [language, fetchTTSBlob]);
 
   const enqueueTTSChunk = useCallback((text: string) => {
     if (!voiceEnabled || !text.trim()) return;
     ttsQueue.current.push(text);
+    // Pre-fetch immediately when enqueuing so Sarvam response is ready by the time we play
+    fetchTTSBlob(text);
     playNextTTSChunk();
-  }, [voiceEnabled, playNextTTSChunk]);
+  }, [voiceEnabled, playNextTTSChunk, fetchTTSBlob]);
+
 
   // Stop ongoing TTS (soft — keeps queue)
   const stopSpeaking = useCallback(() => {
@@ -221,9 +251,6 @@ export function ChatPanel({
       setInput("");
       setLoading(true);
       setIsStreaming(true);
-
-      // Force a tiny delay so the user message renders before the bot loading bubble
-      await new Promise(resolve => setTimeout(resolve, 50));
 
       // Add empty streaming bot bubble
       setMessages((m) => {
@@ -285,9 +312,11 @@ export function ChatPanel({
                 accumulated += token;
                 sentenceBuffer += token;
                 
-                // Chunk boundary detection for streaming TTS
-                if (/[.!?\n]/.test(token)) {
-                  enqueueTTSChunk(sentenceBuffer.trim());
+                // Chunk boundary: sentence end, clause punctuation, OR 4+ words buffered
+                const wordCount = sentenceBuffer.trim().split(/\s+/).length;
+                if (/[.!?\n]/.test(token) || (/[,;:]/.test(token) && wordCount >= 3) || wordCount >= 4) {
+                  const toSpeak = sentenceBuffer.trim();
+                  if (toSpeak) enqueueTTSChunk(toSpeak);
                   sentenceBuffer = "";
                 }
 
@@ -510,8 +539,8 @@ export function ChatPanel({
         </div>
       </div>
 
-      {/* Messages */}
-      <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto p-4">
+      {/* Messages — min-h-0 is critical for overflow-y-auto to work inside flex-1 */}
+      <div ref={scrollRef} className="flex-1 min-h-0 space-y-3 overflow-y-auto p-4">
         {messages.map((m, i) => (
           <div key={i} className={cn("flex", m.role === "user" ? "justify-end" : "justify-start")}>
             <div

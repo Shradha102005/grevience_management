@@ -244,7 +244,7 @@ def _call_groq(messages: list[dict[str, str]], max_tokens: int = 300) -> str:
     if _MOCK_AI or _groq is None:
         raise RuntimeError("Mock mode")
     resp = _groq.chat.completions.create(  # pyrefly: ignore
-        model="llama-3.1-8b-instant",
+        model="openai/gpt-oss-20b",
         messages=messages,  # type: ignore[arg-type]
         max_tokens=max_tokens,
         temperature=0.6,
@@ -495,7 +495,7 @@ async def chat_stream(req: ChatRequest) -> StreamingResponse:
             # Use a language-aware token budget (Indic scripts need more tokens)
             token_budget = _get_max_tokens(req.language, req.detected_language)
             stream = _groq.chat.completions.create(  # pyrefly: ignore
-                model="llama-3.1-8b-instant",
+                model="openai/gpt-oss-20b",
                 messages=messages,  # type: ignore[arg-type]
                 max_tokens=token_budget,
                 temperature=0.6,
@@ -602,7 +602,7 @@ async def agriculture_analyze(
 
     try:
         resp = _groq.chat.completions.create(  # pyrefly: ignore
-            model="llama-3.1-8b-instant",
+            model="openai/gpt-oss-20b",
             messages=[  # type: ignore[arg-type]
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_msg},
@@ -640,7 +640,7 @@ def ai_status() -> dict:
     """Return current AI mode (live or mock)."""
     return {
         "mode": "mock" if _MOCK_AI else "live",
-        "model": "llama-3.1-8b-instant" if not _MOCK_AI else None,
+        "model": "openai/gpt-oss-20b" if not _MOCK_AI else None,
         "supported_modules": list(MODULE_PROMPTS.keys()),
         "supported_languages": LANGUAGE_MAP,
     }

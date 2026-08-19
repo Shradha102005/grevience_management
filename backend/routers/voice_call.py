@@ -34,7 +34,7 @@ BASE_URL: str = os.getenv("TWILIO_CALL_BASE_URL", "").rstrip("/")
 # Recovered from DB automatically if server restarts mid-call.
 _sessions: dict[str, dict[str, Any]] = {}
 
-SPEECH_TIMEOUT = "auto"  # Twilio intelligent detection — best for conversational barge-in
+SPEECH_TIMEOUT = "1"   # ← was 3 — shorter silence gap = faster turn-taking
 LANGUAGE = "en-IN"
 VOICE = "Polly.Aditi"  # Indian English TTS (Amazon Polly via Twilio)
 
@@ -55,11 +55,9 @@ def _twiml_response(text: str, gather_action: str | None = None) -> str:
             "input": "speech",
             "action": gather_action,
             "method": "POST",
-            "speechTimeout": SPEECH_TIMEOUT,   # "auto" = intelligent barge-in detection
+            "speechTimeout": SPEECH_TIMEOUT,
             "language": LANGUAGE,
-            "actionOnEmptyResult": "true",     # fire even on partial/ambiguous barge-in
-            # NOTE: enhanced="true" removed — it uses a different STT pipeline
-            # that doesn't support barge-in reliably
+            "enhanced": "true",
         })
         say = ET.SubElement(gather, "Say", {"voice": VOICE, "language": LANGUAGE})
         say.text = text
@@ -164,7 +162,7 @@ def _get_ai_reply(session: dict, user_text: str) -> str:
         ] + session["history"]
 
         resp = client.chat.completions.create(
-            model="llama-3.1-8b-instant",   # fastest Groq model
+            model="openai/gpt-oss-20b",
             messages=messages,               # type: ignore
             max_tokens=60,                   # ← was 120 — short = fast on a call
             temperature=0.5,
@@ -211,6 +209,7 @@ def call_start(
         if not opening_message:
             opening_message = (
                 f"Hello! This is CivicSaathi calling on behalf of "
+                # pyrefly: ignore [bad-index]
                 f"{session['campaign']['candidate_name']}'s campaign. "
                 "Feel free to ask me anything about the candidate or their policies."
             )
@@ -218,6 +217,7 @@ def call_start(
         action_url = f"{BASE_URL}/api/voice/call/respond?session_id={session_id}"
         twiml = _twiml_response(text=opening_message, gather_action=action_url)
         logger.info("Call started: CallSid=%s session=%s candidate=%s",
+                    # pyrefly: ignore [bad-index]
                     call_sid, session_id, session["campaign"]["candidate_name"])
         return _xml(twiml)
     except Exception as exc:
@@ -260,6 +260,7 @@ async def call_respond(
                 }
                 _sessions[call_sid] = session
 
+        # pyrefly: ignore [unsupported-operation]
         session["turns"] += 1
         user_text = SpeechResult.strip()
         logger.info("CallSid=%s Turn=%d Conf=%s Said=%r", call_sid, session["turns"], Confidence, user_text)
