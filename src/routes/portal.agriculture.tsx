@@ -6,7 +6,8 @@ import {
   Thermometer, Activity, ShieldAlert, BarChart3,
   RefreshCw, ChevronDown, CheckCircle2, Sparkles, Send, MessageCircle,
   Paperclip, CalendarDays, Sprout, Gauge, TrendingUp, Bell, BellRing,
-  BookOpen, MapPin, Landmark, ExternalLink, Trash2, AlertTriangle, ChevronRight
+  BookOpen, MapPin, Landmark, ExternalLink, Trash2, AlertTriangle, ChevronRight,
+  Camera, Image as ImageIcon, CheckCircle, ShieldCheck
 } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
@@ -129,33 +130,252 @@ function AgriChatModal({ onClose }: { onClose: () => void }) {
 // Tab Components
 // 
 
-//  Tab 1: Dashboard 
-function DashboardTab() {
+//  Tab 1: Live Interactive Dashboard 
+function DashboardTab({ onNavigateTab, onOpenChat }: { onNavigateTab?: (tab: "dashboard" | "diagnosis" | "planner" | "markets" | "advisories") => void; onOpenChat?: () => void }) {
+  const [selectedCity, setSelectedCity] = useState("Hyderabad");
+  const [weatherData, setWeatherData] = useState<WeatherResponse | null>(null);
+  const [weatherLoading, setWeatherLoading] = useState(true);
+  const [marketItems, setMarketItems] = useState<MarketItem[]>([]);
+  const [marketLoading, setMarketLoading] = useState(true);
+  const [selectedPestRegion, setSelectedPestRegion] = useState("All");
+
+  const CITIES = [
+    { name: "Hyderabad", state: "Telangana" },
+    { name: "Pune", state: "Maharashtra" },
+    { name: "Jaipur", state: "Rajasthan" },
+    { name: "Chandigarh", state: "Punjab" },
+    { name: "Lucknow", state: "Uttar Pradesh" },
+    { name: "Patna", state: "Bihar" },
+    { name: "Chennai", state: "Tamil Nadu" },
+    { name: "Bengaluru", state: "Karnataka" },
+    { name: "Bhopal", state: "Madhya Pradesh" },
+    { name: "Ahmedabad", state: "Gujarat" },
+  ];
+
+  // Fetch live weather when city changes
+  useEffect(() => {
+    setWeatherLoading(true);
+    fetch(`${API_BASE}/live/weather?city=${encodeURIComponent(selectedCity)}`)
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d) setWeatherData(d); })
+      .catch(() => {})
+      .finally(() => setWeatherLoading(false));
+  }, [selectedCity]);
+
+  // Fetch live market data
+  useEffect(() => {
+    fetch(`${API_BASE}/agriculture/market-prices`)
+      .then(r => r.ok ? r.json() : [])
+      .then(d => setMarketItems(d || []))
+      .catch(() => setMarketItems([]))
+      .finally(() => setMarketLoading(false));
+  }, []);
+
+  const today = weatherData?.forecast?.[0];
+  const temp = today?.high ?? 28;
+  const humidity = today?.humidity ?? 45;
+  const rainChance = today?.rain_chance ?? 15;
+  const windSpeed = today?.wind_speed ?? 12;
+
+  // Dynamic calculated indicators based on real weather
+  const estimatedSoilMoisture = Math.min(95, Math.max(20, Math.round(35 + (humidity * 0.3) + (rainChance * 0.2) - (temp > 32 ? (temp - 32) * 1.5 : 0))));
+  const moistureStatus = estimatedSoilMoisture < 35 ? "Low (Irrigation Due)" : estimatedSoilMoisture > 75 ? "High (Saturated)" : "Optimal";
+  const moistureColor = estimatedSoilMoisture < 35 ? "amber" : estimatedSoilMoisture > 75 ? "indigo" : "emerald";
+
+  const healthScore = Math.min(10, Math.max(5.0, Number((9.4 - (temp > 35 ? 1.2 : 0) - (humidity > 80 ? 0.8 : 0) - (rainChance > 70 ? 0.5 : 0)).toFixed(1))));
+  const healthStatus = healthScore >= 8.5 ? "Excellent Conditions" : healthScore >= 7.0 ? "Moderate Vigilance" : "Weather Stress";
+
+  const topMandi = marketItems[0] || { crop: "Wheat", modal_price: 2275, market: "Karnal", state: "Punjab" };
+
+  const filteredPests = selectedPestRegion === "All"
+    ? PEST_ALERTS
+    : PEST_ALERTS.filter(p => p.area.toLowerCase().includes(selectedPestRegion.toLowerCase()));
+
   return (
     <div className="flex flex-col gap-6">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
-        {[
-          { icon: Droplets, label: "Soil Moisture", value: "42%", status: "Optimal", color: "sky" },
-          { icon: Thermometer, label: "Avg Temp", value: "28°C", status: "Normal", color: "amber" },
-          { icon: Activity, label: "Health Index", value: "8.4", status: "Good", color: "emerald" },
-          { icon: ShieldAlert, label: "Active Alerts", value: "2", status: "Review", color: "rose" },
-        ].map((pod, i) => (
-          <div key={i} className={`${glassCard} relative overflow-hidden group`}>
-            <div className={`absolute -right-4 -top-4 w-20 h-20 bg-${pod.color}-500/10 rounded-full blur-xl group-hover:bg-${pod.color}-500/20 transition-all`} />
-            <div className="flex items-center gap-2 mb-3"><pod.icon className={`w-4 h-4 text-${pod.color}-500`} /><span className="text-sm font-black text-slate-400 uppercase tracking-widest">{pod.label}</span></div>
-            <span className="text-3xl font-black text-slate-800 tracking-tight">{pod.value}</span>
-            <p className="text-sm font-bold text-slate-400 mt-1">{pod.status}</p>
+      {/* Top Location & Condition Ribbon */}
+      <div className={`${glassCard} flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-transparent border-emerald-200/50`}>
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-lg shadow-emerald-500/30 shrink-0">
+            <MapPin className="w-6 h-6 animate-pulse" />
           </div>
-        ))}
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-black text-emerald-600 uppercase tracking-widest">Live Region Intelligence</span>
+              <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+            </div>
+            <div className="flex items-center gap-2 mt-0.5">
+              <select
+                value={selectedCity}
+                onChange={e => setSelectedCity(e.target.value)}
+                className="bg-white/80 dark:bg-slate-800/80 border border-emerald-300 font-extrabold text-slate-900 dark:text-white rounded-xl px-3 py-1 text-sm focus:ring-2 focus:ring-emerald-500 outline-none cursor-pointer shadow-sm"
+              >
+                {CITIES.map(c => <option key={c.name} value={c.name}>{c.name} ({c.state})</option>)}
+              </select>
+              <span className="text-sm text-slate-500 font-medium hidden sm:inline">• Live data syncing</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <div className="bg-white/80 dark:bg-slate-800/80 border border-slate-100 rounded-xl px-4 py-2 text-right shadow-sm">
+            <p className="text-sm font-black text-slate-400 uppercase tracking-wider">Today's Forecast</p>
+            <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{today?.description || "Clear Sky"} ({temp}°C / {humidity}%)</p>
+          </div>
+        </div>
       </div>
 
-      <div className={`${glassCard}`}>
-        <h2 className="text-base font-black text-slate-800 mb-5 flex items-center gap-2"><ShieldAlert className="w-4 h-4 text-rose-500" /> Regional Pest Alerts</h2>
+      {/* 4 Dynamic KPI Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
+        {/* Soil Moisture */}
+        <div className={`${glassCard} relative overflow-hidden group`}>
+          <div className={`absolute -right-4 -top-4 w-20 h-20 bg-${moistureColor}-500/10 rounded-full blur-xl group-hover:bg-${moistureColor}-500/20 transition-all`} />
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <Droplets className={`w-4 h-4 text-${moistureColor}-500`} />
+              <span className="text-sm font-black text-slate-400 uppercase tracking-widest">Soil Moisture</span>
+            </div>
+            <Badge className={`bg-${moistureColor}-100 text-${moistureColor}-800 border-none text-[9px] font-black`}>
+              {moistureStatus}
+            </Badge>
+          </div>
+          <span className="text-3xl font-black text-slate-800 tracking-tight">{weatherLoading ? "..." : `${estimatedSoilMoisture}%`}</span>
+          <div className="w-full bg-slate-100 rounded-full h-1.5 mt-3 overflow-hidden">
+            <div
+              className={`bg-gradient-to-r from-emerald-500 to-${moistureColor}-500 h-full rounded-full transition-all duration-500`}
+              style={{ width: `${estimatedSoilMoisture}%` }}
+            />
+          </div>
+        </div>
+
+        {/* Live Ambient Temperature */}
+        <div className={`${glassCard} relative overflow-hidden group`}>
+          <div className="absolute -right-4 -top-4 w-20 h-20 bg-amber-500/10 rounded-full blur-xl group-hover:bg-amber-500/20 transition-all" />
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <Thermometer className="w-4 h-4 text-amber-500" />
+              <span className="text-sm font-black text-slate-400 uppercase tracking-widest">Temperature</span>
+            </div>
+            <span className="text-xl">{today?.icon || "☀️"}</span>
+          </div>
+          <span className="text-3xl font-black text-slate-800 tracking-tight">{weatherLoading ? "..." : `${temp}°C`}</span>
+          <p className="text-sm font-bold text-slate-400 mt-1">
+            Min: {today?.low || 20}°C | Rain: {rainChance}%
+          </p>
+        </div>
+
+        {/* Dynamic Crop Health Index */}
+        <div className={`${glassCard} relative overflow-hidden group`}>
+          <div className="absolute -right-4 -top-4 w-20 h-20 bg-emerald-500/10 rounded-full blur-xl group-hover:bg-emerald-500/20 transition-all" />
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <Activity className="w-4 h-4 text-emerald-500" />
+              <span className="text-sm font-black text-slate-400 uppercase tracking-widest">Health Index</span>
+            </div>
+            <Badge className="bg-emerald-100 text-emerald-800 border-none text-[9px] font-black">
+              {healthScore >= 8 ? "Prime" : "Attention"}
+            </Badge>
+          </div>
+          <span className="text-3xl font-black text-slate-800 tracking-tight">{healthScore}/10</span>
+          <p className="text-sm font-bold text-emerald-600 mt-1">{healthStatus}</p>
+        </div>
+
+        {/* Top Mandi Rate */}
+        <div className={`${glassCard} relative overflow-hidden group`}>
+          <div className="absolute -right-4 -top-4 w-20 h-20 bg-indigo-500/10 rounded-full blur-xl group-hover:bg-indigo-500/20 transition-all" />
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <BarChart3 className="w-4 h-4 text-indigo-500" />
+              <span className="text-sm font-black text-slate-400 uppercase tracking-widest">Top Mandi Rate</span>
+            </div>
+            <Badge className="bg-indigo-100 text-indigo-800 border-none text-[9px] font-black">
+              Agmarknet
+            </Badge>
+          </div>
+          <span className="text-2xl font-black text-slate-800 tracking-tight">
+            ₹{Math.round(topMandi.modal_price).toLocaleString()}
+            <span className="text-sm text-slate-400 font-bold ml-1">/q</span>
+          </span>
+          <p className="text-sm font-bold text-slate-500 mt-1 truncate">
+            {topMandi.crop} • {topMandi.market || topMandi.state}
+          </p>
+        </div>
+      </div>
+
+      {/* 5-Day Weather & Sowing Advisory */}
+      <div className={glassCardLg}>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <Cloud className="w-5 h-5 text-emerald-600" />
+            <h3 className="text-base font-black text-slate-800">5-Day Agro-Meteorological Forecast ({selectedCity})</h3>
+          </div>
+          <span className="text-sm font-bold text-slate-400">OpenWeatherMap Live Feed</span>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+          {(weatherData?.forecast || []).slice(0, 5).map((day, i) => (
+            <div key={i} className="bg-white/80 dark:bg-slate-800/80 border border-slate-100 dark:border-slate-700 rounded-2xl p-3.5 flex flex-col items-center text-center shadow-sm">
+              <span className="text-sm font-extrabold text-slate-700 dark:text-slate-200">{day.day}</span>
+              <span className="text-3xl my-1">{day.icon}</span>
+              <p className="text-sm font-black text-slate-900 dark:text-white">{day.high}° / <span className="text-slate-400">{day.low}°</span></p>
+              <div className="flex items-center gap-1 text-[10px] font-bold text-sky-600 mt-1">
+                <Droplets className="w-3 h-3" /> {day.humidity}% hum
+              </div>
+              <p className="text-[10px] text-slate-500 font-medium mt-1 truncate max-w-full">{day.description}</p>
+            </div>
+          ))}
+        </div>
+
+        {weatherData?.advisory && weatherData.advisory.length > 0 && (
+          <div className="mt-4 p-4 rounded-2xl bg-emerald-50/70 border border-emerald-100 flex flex-col gap-1.5">
+            <span className="text-sm font-black text-emerald-700 uppercase tracking-wider flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5" /> AI Farm Advisory for Current Climate:
+            </span>
+            {weatherData.advisory.map((adv, i) => (
+              <p key={i} className="text-sm text-emerald-900 font-medium leading-relaxed">
+                • {adv}
+              </p>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Regional Pest Alerts with Filter */}
+      <div className={glassCard}>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+          <h2 className="text-base font-black text-slate-800 flex items-center gap-2">
+            <ShieldAlert className="w-4 h-4 text-rose-500" /> Regional Pest & Outbreak Radar
+          </h2>
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-bold text-slate-400">Filter Region:</span>
+            <select
+              value={selectedPestRegion}
+              onChange={e => setSelectedPestRegion(e.target.value)}
+              className="bg-slate-100 border-none font-bold text-xs text-slate-700 rounded-xl px-2.5 py-1.5 outline-none"
+            >
+              <option value="All">All Regions</option>
+              <option value="Punjab">North (Punjab/Haryana)</option>
+              <option value="Central">Central India</option>
+              <option value="Tamil">South India</option>
+              <option value="Rajasthan">West (Rajasthan)</option>
+            </select>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-          {PEST_ALERTS.map((a, i) => (
-            <div key={i} className={`p-4 rounded-2xl bg-${a.color}-50/60 border border-${a.color}-100 flex gap-3 items-start`}>
+          {filteredPests.map((a, i) => (
+            <div key={i} className={`p-4 rounded-2xl bg-${a.color}-50/70 border border-${a.color}-100 flex gap-3 items-start hover:shadow-sm transition-shadow`}>
               <span className="text-2xl shrink-0">{a.icon}</span>
-              <div><h4 className="text-sm font-bold text-slate-800">{a.title}</h4><p className="text-sm text-slate-500 font-medium mt-0.5">{a.area}</p><p className="text-sm text-slate-600 mt-1 leading-relaxed">{a.desc}</p></div>
+              <div>
+                <div className="flex items-center justify-between gap-2">
+                  <h4 className="text-sm font-bold text-slate-800">{a.title}</h4>
+                  <Badge className={`bg-${a.color}-100 text-${a.color}-800 border-none text-[8px] font-black capitalize`}>
+                    {a.risk} risk
+                  </Badge>
+                </div>
+                <p className="text-sm text-slate-500 font-semibold mt-0.5">{a.area}</p>
+                <p className="text-sm text-slate-600 mt-1 leading-relaxed">{a.desc}</p>
+              </div>
             </div>
           ))}
         </div>
@@ -524,9 +744,305 @@ function AdvisoriesTab() {
   );
 }
 
+//  Tab 5: Crop Doctor (Photo & Disease Analysis) 
+function CropDoctorTab() {
+  const [file, setFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [description, setDescription] = useState("");
+  const [analyzing, setAnalyzing] = useState(false);
+  const [diagnosis, setDiagnosis] = useState<Diagnosis | null>(null);
+  const [chatMessages, setChatMessages] = useState<{ role: string; content: string }[]>([]);
+  const [chatInput, setChatInput] = useState("");
+  const [chatLoading, setChatLoading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const sampleSymptoms = [
+    "White powdery coating on tomato leaves",
+    "Yellow stripes and brown rust on wheat blades",
+    "Browning leaf tips and stunted growth in paddy",
+    "Curled leaves with tiny white insects on cotton",
+  ];
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const selected = e.target.files[0];
+      setFile(selected);
+      setPreviewUrl(URL.createObjectURL(selected));
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const selected = e.dataTransfer.files[0];
+      setFile(selected);
+      setPreviewUrl(URL.createObjectURL(selected));
+    }
+  };
+
+  const clearFile = () => {
+    setFile(null);
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    setPreviewUrl(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const runDiagnosis = async () => {
+    if (!file && !description.trim()) {
+      toast.error("Please upload a crop photo or describe the symptoms.");
+      return;
+    }
+    setAnalyzing(true);
+    setDiagnosis(null);
+    setChatMessages([]);
+    try {
+      const formData = new FormData();
+      if (file) formData.append("image", file);
+      formData.append("description", description.trim() || "Analyze this crop image for diseases and nutrient deficiencies");
+      formData.append("language", "en");
+
+      const res = await fetch(`${API_BASE}/agriculture/analyze`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) throw new Error(`Diagnosis HTTP ${res.status}`);
+      const data: Diagnosis = await res.json();
+      setDiagnosis(data);
+      toast.success("Crop diagnosis ready!");
+    } catch (err) {
+      toast.error("Failed to analyze crop. Please check connection.");
+    } finally {
+      setAnalyzing(false);
+    }
+  };
+
+  const sendFollowUp = async () => {
+    if (!chatInput.trim() || !diagnosis || chatLoading) return;
+    const userMsg = chatInput.trim();
+    setChatInput("");
+    setChatMessages(prev => [...prev, { role: "user", content: userMsg }]);
+    setChatLoading(true);
+
+    try {
+      const context = `Crop diagnosis: ${diagnosis.diagnosis} (${diagnosis.confidence}% confidence). Treatment steps: ${diagnosis.treatment.join("; ")}`;
+      const res = await fetch(`${API_BASE}/agriculture/analyze-chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          diagnosis_context: context,
+          messages: [...chatMessages, { role: "user", content: userMsg }],
+        }),
+      });
+      const data = await res.json();
+      setChatMessages(prev => [...prev, { role: "assistant", content: data.reply || "No reply available." }]);
+    } catch {
+      toast.error("Could not send message.");
+    } finally {
+      setChatLoading(false);
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-6">
+      {/* Upload & Input Card */}
+      <div className={glassCardLg}>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center">
+            <Bug className="w-5 h-5 text-emerald-600" />
+          </div>
+          <div>
+            <h2 className="text-base font-black text-slate-800">AI Crop Doctor & Disease Diagnosis</h2>
+            <p className="text-sm text-slate-500 font-medium mt-0.5">Upload a photo of damaged leaves or crops for instant treatment guidance.</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-4">
+          {/* Photo Dropzone */}
+          <div className="lg:col-span-5 flex flex-col gap-3">
+            <label className="block text-sm font-black text-slate-400 uppercase tracking-widest">Crop Photo (Leaf / Stem / Fruit)</label>
+            <input
+              type="file"
+              ref={fileInputRef}
+              accept="image/*"
+              className="hidden"
+              onChange={handleFileChange}
+            />
+
+            {!previewUrl ? (
+              <div
+                onClick={() => fileInputRef.current?.click()}
+                onDragOver={e => e.preventDefault()}
+                onDrop={handleDrop}
+                className="border-2 border-dashed border-slate-200 hover:border-emerald-500 bg-slate-50/50 hover:bg-emerald-50/30 rounded-2xl p-8 flex flex-col items-center justify-center gap-3 cursor-pointer transition-all min-h-[220px] text-center group"
+              >
+                <div className="w-12 h-12 rounded-full bg-white shadow-md flex items-center justify-center text-slate-400 group-hover:text-emerald-500 group-hover:scale-110 transition-all">
+                  <Camera className="w-6 h-6" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-slate-700">Click to upload or drag & drop</p>
+                  <p className="text-sm text-slate-400 mt-1">PNG, JPG, WebP up to 10MB</p>
+                </div>
+              </div>
+            ) : (
+              <div className="relative rounded-2xl overflow-hidden border border-slate-200 shadow-sm bg-slate-900 group max-h-[260px] flex items-center justify-center">
+                <img src={previewUrl} alt="Crop upload preview" className="w-full h-auto object-cover max-h-[260px]" />
+                <button
+                  onClick={clearFile}
+                  className="absolute top-3 right-3 p-2 bg-slate-900/80 hover:bg-rose-600 text-white rounded-full transition-colors shadow-lg"
+                  title="Remove photo"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Symptoms Description */}
+          <div className="lg:col-span-7 flex flex-col justify-between gap-4">
+            <div>
+              <label className="block text-sm font-black text-slate-400 uppercase tracking-widest mb-2">Visible Symptoms & Description</label>
+              <textarea
+                value={description}
+                onChange={e => setDescription(e.target.value)}
+                placeholder="Describe what you see on the leaves, stem, or fruit (e.g. brown circular spots, yellowing veins, powdery mold, insect bite marks)..."
+                className="w-full h-28 bg-slate-100/80 border-none text-sm font-medium text-slate-800 rounded-2xl p-3.5 focus:ring-2 focus:ring-emerald-500 outline-none resize-none"
+              />
+
+              {/* Sample Prompt Chips */}
+              <div className="mt-3">
+                <p className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">Quick Sample Symptoms:</p>
+                <div className="flex flex-wrap gap-2">
+                  {sampleSymptoms.map((sample, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => setDescription(sample)}
+                      className="text-sm bg-white border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/50 text-slate-600 font-medium px-3 py-1.5 rounded-xl transition-colors text-left"
+                    >
+                      {sample}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <button
+              onClick={runDiagnosis}
+              disabled={analyzing}
+              className="w-full h-12 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-extrabold text-sm flex items-center justify-center gap-2 transition-all shadow-xl shadow-emerald-500/20 disabled:opacity-60"
+            >
+              {analyzing ? <Loader2 className="w-5 h-5 animate-spin" /> : <Sparkles className="w-5 h-5" />}
+              {analyzing ? "Diagnosing Condition..." : "Analyze Crop Condition"}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Diagnosis Results Card */}
+      {diagnosis && (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-400">
+          {/* Main Diagnosis & Treatment */}
+          <div className={`${glassCardLg} lg:col-span-8 flex flex-col gap-5`}>
+            <div className="flex items-start justify-between gap-4 border-b border-slate-100 pb-4">
+              <div>
+                <span className="text-sm font-black uppercase tracking-wider text-emerald-600">Detected Condition</span>
+                <h3 className="text-xl font-black text-slate-900 mt-1">{diagnosis.diagnosis}</h3>
+              </div>
+              <div className="text-right shrink-0">
+                <Badge className="bg-emerald-100 text-emerald-800 border-none text-sm font-black px-3 py-1">
+                  {diagnosis.confidence}% Confidence
+                </Badge>
+              </div>
+            </div>
+
+            {/* Treatment Steps */}
+            <div>
+              <h4 className="text-sm font-black text-slate-700 uppercase tracking-widest mb-3 flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-emerald-600" /> Action & Treatment Plan
+              </h4>
+              <div className="grid grid-cols-1 gap-2.5">
+                {diagnosis.treatment.map((step, i) => (
+                  <div key={i} className="flex items-start gap-3 bg-emerald-50/60 border border-emerald-100/80 rounded-xl p-3.5 shadow-sm">
+                    <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                    <p className="text-sm text-slate-700 font-medium leading-relaxed">{step}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Subsidies and schemes */}
+            {diagnosis.schemes && diagnosis.schemes.length > 0 && (
+              <div className="pt-2 border-t border-slate-100">
+                <h4 className="text-sm font-black text-slate-700 uppercase tracking-widest mb-2 flex items-center gap-2">
+                  <Landmark className="w-4 h-4 text-indigo-500" /> Applicable Government Support
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {diagnosis.schemes.map((scheme, i) => (
+                    <Badge key={i} className="bg-indigo-50 text-indigo-700 border border-indigo-100 text-sm font-bold px-3 py-1">
+                      {scheme}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Doctor Follow-Up Q&A */}
+          <div className={`${glassCard} lg:col-span-4 flex flex-col justify-between min-h-[380px]`}>
+            <div>
+              <div className="flex items-center gap-2 mb-3 pb-3 border-b border-slate-100">
+                <MessageCircle className="w-4 h-4 text-emerald-600" />
+                <h4 className="text-sm font-black text-slate-800">Ask Crop Doctor</h4>
+              </div>
+
+              <div className="flex flex-col gap-2.5 max-h-[260px] overflow-y-auto pr-1 text-sm">
+                <div className="bg-slate-100 rounded-2xl p-3 text-slate-700 font-medium">
+                  Hello! I've analyzed this condition. Ask me about spray dosage, organic remedies, or recovery time.
+                </div>
+                {chatMessages.map((m, i) => (
+                  <div
+                    key={i}
+                    className={`p-3 rounded-2xl font-medium ${m.role === "user" ? "bg-emerald-600 text-white ml-6" : "bg-slate-100 text-slate-800 mr-6"}`}
+                  >
+                    {m.content}
+                  </div>
+                ))}
+                {chatLoading && (
+                  <div className="flex items-center gap-2 text-slate-400 font-bold p-2 text-sm">
+                    <Loader2 className="w-4 h-4 animate-spin text-emerald-500" /> Thinking...
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="flex gap-2 mt-4 pt-3 border-t border-slate-100">
+              <input
+                type="text"
+                value={chatInput}
+                onChange={e => setChatInput(e.target.value)}
+                onKeyDown={e => e.key === "Enter" && sendFollowUp()}
+                placeholder="Ask a question about this diagnosis..."
+                className="flex-1 bg-slate-100 border-none text-sm font-medium text-slate-800 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500"
+              />
+              <button
+                onClick={sendFollowUp}
+                disabled={chatLoading || !chatInput.trim()}
+                className="p-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition-colors shadow-md disabled:opacity-50"
+              >
+                <Send className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 //  Main Component 
 function Agriculture() {
-  const [activeTab, setActiveTab] = useState<"dashboard" | "planner" | "markets" | "advisories">("dashboard");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "diagnosis" | "planner" | "markets" | "advisories">("dashboard");
   const [weather, setWeather] = useState<WeatherResponse | null>(null);
   const [weatherLoading, setWeatherLoading] = useState(true);
   const [showWeather, setShowWeather] = useState(false);
@@ -541,6 +1057,7 @@ function Agriculture() {
 
   const TABS = [
     { id: "dashboard", label: "Dashboard", icon: Activity },
+    { id: "diagnosis", label: "Crop Doctor", icon: Bug },
     { id: "planner", label: "AI Planner", icon: CalendarDays },
     { id: "markets", label: "Markets", icon: BarChart3 },
     { id: "advisories", label: "Advisories", icon: BookOpen },
@@ -597,7 +1114,13 @@ function Agriculture() {
       {/* Tab Content */}
       <div className="flex-1 overflow-y-auto px-6 lg:px-10 pt-4 pb-8 z-10 relative" style={{ scrollbarWidth: "none" }}>
         <div className="max-w-[1400px] mx-auto">
-          {activeTab === "dashboard" && <DashboardTab />}
+          {activeTab === "dashboard" && (
+            <DashboardTab
+              onNavigateTab={setActiveTab}
+              onOpenChat={() => setShowChat(true)}
+            />
+          )}
+          {activeTab === "diagnosis" && <CropDoctorTab />}
           {activeTab === "planner" && <PlannerTab />}
           {activeTab === "markets" && <MarketsTab />}
           {activeTab === "advisories" && <AdvisoriesTab />}

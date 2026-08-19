@@ -240,7 +240,7 @@ async def get_commodity_detail(
 
 @router.post("/analyze", response_model=DiagnosisResponse)
 async def analyze_crop(
-    image: UploadFile = File(...),
+    image: Optional[UploadFile] = File(None),
     description: str  = Form("Analyze this crop for diseases"),
     language: str     = Form("en"),
 ):
