@@ -238,8 +238,13 @@ async def synthesize_sarvam_tts_b64(text: str, language: str = "en", speaker: st
         return None
 
     import re as _re
-    clean = _re.sub(r'\([^)]*\)', '', text)
-    clean = _re.sub(r'https?://[^\s]+', '', clean)
+    clean = _re.sub(r'\[\s*STATUS\s*:\s*[^\]]*\]', '', text, flags=_re.IGNORECASE)  # strip [STATUS:resolved] etc.
+    clean = _re.sub(r'\bSTATUS\s*:\s*(?:resolved|unresolved)\b', '', clean, flags=_re.IGNORECASE)
+    clean = _re.sub(r'\[\s*(?:resolved|unresolved)\s*\]', '', clean, flags=_re.IGNORECASE)
+    clean = _re.sub(r'\([^)]*\)', '', clean)      # remove parentheticals
+    clean = _re.sub(r'https?://[^\s]+', '', clean) # strip URLs
+    clean = _re.sub(r'\*+', '', clean)             # strip markdown asterisks
+    clean = _re.sub(r'#+\s*', '', clean)           # strip markdown headers
     clean = clean.strip()
     if not clean or not _re.search(r'[\w\u0900-\u097F\u0C00-\u0C7F\u0B80-\u0BFF\u0D00-\u0D7F\u0A80-\u0AFF\u0B00-\u0B7F\u0A00-\u0A7F\u0980-\u09FF]', clean):
         return None

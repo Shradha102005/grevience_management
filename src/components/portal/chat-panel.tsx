@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { LanguageDropdown } from "./language-selector";
+import { useAuth } from "@/lib/auth-context";
 
 interface Msg {
   role: "user" | "bot";
@@ -48,6 +49,7 @@ export function ChatPanel({
   showLanguageSelector?: boolean;
   onClose?: () => void;
 }) {
+  const { user } = useAuth();
   const [messages, setMessages] = useState<Msg[]>([{ role: "bot", text: greeting }]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -60,8 +62,6 @@ export function ChatPanel({
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
-  const ttsQueue = useRef<string[]>([]);
-  const isPlayingTTS = useRef<boolean>(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const historyRef = useRef<{ role: string; content: string }[]>([]);
@@ -84,156 +84,161 @@ export function ChatPanel({
       }));
   }, [messages]);
 
-  // ── Server-side TTS via Sarvam AI ─────────────────────────────────────────
-  const speakText = useCallback(
-    async (text: string) => {
-      if (!voiceEnabled || !text.trim()) return;
+  // ── Ultra-Low Latency Pipelined TTS System ──────────────────────────────────
+  interface TTSJob {
+    text: string;
+    lang: string;
+    fetchPromise: Promise<string | null>;
+  }
 
-      // Stop any current audio
-      if (currentAudioRef.current) {
-        currentAudioRef.current.pause();
-        currentAudioRef.current = null;
+  const ttsJobsRef = useRef<TTSJob[]>([]);
+  const currentJobIdxRef = useRef<number>(0);
+  const isPlayingAudioRef = useRef<boolean>(false);
+  const isStreamActiveRef = useRef<boolean>(false);
+  const ttsAbortRef = useRef<boolean>(false);
+
+  const cleanTextForTTS = (text: string): string => {
+    return text
+      .replace(/\[\s*STATUS\s*:[^\]]*\]/gi, "")
+      .replace(/\bSTATUS\s*:\s*(?:resolved|unresolved)\b/gi, "")
+      .replace(/\[\s*(?:resolved|unresolved)\s*\]/gi, "")
+      .replace(/\[\s*\]/g, "")
+      .replace(/https?:\/\/[^\s)]+/gi, "")
+      .replace(/www\.[^\s)]+/gi, "")
+      .replace(/\b[\w.-]+?\.(?:gov\.in|nic\.in|gov|in|org|com|net|edu)\b[^\s)]*/gi, "")
+      .replace(/\*+/g, "")
+      .replace(/#+\s*/g, "")
+      .replace(/\([^)]*\)/g, "")
+      .replace(/\s{2,}/g, " ")
+      .trim();
+  };
+
+  // Hard stop — clears ALL queues (used on interruption / new message)
+  const stopSpeakingImmediately = useCallback(() => {
+    ttsAbortRef.current = true;
+    isStreamActiveRef.current = false;
+    if (currentAudioRef.current) {
+      currentAudioRef.current.pause();
+      currentAudioRef.current = null;
+    }
+    window.speechSynthesis?.cancel();
+    ttsJobsRef.current = [];
+    currentJobIdxRef.current = 0;
+    isPlayingAudioRef.current = false;
+    setIsSpeaking(false);
+  }, []);
+
+  const stopSpeaking = stopSpeakingImmediately;
+
+  const pumpTTSPlayback = useCallback(async () => {
+    if (isPlayingAudioRef.current || !voiceEnabled || ttsAbortRef.current) return;
+
+    if (currentJobIdxRef.current >= ttsJobsRef.current.length) {
+      if (!isStreamActiveRef.current) {
+        setIsSpeaking(false);
       }
-      window.speechSynthesis?.cancel();
+      return;
+    }
 
-      setIsSpeaking(true);
-      try {
-        const resp = await fetch(`${API_BASE}/voice/tts`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text, language }),
-        });
+    const job = ttsJobsRef.current[currentJobIdxRef.current];
+    currentJobIdxRef.current += 1;
+    isPlayingAudioRef.current = true;
+    setIsSpeaking(true);
 
-        if (!resp.ok) throw new Error(`TTS HTTP ${resp.status}`);
+    const audioUrl = await job.fetchPromise;
 
-        const contentType = resp.headers.get("content-type") || "";
+    if (ttsAbortRef.current || !voiceEnabled) {
+      if (audioUrl) URL.revokeObjectURL(audioUrl);
+      isPlayingAudioRef.current = false;
+      return;
+    }
 
-        // Fallback: server told us to use browser TTS — stay silent (consistent voice)
-        if (contentType.includes("application/json")) {
-          setIsSpeaking(false);
-          return;
-        }
-
-        // Play Sarvam audio blob
-        const audioBlob = await resp.blob();
-        const audioUrl = URL.createObjectURL(audioBlob);
+    if (audioUrl) {
+      await new Promise<void>((resolve) => {
         const audio = new Audio(audioUrl);
         currentAudioRef.current = audio;
         audio.onended = () => {
-          setIsSpeaking(false);
           URL.revokeObjectURL(audioUrl);
+          currentAudioRef.current = null;
+          resolve();
         };
         audio.onerror = () => {
-          setIsSpeaking(false);
           URL.revokeObjectURL(audioUrl);
+          currentAudioRef.current = null;
+          resolve();
         };
-        await audio.play();
-      } catch (err) {
-        console.warn("TTS error:", err);
-        setIsSpeaking(false);
-        // No browser speechSynthesis fallback — avoids mixed voices
+        audio.play().catch(() => resolve());
+      });
+    } else {
+      if (window.speechSynthesis) {
+        await new Promise<void>((resolve) => {
+          const utt = new SpeechSynthesisUtterance(job.text);
+          utt.lang = job.lang === "en" ? "en-IN" : `${job.lang}-IN`;
+          utt.onend = () => resolve();
+          utt.onerror = () => resolve();
+          window.speechSynthesis.speak(utt);
+        });
       }
+    }
+
+    isPlayingAudioRef.current = false;
+    pumpTTSPlayback();
+  }, [voiceEnabled]);
+
+  const queueSentenceForTTS = useCallback(
+    (rawText: string, langCode: string) => {
+      if (!voiceEnabled || ttsAbortRef.current) return;
+      const clean = cleanTextForTTS(rawText);
+      if (!clean || !/\w|[\u0900-\u0D7F]/.test(clean)) return;
+
+      const subChunks: string[] = [];
+      if (clean.length > 450) {
+        const parts = clean.split(/(?<=[,;])\s+/);
+        let cur = "";
+        for (const p of parts) {
+          if ((cur + " " + p).trim().length <= 450) {
+            cur = (cur + " " + p).trim();
+          } else {
+            if (cur) subChunks.push(cur);
+            cur = p.slice(0, 450);
+          }
+        }
+        if (cur) subChunks.push(cur);
+      } else {
+        subChunks.push(clean);
+      }
+
+      for (const chunk of subChunks) {
+        const fetchPromise = (async () => {
+          try {
+            const resp = await fetch(`${API_BASE}/voice/tts`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ text: chunk, language: langCode }),
+            });
+            if (ttsAbortRef.current) return null;
+            const contentType = resp.headers.get("content-type") || "";
+            if (resp.ok && contentType.includes("audio")) {
+              const blob = await resp.blob();
+              return URL.createObjectURL(blob);
+            }
+            return null;
+          } catch {
+            return null;
+          }
+        })();
+
+        ttsJobsRef.current.push({
+          text: chunk,
+          lang: langCode,
+          fetchPromise,
+        });
+      }
+
+      pumpTTSPlayback();
     },
-    [voiceEnabled, language],
+    [voiceEnabled, pumpTTSPlayback],
   );
-
-  // Pre-fetch cache: chunk text → fetched blob URL (ready to play immediately)
-  const prefetchCache = useRef<Map<string, Promise<string | null>>>(new Map());
-
-  const fetchTTSBlob = useCallback((text: string): Promise<string | null> => {
-    if (prefetchCache.current.has(text)) return prefetchCache.current.get(text)!;
-    const p = fetch(`${API_BASE}/voice/tts`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text, language }),
-    }).then(async (resp) => {
-      if (resp.ok && resp.headers.get("content-type")?.includes("audio")) {
-        const blob = await resp.blob();
-        return URL.createObjectURL(blob);
-      }
-      return null;
-    }).catch(() => null);
-    prefetchCache.current.set(text, p);
-    return p;
-  }, [language]);
-
-  const playNextTTSChunk = useCallback(async () => {
-    if (isPlayingTTS.current || ttsQueue.current.length === 0) return;
-    isPlayingTTS.current = true;
-    const chunk = ttsQueue.current.shift()!;
-
-    // Pre-fetch the NEXT chunk immediately so it's ready when needed
-    if (ttsQueue.current.length > 0) fetchTTSBlob(ttsQueue.current[0]);
-
-    const audioUrl = await fetchTTSBlob(chunk);
-    // Clean this entry from cache since we're consuming it
-    prefetchCache.current.delete(chunk);
-
-    if (audioUrl) {
-      const audio = new Audio(audioUrl);
-      currentAudioRef.current = audio;
-      audio.onended = () => {
-        URL.revokeObjectURL(audioUrl);
-        isPlayingTTS.current = false;
-        setIsSpeaking(ttsQueue.current.length > 0);
-        playNextTTSChunk();
-      };
-      audio.onerror = () => {
-        URL.revokeObjectURL(audioUrl);
-        isPlayingTTS.current = false;
-        playNextTTSChunk();
-      };
-      setIsSpeaking(true);
-      await audio.play().catch(() => { isPlayingTTS.current = false; });
-      return;
-    }
-    isPlayingTTS.current = false;
-    playNextTTSChunk();
-  }, [language, fetchTTSBlob]);
-
-  const enqueueTTSChunk = useCallback((text: string) => {
-    if (!voiceEnabled || !text.trim()) return;
-    // Skip chunks with no actual word characters (punctuation/symbols only → Sarvam 400)
-    if (!/\w/.test(text)) return;
-    // Strip ALL parenthetical content and URLs (shown in text but not spoken)
-    const speakText = text
-      .replace(/\([^)]*\)/g, "")               // Remove complete ( ... ) blocks
-      .replace(/\([^)]*$/g, "")                // Remove unclosed ( ... at end of chunk
-      .replace(/^[^(]*\)/g, "")                // Remove leftover ... ) at start of chunk
-      .replace(/https?:\/\/[^\s)]+/gi, "")     // Strip full URLs (including .in / path)
-      .replace(/www\.[^\s)]+/gi, "")           // Strip www links
-      .replace(/\b[\w.-]+?\.(?:gov\.in|nic\.in|gov|in|org|com|net|edu)\b[^\s)]*/gi, "") // Strip any domain like myscheme.gov.in
-      .replace(/\s{2,}/g, " ")
-      .trim();
-    if (!speakText || !/\w/.test(speakText)) return;
-    ttsQueue.current.push(speakText);
-    // Pre-fetch immediately when enqueuing so Sarvam response is ready by the time we play
-    fetchTTSBlob(speakText);
-    playNextTTSChunk();
-  }, [voiceEnabled, playNextTTSChunk, fetchTTSBlob]);
-
-
-  // Stop ongoing TTS (soft — keeps queue)
-  const stopSpeaking = useCallback(() => {
-    if (currentAudioRef.current) {
-      currentAudioRef.current.pause();
-      currentAudioRef.current = null;
-    }
-    window.speechSynthesis?.cancel();
-    setIsSpeaking(false);
-  }, []);
-
-  // Hard stop — clears queue too (used on interruption)
-  const stopSpeakingImmediately = useCallback(() => {
-    ttsQueue.current = [];
-    isPlayingTTS.current = false;
-    if (currentAudioRef.current) {
-      currentAudioRef.current.pause();
-      currentAudioRef.current = null;
-    }
-    window.speechSynthesis?.cancel();
-    setIsSpeaking(false);
-  }, []);
 
   // ── Streaming SSE chat ────────────────────────────────────────────────────
   const sendMessage = useCallback(
@@ -256,6 +261,12 @@ export function ChatPanel({
         return [...m, { role: "bot", text: "", streaming: true }];
       });
 
+      // Mark stream as active for the TTS playback pump
+      isStreamActiveRef.current = true;
+      ttsJobsRef.current = [];
+      currentJobIdxRef.current = 0;
+      ttsAbortRef.current = false;
+
       const controller = new AbortController();
       abortControllerRef.current = controller;
 
@@ -267,6 +278,8 @@ export function ChatPanel({
             module,
             message: q,
             language,
+            user_name: user?.name || "",
+            user_id: user?.id || "",
             history: historyRef.current.slice(-10),
           }),
           signal: controller.signal,
@@ -280,9 +293,9 @@ export function ChatPanel({
         let accumulated = "";
         let sentenceBuffer = "";
         let buffer = "";
-        let isFirstChunk = true;
+        let streamDone = false;
 
-        while (true) {
+        while (!streamDone) {
           const { done, value } = await reader.read();
           if (done) break;
 
@@ -302,41 +315,14 @@ export function ChatPanel({
                     : msg,
                 ),
               );
-              if (sentenceBuffer.trim()) enqueueTTSChunk(sentenceBuffer.trim());
-              break;
+              streamDone = true;
+              continue;
             }
             try {
               const { token } = JSON.parse(raw);
               if (token) {
                 accumulated += token;
                 sentenceBuffer += token;
-
-                const wordCount = sentenceBuffer.trim().split(/\s+/).length;
-                const isSentenceEnd = /[.!?\n]/.test(token);
-                const insideParen = (sentenceBuffer.split("(").length > sentenceBuffer.split(")").length);
-
-                // First chunk fires early (at 4 words or punctuation) for instant voice start.
-                // Subsequent chunks wait for complete sentences for natural flow.
-                const shouldTrigger = !insideParen && (
-                  (isFirstChunk && (wordCount >= 4 || isSentenceEnd || /[,;:]/.test(token))) ||
-                  (!isFirstChunk && (isSentenceEnd || wordCount >= 20))
-                );
-
-                if (shouldTrigger) {
-                  let toSpeak: string;
-                  const lastSpace = sentenceBuffer.lastIndexOf(" ");
-                  if (!isSentenceEnd && lastSpace > 0) {
-                    toSpeak = sentenceBuffer.substring(0, lastSpace).trim();
-                    sentenceBuffer = sentenceBuffer.substring(lastSpace + 1);
-                  } else {
-                    toSpeak = sentenceBuffer.trim();
-                    sentenceBuffer = "";
-                  }
-                  if (toSpeak) {
-                    enqueueTTSChunk(toSpeak);
-                    isFirstChunk = false;
-                  }
-                }
 
                 setMessages((m) =>
                   m.map((msg, i) =>
@@ -345,13 +331,33 @@ export function ChatPanel({
                       : msg,
                   ),
                 );
+
+                // Fast-start: As soon as a complete sentence (.!?) is formed during streaming,
+                // queue it IMMEDIATELY so TTS starts in the background while the rest streams!
+                const match = sentenceBuffer.match(/^([\s\S]*?[.!?\n]+)\s*([\s\S]*)$/);
+                if (match) {
+                  const completeSentence = match[1];
+                  sentenceBuffer = match[2];
+                  queueSentenceForTTS(completeSentence, language);
+                }
               }
             } catch {
               // ignore malformed SSE
             }
           }
         }
+
+        // Stream finished
+        isStreamActiveRef.current = false;
+
+        // Queue any remaining text in sentenceBuffer
+        if (sentenceBuffer.trim()) {
+          queueSentenceForTTS(sentenceBuffer.trim(), language);
+        }
+
+        pumpTTSPlayback();
       } catch (err: any) {
+        isStreamActiveRef.current = false;
         if (err.name === "AbortError") {
           // User stopped — finalize whatever we have
           setMessages((m) =>
@@ -377,7 +383,7 @@ export function ChatPanel({
         abortControllerRef.current = null;
       }
     },
-    [loading, module, language, speakText, stopSpeakingImmediately],
+    [loading, module, language, user, stopSpeakingImmediately, queueSentenceForTTS, pumpTTSPlayback],
   );
 
   const stopStreaming = useCallback(() => {

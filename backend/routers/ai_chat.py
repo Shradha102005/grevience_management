@@ -575,17 +575,12 @@ async def chat_stream(req: ChatRequest) -> StreamingResponse:
         )
 
     async def token_generator():
-        """Yields SSE-formatted token chunks AND synthesized audio chunks concurrently."""
+        """Yields SSE-formatted token chunks. TTS is handled by the frontend."""
         if _MOCK_AI or _groq is None:
             mock = MOCK_RESPONSES.get(module, "I'm here to help! (AI mock mode)")
             yield f"data: {json.dumps({'token': mock})}\n\n"
             yield "data: [DONE]\n\n"
             return
-
-        try:
-            from .voice import synthesize_sarvam_tts_b64
-        except Exception:
-            synthesize_sarvam_tts_b64 = None
 
         try:
             import asyncio
@@ -594,7 +589,6 @@ async def chat_stream(req: ChatRequest) -> StreamingResponse:
                 messages.append({"role": h.role, "content": h.content})
             messages.append({"role": "user", "content": req.message})
 
-            # Use a language-aware token budget (Indic scripts need more tokens)
             token_budget = _get_max_tokens(req.language, req.detected_language)
             stream = await _async_groq.chat.completions.create(  # pyrefly: ignore
                 model="groq/compound-mini",
@@ -612,74 +606,47 @@ async def chat_stream(req: ChatRequest) -> StreamingResponse:
                 stream=True,
             )
 
-            sentence_buffer = ""
-            is_first_chunk = True
-            tts_tasks: list[asyncio.Task] = []
+            # ── [STATUS:...] tag filter ──────────────────────────────────────
+            _status_re = re.compile(
+                r'\[\s*STATUS\s*:\s*(?:resolved|unresolved)\s*\]|\bSTATUS\s*:\s*(?:resolved|unresolved)\b|\[\s*(?:resolved|unresolved)\s*\]',
+                re.IGNORECASE
+            )
+            _partial_re = re.compile(
+                r'\[\s*s?t?a?t?u?s?:?\s*(?:r?e?s?o?l?v?e?d?|u?n?r?e?s?o?l?v?e?d?)?\]?$',
+                re.IGNORECASE
+            )
 
-            async def _stream_tokens():
-                if _async_groq is not None:
-                    async for chunk in stream:
-                        tok = chunk.choices[0].delta.content or ""
-                        if tok:
-                            yield tok
-                else:
-                    for chunk in stream:
-                        tok = chunk.choices[0].delta.content or ""
-                        if tok:
-                            yield tok
+            def _flush_safe(raw: str):
+                cleaned = _status_re.sub("", raw)
+                m = _partial_re.search(cleaned)
+                if m:
+                    return cleaned[:m.start()], cleaned[m.start():]
+                return cleaned, ""
 
-            async for token in _stream_tokens():
-                sentence_buffer += token
-                yield f"data: {json.dumps({'token': token})}\n\n"
+            tag_hold = ""
 
-                # Check if we should launch server-side TTS on this chunk
-                words = sentence_buffer.strip().split()
-                has_sentence_end = bool(re.search(r'[.!?\n]', token))
-                open_paren = sentence_buffer.count("(") > sentence_buffer.count(")")
+            if _async_groq is not None:
+                async for chunk in stream:
+                    tok = chunk.choices[0].delta.content or ""
+                    if tok:
+                        raw = tag_hold + tok
+                        safe_token, tag_hold = _flush_safe(raw)
+                        if safe_token:
+                            yield f"data: {json.dumps({'token': safe_token})}\n\n"
+            else:
+                for chunk in stream:
+                    tok = chunk.choices[0].delta.content or ""
+                    if tok:
+                        raw = tag_hold + tok
+                        safe_token, tag_hold = _flush_safe(raw)
+                        if safe_token:
+                            yield f"data: {json.dumps({'token': safe_token})}\n\n"
 
-                if not open_paren and synthesize_sarvam_tts_b64 is not None:
-                    if is_first_chunk and len(words) >= 4:
-                        last_space = sentence_buffer.rfind(" ")
-                        if last_space > 0:
-                            chunk_text = sentence_buffer[:last_space].strip()
-                            sentence_buffer = sentence_buffer[last_space:].lstrip()
-                            if chunk_text:
-                                task = asyncio.create_task(synthesize_sarvam_tts_b64(chunk_text, req.language))
-                                tts_tasks.append(task)
-                                is_first_chunk = False
-                    elif not is_first_chunk and has_sentence_end:
-                        match = re.match(r'^([\s\S]*?[.!?\n]+)\s*([\s\S]*)$', sentence_buffer)
-                        if match:
-                            complete = match.group(1).strip()
-                            sentence_buffer = match.group(2)
-                            if complete:
-                                task = asyncio.create_task(synthesize_sarvam_tts_b64(complete, req.language))
-                                tts_tasks.append(task)
-
-                # Check if any TTS task has completed and yield its audio immediately
-                for t in list(tts_tasks):
-                    if t.done():
-                        tts_tasks.remove(t)
-                        try:
-                            audio_b64 = t.result()
-                            if audio_b64:
-                                yield f"data: {json.dumps({'audio': audio_b64})}\n\n"
-                        except Exception:
-                            pass
-
-            # Flush any remaining text in buffer to TTS
-            if sentence_buffer.strip() and synthesize_sarvam_tts_b64 is not None:
-                task = asyncio.create_task(synthesize_sarvam_tts_b64(sentence_buffer.strip(), req.language))
-                tts_tasks.append(task)
-
-            # Wait for all pending TTS tasks and yield their audio chunks
-            for task in tts_tasks:
-                try:
-                    audio_b64 = await task
-                    if audio_b64:
-                        yield f"data: {json.dumps({'audio': audio_b64})}\n\n"
-                except Exception:
-                    pass
+            # Flush any held partial (strip status tag residue)
+            if tag_hold:
+                safe_tail = _status_re.sub("", tag_hold).strip()
+                if safe_tail:
+                    yield f"data: {json.dumps({'token': safe_tail})}\n\n"
 
             yield "data: [DONE]\n\n"
 

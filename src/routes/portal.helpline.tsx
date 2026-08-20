@@ -37,6 +37,7 @@ interface BotMessage {
   isVoice?: boolean;           // true if this message came from mic input
   resolved?: boolean;          // from AI response  false triggers escalation
   suggestedReplies?: string[]; // quick-reply chips shown below the bot bubble
+  streaming?: boolean;
 }
 
 interface HelplineStats {
@@ -309,6 +310,13 @@ function BotBubble({
         }}>
           <span style={{ display: "block", whiteSpace: "pre-wrap", color: "white", opacity: 0.95 }}>
             {msg.content}
+            {msg.streaming && (
+              <span style={{
+                display: "inline-block", width: "6px", height: "14px",
+                background: "#38bdf8", marginLeft: "4px", verticalAlign: "middle",
+                borderRadius: "1px", animation: "dotPulse 0.6s ease-in-out infinite alternate",
+              }} />
+            )}
           </span>
         </div>
       </div>
@@ -1172,6 +1180,7 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
   const [messages, setMessages] = useState<BotMessage[]>([
     { role: "assistant", content: lang.greeting, ts: Date.now() },
   ]);
+
   const [input, setInput] = useState("");
   const [orbState, setOrbState] = useState<OrbState>("idle");
   const [isTyping, setIsTyping] = useState(false);
@@ -1206,15 +1215,63 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
   const currentAudioRef   = useRef<HTMLAudioElement | null>(null);
   const voiceModeRef      = useRef(false);   // mirror of voiceMode for callbacks
   const loopActiveRef     = useRef(false);   // prevent overlapping loops
+  const ttsEnabledRef     = useRef(true);    // instant mute tracking
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const streamingIndexRef = useRef<number>(-1);
 
-  // Keep ref in sync
+  // Keep refs in sync
   useEffect(() => { voiceModeRef.current = voiceMode; }, [voiceMode]);
+  useEffect(() => { ttsEnabledRef.current = ttsEnabled; }, [ttsEnabled]);
 
   // Auto-scroll
   useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, isTyping]);
 
+  // ── Ultra-Low Latency Pipelined TTS System ──────────────────────────────────
+  interface TTSJob {
+    text: string;
+    lang: string;
+    fetchPromise: Promise<string | null>;
+  }
+
+  const ttsJobsRef = useRef<TTSJob[]>([]);
+  const currentJobIdxRef = useRef<number>(0);
+  const isPlayingAudioRef = useRef<boolean>(false);
+  const isStreamActiveRef = useRef<boolean>(false);
+  const ttsAbortRef = useRef<boolean>(false);
+
+  const cleanTextForTTS = (text: string): string => {
+    return text
+      .replace(/\[\s*STATUS\s*:[^\]]*\]/gi, "")
+      .replace(/\bSTATUS\s*:\s*(?:resolved|unresolved)\b/gi, "")
+      .replace(/\[\s*(?:resolved|unresolved)\s*\]/gi, "")
+      .replace(/\[\s*\]/g, "")
+      .replace(/https?:\/\/[^\s)]+/gi, "")
+      .replace(/www\.[^\s)]+/gi, "")
+      .replace(/\b[\w.-]+?\.(?:gov\.in|nic\.in|gov|in|org|com|net|edu)\b[^\s)]*/gi, "")
+      .replace(/\*+/g, "")
+      .replace(/#+\s*/g, "")
+      .replace(/\([^)]*\)/g, "")
+      .replace(/\s{2,}/g, " ")
+      .trim();
+  };
+
+  const stopAllAudio = useCallback(() => {
+    ttsAbortRef.current = true;
+    isStreamActiveRef.current = false;
+    if (currentAudioRef.current) {
+      currentAudioRef.current.pause();
+      currentAudioRef.current = null;
+    }
+    window.speechSynthesis?.cancel();
+    ttsJobsRef.current = [];
+    currentJobIdxRef.current = 0;
+    isPlayingAudioRef.current = false;
+    setOrbState("idle");
+  }, []);
+
   // Update greeting when language changes
   const switchLanguage = (idx: number) => {
+    stopAllAudio();
     setLangIdx(idx);
     setShowLangMenu(false);
     const newLang = LANGUAGES[idx];
@@ -1225,57 +1282,124 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
     setEscalationOffered(false);
   };
 
-  //  TTS: play bot reply via edge-tts backend 
-  const speakText = useCallback(async (text: string, langCode: string): Promise<void> => {
-    // Cancel any currently playing audio
-    if (currentAudioRef.current) {
-      currentAudioRef.current.pause();
-      currentAudioRef.current = null;
-    }
-    setOrbState("speaking");
-    try {
-      const res = await fetch(`${API_BASE}/voice/tts`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text, language: langCode }),
-      });
+  const pumpTTSPlayback = useCallback(async () => {
+    if (isPlayingAudioRef.current || !ttsEnabledRef.current || ttsAbortRef.current) return;
 
-      // If edge-tts not installed, backend returns JSON with fallback:true
-      const contentType = res.headers.get("content-type") || "";
-      if (contentType.includes("application/json")) {
-        // Browser speechSynthesis fallback
-        const data = await res.json();
-        if (data.fallback && "speechSynthesis" in window) {
-          await new Promise<void>((resolve) => {
-            const utt = new SpeechSynthesisUtterance(data.text);
-            utt.lang = langCode + "-IN";
-            utt.rate = 1.0;
-            const voices = window.speechSynthesis.getVoices();
-            const match = voices.find(v => v.lang.startsWith(langCode));
-            if (match) utt.voice = match;
-            utt.onend = () => resolve();
-            utt.onerror = () => resolve();
-            window.speechSynthesis.speak(utt);
-          });
+    if (currentJobIdxRef.current >= ttsJobsRef.current.length) {
+      // No more jobs currently queued
+      if (!isStreamActiveRef.current) {
+        // Stream is fully done and all queued audio finished
+        setOrbState("idle");
+        if (voiceModeRef.current && !loopActiveRef.current) {
+          setTimeout(() => {
+            if (voiceModeRef.current) startListeningLoop();
+          }, 500);
         }
-      } else {
-        // Real audio from edge-tts
-        const blob = await res.blob();
-        const url  = URL.createObjectURL(blob);
-        await new Promise<void>((resolve) => {
-          const audio = new Audio(url);
-          currentAudioRef.current = audio;
-          audio.onended = () => { URL.revokeObjectURL(url); resolve(); };
-          audio.onerror = () => { URL.revokeObjectURL(url); resolve(); };
-          audio.play().catch(() => resolve());
-        });
-        currentAudioRef.current = null;
       }
-    } catch {
-      // Silently continue if TTS fails
+      return;
     }
-    setOrbState("idle");
+
+    const job = ttsJobsRef.current[currentJobIdxRef.current];
+    currentJobIdxRef.current += 1;
+    isPlayingAudioRef.current = true;
+    setOrbState("speaking");
+
+    // Await the pre-fetched audio (which was already downloading concurrently in the background!)
+    const audioUrl = await job.fetchPromise;
+
+    if (ttsAbortRef.current || !ttsEnabledRef.current) {
+      if (audioUrl) URL.revokeObjectURL(audioUrl);
+      isPlayingAudioRef.current = false;
+      return;
+    }
+
+    if (audioUrl) {
+      await new Promise<void>((resolve) => {
+        const audio = new Audio(audioUrl);
+        currentAudioRef.current = audio;
+        audio.onended = () => {
+          URL.revokeObjectURL(audioUrl);
+          currentAudioRef.current = null;
+          resolve();
+        };
+        audio.onerror = () => {
+          URL.revokeObjectURL(audioUrl);
+          currentAudioRef.current = null;
+          resolve();
+        };
+        audio.play().catch(() => resolve());
+      });
+    } else {
+      // Browser SpeechSynthesis fallback
+      if (window.speechSynthesis) {
+        await new Promise<void>((resolve) => {
+          const utt = new SpeechSynthesisUtterance(job.text);
+          utt.lang = job.lang === "en" ? "en-IN" : `${job.lang}-IN`;
+          utt.onend = () => resolve();
+          utt.onerror = () => resolve();
+          window.speechSynthesis.speak(utt);
+        });
+      }
+    }
+
+    isPlayingAudioRef.current = false;
+    pumpTTSPlayback();
   }, []);
+
+  const queueSentenceForTTS = useCallback((rawText: string, langCode: string) => {
+    if (!ttsEnabledRef.current || ttsAbortRef.current) return;
+    const clean = cleanTextForTTS(rawText);
+    if (!clean || !/\w|[\u0900-\u0D7F]/.test(clean)) return;
+
+    // If chunk is >450 chars, split it
+    const subChunks: string[] = [];
+    if (clean.length > 450) {
+      const parts = clean.split(/(?<=[,;])\s+/);
+      let cur = "";
+      for (const p of parts) {
+        if ((cur + " " + p).trim().length <= 450) {
+          cur = (cur + " " + p).trim();
+        } else {
+          if (cur) subChunks.push(cur);
+          cur = p.slice(0, 450);
+        }
+      }
+      if (cur) subChunks.push(cur);
+    } else {
+      subChunks.push(clean);
+    }
+
+    for (const chunk of subChunks) {
+      // Launch background fetch immediately — zero waiting!
+      const fetchPromise = (async () => {
+        try {
+          const resp = await fetch(`${API_BASE}/voice/tts`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text: chunk, language: langCode }),
+          });
+          if (ttsAbortRef.current) return null;
+          const contentType = resp.headers.get("content-type") || "";
+          if (resp.ok && contentType.includes("audio")) {
+            const blob = await resp.blob();
+            return URL.createObjectURL(blob);
+          }
+          return null;
+        } catch {
+          return null;
+        }
+      })();
+
+      ttsJobsRef.current.push({
+        text: chunk,
+        lang: langCode,
+        fetchPromise,
+      });
+    }
+
+    // Trigger playback pump
+    pumpTTSPlayback();
+  }, [pumpTTSPlayback]);
 
   //  STT: send recorded blob to backend 
   const transcribeAudio = useCallback(
@@ -1302,86 +1426,148 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
     []
   );
 
-  //  Core: send message and handle AI response 
-  // activeLang: the language to use for AI + TTS (auto-detected from speech, else dropdown)
+  //  Core: real-time streaming send message with pipelined fast-start TTS 
   const sendMessage = useCallback(async (text: string, isVoice = false, activeLang?: string) => {
     const trimmed = text.trim();
     if (!trimmed || orbState === "thinking") return;
 
-    // Use the auto-detected language if provided, otherwise fall back to dropdown
-    const effectiveLang = activeLang || lang.code;
+    if (abortControllerRef.current) abortControllerRef.current.abort();
+    abortControllerRef.current = new AbortController();
 
+    // Clear previous speech / audio
+    stopAllAudio();
+
+    // Use auto-detected language if provided, otherwise dropdown
+    const effectiveLang = activeLang || lang.code;
     const userMsg: BotMessage = { role: "user", content: trimmed, ts: Date.now(), isVoice };
-    setMessages(prev => [...prev, userMsg]);
+
     setInput("");
-    setOrbState("listening");
-    setTimeout(() => setOrbState("thinking"), 600);
+    setOrbState("thinking");
     setIsTyping(true);
 
+    const history = messages
+      .filter(m => !m.streaming)
+      .map(m => ({ role: m.role === "assistant" ? "assistant" : "user", content: m.content }));
+
+    // Append user message + empty streaming assistant message
+    const botPlaceholder: BotMessage = { role: "assistant", content: "", ts: Date.now(), streaming: true };
+    setMessages(prev => {
+      const next = [...prev, userMsg, botPlaceholder];
+      streamingIndexRef.current = next.length - 1;
+      return next;
+    });
+
+    // Mark stream as active for the TTS playback pump
+    isStreamActiveRef.current = true;
+    ttsJobsRef.current = [];
+    currentJobIdxRef.current = 0;
+    ttsAbortRef.current = false;
+
     try {
-      const history = messages.map(m => ({ role: m.role, content: m.content }));
-      const res = await fetch(`${API_BASE}/ai/chat`, {
+      const res = await fetch(`${API_BASE}/ai/chat/stream`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           module: "helpline",
           message: trimmed,
-          language: effectiveLang,          // use detected lang, not just dropdown
-          detected_language: effectiveLang, // extra hint for backend prompt
-          user_name: user?.name || "",      // personalised greeting
+          language: effectiveLang,
+          detected_language: effectiveLang,
+          user_name: user?.name || "",
           user_id: user?.id || "",
           history,
         }),
+        signal: abortControllerRef.current.signal,
       });
-      const data = await res.json();
-      const reply   = data.reply || "I'm sorry, I couldn't process that. Please try again.";
-      const resolved: boolean = data.resolved !== false; // default true if missing
+
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const reader = res.body?.getReader();
+      if (!reader) throw new Error("No readable stream");
+
+      const decoder = new TextDecoder();
+      let accumulated = "";
+      let sentenceBuffer = "";
 
       setIsTyping(false);
-      const suggested: string[] = Array.isArray(data.suggested_replies) ? data.suggested_replies : [];
-      setMessages(prev => [...prev, { role: "assistant", content: reply, ts: Date.now(), resolved, suggestedReplies: suggested }]);
 
-      //  Escalation tracking 
-      if (!resolved) {
-        setUnresolvedTurns(prev => {
-          const next = prev + 1;
-          if (next >= 5 && !autoEscalated) {
-            // Auto-create ticket after 5 unresolved turns
-            autoCreateTicket(trimmed, reply);
-          } else if (next >= 3 && !escalationOffered) {
-            setEscalationOffered(true);
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const textChunk = decoder.decode(value, { stream: true });
+        const lines = textChunk.split("\n");
+
+        for (const line of lines) {
+          if (!line.startsWith("data: ")) continue;
+          const dataStr = line.slice(6).trim();
+          if (!dataStr || dataStr === "[DONE]") continue;
+
+          try {
+            const parsed = JSON.parse(dataStr);
+            const token = parsed.token || "";
+
+            if (token) {
+              accumulated += token;
+              sentenceBuffer += token;
+
+              // Stream token directly into bubble in real time
+              setMessages(prev => {
+                const idx = streamingIndexRef.current;
+                if (idx < 0 || idx >= prev.length) return prev;
+                const updated = [...prev];
+                updated[idx] = { ...updated[idx], content: accumulated, streaming: true };
+                return updated;
+              });
+
+              // Fast-start: As soon as a complete sentence (.!?) is formed during streaming,
+              // queue it IMMEDIATELY so TTS starts in the background while the rest streams!
+              const match = sentenceBuffer.match(/^([\s\S]*?[.!?\n]+)\s*([\s\S]*)$/);
+              if (match) {
+                const completeSentence = match[1];
+                sentenceBuffer = match[2];
+                queueSentenceForTTS(completeSentence, effectiveLang);
+              }
+            }
+          } catch {
+            // ignore non-json line
           }
-          return next;
-        });
-      } else {
-        setUnresolvedTurns(0);
-        setEscalationOffered(false);
+        }
       }
 
-      //  TTS playback 
-      if (ttsEnabled) {
-        await speakText(reply, effectiveLang);   // speak in same language user spoke
-        // Echo-guard: 700ms gap after TTS ends so mic doesn't pick up speakers
-        await new Promise(r => setTimeout(r, 700));
-      }
-      // Restart listening loop if voice mode still on
-      if (voiceModeRef.current && !loopActiveRef.current) {
-        startListeningLoop();
-      } else if (!ttsEnabled) {
-        setTimeout(() => setOrbState("idle"), 2000);
+      // Stream finished — mark stream inactive
+      isStreamActiveRef.current = false;
+
+      // Queue any remaining text in sentenceBuffer
+      if (sentenceBuffer.trim()) {
+        queueSentenceForTTS(sentenceBuffer.trim(), effectiveLang);
       }
 
-    } catch {
+      // Finalize message in state
+      setMessages(prev => {
+        const idx = streamingIndexRef.current;
+        if (idx < 0 || idx >= prev.length) return prev;
+        const updated = [...prev];
+        updated[idx] = { ...updated[idx], content: accumulated, streaming: false };
+        return updated;
+      });
+
+      // Pump playback in case all chunks arrived before pump executed
+      pumpTTSPlayback();
+
+    } catch (err: any) {
+      isStreamActiveRef.current = false;
+      if (err?.name === "AbortError") return;
       setIsTyping(false);
       setOrbState("idle");
-      setMessages(prev => [...prev, {
-        role: "assistant",
-        content: "Connection error. Please check the backend service and try again.",
-        ts: Date.now(),
-      }]);
+      setMessages(prev => [
+        ...prev.filter(m => !m.streaming),
+        {
+          role: "assistant",
+          content: "Connection error. Please check the backend service and try again.",
+          ts: Date.now(),
+        },
+      ]);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messages, lang, orbState, speakText, escalationOffered, autoEscalated, ttsEnabled]);
+  }, [messages, lang, orbState, user, stopAllAudio, queueSentenceForTTS, pumpTTSPlayback]);
 
   //  Auto-create ticket from conversation 
   const autoCreateTicket = useCallback(async (lastQuery: string, lastReply: string) => {
@@ -1590,6 +1776,7 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
   };
 
   const clearChat = () => {
+    stopAllAudio();
     if (voiceMode) toggleVoiceMode();
     setMessages([{ role: "assistant", content: lang.greeting, ts: Date.now() }]);
     setOrbState("idle");
@@ -1727,8 +1914,22 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
 
             {/* Volume / mute button */}
             <button
-              onClick={() => setTtsEnabled(v => !v)}
-              title={ttsEnabled ? "Mute voice" : "Enable voice"}
+              onClick={() => {
+                setTtsEnabled(prev => {
+                  const next = !prev;
+                  ttsEnabledRef.current = next;
+                  if (!next) {
+                    if (currentAudioRef.current) {
+                      currentAudioRef.current.pause();
+                      currentAudioRef.current = null;
+                    }
+                    window.speechSynthesis?.cancel();
+                    setOrbState("idle");
+                  }
+                  return next;
+                });
+              }}
+              title={ttsEnabled ? "Turn Voice OFF" : "Turn Voice ON"}
               style={{
                 width: "30px", height: "30px", borderRadius: "8px",
                 background: ttsEnabled ? "rgba(56,189,248,0.12)" : "rgba(255,255,255,0.04)",
@@ -1760,7 +1961,7 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
             padding: "8px 18px", background: "rgba(34,211,238,0.06)",
             borderBottom: "1px solid rgba(34,211,238,0.15)",
             display: "flex", alignItems: "center", justifyContent: "space-between",
-            flexShrink: 0, position: "relative", zIndex: 2,
+            flexShrink: 0, position: "relative", zIndex: 5,
           }}>
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
               <div style={{
@@ -1790,85 +1991,81 @@ function AIBotPanel({ onTicketCreated }: { onTicketCreated: (t: Ticket) => void 
           </div>
         )}
 
-        {/* Orb + state label */}
+        {/* Ambient AI Orb Background (behind the chat messages) */}
         <div style={{
-          display: "flex", flexDirection: "column", alignItems: "center", paddingTop: "16px", paddingBottom: "8px",
-          flexShrink: 0, position: "relative", zIndex: 2,
+          position: "absolute",
+          top: "40%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          pointerEvents: "none",
+          zIndex: 1,
+          opacity: messages.length <= 2 ? 0.8 : 0.28,
+          transition: "opacity 0.5s ease",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
         }}>
-          {/* Clickable orb  tap to start recording in voice mode */}
-          <div
-            onClick={() => {
-              if (voiceMode && !isRecording && orbState === "idle") startListeningLoop();
-              else if (!voiceMode) toggleVoiceMode();
-            }}
-            style={{ cursor: "pointer", position: "relative" }}
-            title={voiceMode ? "Tap to speak" : "Start voice conversation"}
-          >
-            <AIOrb state={orbState} />
-            {/* Tap hint ring */}
-            {!voiceMode && (
-              <div style={{
-                position: "absolute", inset: "-8px", borderRadius: "50%",
-                border: "1.5px dashed rgba(56,189,248,0.25)",
-                animation: "orbIdle 3s ease-in-out infinite",
-                pointerEvents: "none",
-              }} />
-            )}
-          </div>
+          <AIOrb state={orbState} />
+          {/* Subtle surrounding glow */}
           <div style={{
-            marginTop: "8px", display: "flex", alignItems: "center", gap: "6px",
-            padding: "4px 12px", borderRadius: "20px",
-            background: "rgba(56,189,248,0.06)", border: "1px solid rgba(56,189,248,0.12)",
-          }}>
-            <div style={{
-              width: "6px", height: "6px", borderRadius: "50%",
-              background: orbState === "idle" ? "#64748b" : orbState === "listening" ? "#22d3ee" : orbState === "thinking" ? "#a78bfa" : "#34d399",
-              animation: orbState !== "idle" ? "dotPulse 0.8s ease-in-out infinite alternate" : "none",
-            }} />
-            <span style={{ fontSize: "14px", color: "rgba(56,189,248,0.8)", fontWeight: 600 }}>
-              {stateLabel[orbState]}
-            </span>
-          </div>
-          {!voiceMode && (
-            <button
-              onClick={toggleVoiceMode}
-              style={{
-                marginTop: "8px", padding: "6px 16px", borderRadius: "20px",
-                background: "linear-gradient(135deg, rgba(34,211,238,0.15), rgba(56,189,248,0.1))",
-                border: "1px solid rgba(34,211,238,0.3)", color: "#22d3ee",
-                fontSize: "14px", fontWeight: 700, cursor: "pointer",
-                display: "flex", alignItems: "center", gap: "5px",
-                boxShadow: "0 0 16px rgba(34,211,238,0.1)", transition: "all 0.2s",
-              }}
-              onMouseEnter={e => (e.currentTarget.style.background = "rgba(34,211,238,0.22)")}
-              onMouseLeave={e => (e.currentTarget.style.background = "linear-gradient(135deg, rgba(34,211,238,0.15), rgba(56,189,248,0.1))")}
-            >
-              <Mic style={{ width: 12, height: 12 }} />
-              Start Voice Chat
-            </button>
-          )}
+            position: "absolute",
+            width: "360px",
+            height: "360px",
+            borderRadius: "50%",
+            background: orbState === "speaking"
+              ? "radial-gradient(circle, rgba(52,211,153,0.18) 0%, transparent 70%)"
+              : orbState === "thinking"
+              ? "radial-gradient(circle, rgba(168,85,247,0.18) 0%, transparent 70%)"
+              : orbState === "listening"
+              ? "radial-gradient(circle, rgba(34,211,238,0.2) 0%, transparent 70%)"
+              : "radial-gradient(circle, rgba(56,189,248,0.14) 0%, transparent 70%)",
+            filter: "blur(25px)",
+            pointerEvents: "none",
+          }} />
         </div>
 
-        {/* Quick prompt chips */}
+        {/* Quick prompt chips & Voice Start */}
         {messages.length === 1 && (
           <div style={{
-            padding: "0 14px 8px", display: "flex", flexWrap: "wrap", gap: "6px",
-            justifyContent: "center", flexShrink: 0, position: "relative", zIndex: 2,
+            padding: "8px 14px 12px", display: "flex", flexDirection: "column", alignItems: "center", gap: "10px",
+            flexShrink: 0, position: "relative", zIndex: 3,
           }}>
-            {lang.quickPrompts.map((p, i) => (
-              <button key={i} onClick={() => sendMessage(p)}
+            {!voiceMode && (
+              <button
+                onClick={toggleVoiceMode}
                 style={{
-                  fontSize: "14px", fontWeight: 600, padding: "5px 12px", borderRadius: "20px",
-                  background: "rgba(56,189,248,0.07)", border: "1px solid rgba(56,189,248,0.18)",
-                  color: "#38bdf8", cursor: "pointer", transition: "all 0.15s",
-                  animation: `bubbleIn 0.4s ease ${i * 0.08}s both`,
+                  padding: "8px 20px", borderRadius: "24px",
+                  background: "linear-gradient(135deg, rgba(34,211,238,0.18), rgba(56,189,248,0.12))",
+                  border: "1px solid rgba(34,211,238,0.35)", color: "#22d3ee",
+                  fontSize: "14px", fontWeight: 700, cursor: "pointer",
+                  display: "flex", alignItems: "center", gap: "6px",
+                  boxShadow: "0 0 20px rgba(34,211,238,0.15)", transition: "all 0.2s",
                 }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "rgba(56,189,248,0.15)"; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "rgba(56,189,248,0.07)"; }}
+                onMouseEnter={e => (e.currentTarget.style.background = "rgba(34,211,238,0.25)")}
+                onMouseLeave={e => (e.currentTarget.style.background = "linear-gradient(135deg, rgba(34,211,238,0.18), rgba(56,189,248,0.12))")}
               >
-                {p}
+                <Mic style={{ width: 14, height: 14 }} />
+                Start Voice Chat
               </button>
-            ))}
+            )}
+
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", justifyContent: "center" }}>
+              {lang.quickPrompts.map((p, i) => (
+                <button key={i} onClick={() => sendMessage(p)}
+                  style={{
+                    fontSize: "13px", fontWeight: 600, padding: "5px 12px", borderRadius: "20px",
+                    background: "rgba(56,189,248,0.07)", border: "1px solid rgba(56,189,248,0.18)",
+                    color: "#38bdf8", cursor: "pointer", transition: "all 0.15s",
+                    animation: `bubbleIn 0.4s ease ${i * 0.08}s both`,
+                  }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "rgba(56,189,248,0.15)"; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "rgba(56,189,248,0.07)"; }}
+                >
+                  {p}
+                </button>
+              ))}
+            </div>
           </div>
         )}
 

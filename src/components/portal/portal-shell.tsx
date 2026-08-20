@@ -80,6 +80,10 @@ export function PortalShell({ children }: { children: ReactNode }) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  const routerState = useRouterState();
+  const pathname = routerState.location.pathname;
+  const isFullHeightPage = pathname.startsWith("/portal/voice");
+
   const roleLabel =
     user?.role === "admin" ? "Administrator"
       : user?.role === "officer" ? "Government Officer" : "Citizen";
@@ -96,7 +100,7 @@ export function PortalShell({ children }: { children: ReactNode }) {
       </div>
 
       {/* Top App Bar (Mockup Style) */}
-      <header className="flex h-16 shrink-0 items-center justify-between border-b border-white/60 dark:border-white/10 bg-white/40 dark:bg-black/20 backdrop-blur-3xl px-6 z-30 sticky top-0 shadow-sm shadow-slate-200/20">
+      <header className="flex h-16 shrink-0 items-center justify-between border-b border-white/60 dark:border-white/10 bg-white/40 dark:bg-black/20 backdrop-blur-3xl px-6 z-30 shadow-sm shadow-slate-200/20">
         
         {/* Left: App Grid & Logo */}
         <div className="flex items-center gap-4">
@@ -228,7 +232,12 @@ export function PortalShell({ children }: { children: ReactNode }) {
       )}
 
       {/* Main Content Area - Full Width */}
-      <main className="flex-1 overflow-y-auto relative w-full flex flex-col z-10">
+      <main
+        className={cn(
+          "flex-1 min-h-0 w-full flex flex-col relative",
+          isFullHeightPage ? "overflow-hidden" : "overflow-y-auto"
+        )}
+      >
         {children}
       </main>
     </div>
