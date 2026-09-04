@@ -120,17 +120,33 @@ const html = `<!DOCTYPE html>
 ${cssLinks}
     <script>
       // Hydration shim for TanStack Router/Start in client SPA mode
-      window.$_TSR = window.$_TSR || {
-        h: function() {},
-        buffer: [],
-        initialized: true,
-        router: {
-          matches: [],
-          manifest: {},
-          dehydratedData: {},
-          lastMatchId: ""
-        }
-      };
+      (function() {
+        var emptyRoute = { preloads: [], scripts: [], css: [] };
+        var routesProxy = typeof Proxy !== "undefined"
+          ? new Proxy({ __root__: emptyRoute }, {
+              get: function(target, prop) {
+                return target[prop] || emptyRoute;
+              }
+            })
+          : { __root__: emptyRoute };
+
+        window.$_TSR = window.$_TSR || {
+          h: function() { this.hydrated = true; },
+          e: function() { this.streamEnded = true; },
+          c: function() {},
+          p: function(s) { typeof s === "function" && s(); },
+          buffer: [],
+          initialized: true,
+          router: {
+            matches: [],
+            manifest: {
+              routes: routesProxy
+            },
+            dehydratedData: {},
+            lastMatchId: ""
+          }
+        };
+      })();
     </script>
   </head>
   <body>
