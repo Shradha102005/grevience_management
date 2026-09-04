@@ -11,6 +11,7 @@ import {
   writeFileSync,
   cpSync,
   existsSync,
+  readdirSync,
 } from "fs";
 
 // ── Step 1: Run the normal build ─────────────────────────────────────────────
