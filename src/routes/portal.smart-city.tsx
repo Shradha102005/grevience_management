@@ -21,7 +21,7 @@ export const Route = createFileRoute("/portal/smart-city")({
   component: SmartCity,
 });
 
-const API_BASE = "http://localhost:8000";
+const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
 
 //  Types 
 interface WeatherDay { date: string; day: string; weather: string; description: string; high: number; low: number; humidity: number; wind_speed: number; rain_chance: number; icon: string; }

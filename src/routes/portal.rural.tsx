@@ -14,7 +14,7 @@ export const Route = createFileRoute("/portal/rural")({
   component: Rural,
 });
 
-const API_BASE = "http://localhost:8000";
+const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
 
 const SPEECH_LANG: Record<string, string> = {
   en: "en-IN", hi: "hi-IN", te: "te-IN", ta: "ta-IN",
